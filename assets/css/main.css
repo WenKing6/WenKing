@@ -1,0 +1,269 @@
+/**
+ * Atlas Menu 主样式文件
+ * 包含全局样式、组件样式和响应式设计
+ */
+
+/* ===== 全局样式 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #0a0a0f;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ===== 排版样式 ===== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ===== 渐变文本 ===== */
+.gradient-text {
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== 玻璃态效果 ===== */
+.glass-card {
+    background: rgba(18, 18, 26, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* ===== 按钮样式 ===== */
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* ===== 卡片样式 ===== */
+.product-card {
+    background: #0a0a0f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card .card-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transition: filter 0.5s ease;
+}
+
+.product-card .card-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 15, 0.75);
+    transition: background 0.5s ease;
+}
+
+.product-card:hover .card-bg::after {
+    background: rgba(10, 10, 15, 0.55);
+}
+
+.product-card > *:not(.card-bg) {
+    position: relative;
+    z-index: 1;
+}
+
+.product-card:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.product-card:hover .card-bg {
+    filter: blur(8px);
+}
+
+.pricing-card {
+    background: #12121a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.pricing-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.pricing-card.featured {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border: 2px solid #8b5cf6;
+    transform: scale(1.05);
+}
+
+/* ===== 状态标签 ===== */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-online {
+    background: #10b981;
+    color: white;
+}
+
+.status-updating {
+    background: #f59e0b;
+    color: white;
+}
+
+.status-dev {
+    background: #6366f1;
+    color: white;
+}
+
+/* ===== FAQ手风琴 ===== */
+.faq-item {
+    background: #0a0a0f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.faq-question {
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.faq-question:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-answer.active {
+    max-height: 500px;
+    padding-bottom: 1rem;
+}
+
+.faq-icon {
+    transition: transform 0.3s ease;
+}
+
+.faq-icon.active {
+    transform: rotate(180deg);
+}
+
+/* ===== 背景光效 ===== */
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: float 6s ease-in-out infinite;
+}
+
+.glow-orb-1 {
+    background: #8b5cf6;
+    width: 400px;
+    height: 400px;
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.glow-orb-2 {
+    background: #3b82f6;
+    width: 400px;
+    height: 400px;
+    bottom: 20%;
+    right: 20%;
+    animation-delay: 2s;
+}
+
+.glow-orb-3 {
+    background: #06b6d4;
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    right: 30%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) scale(1.1);
+    }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+    .pricing-card.featured {
+        transform: scale(1);
+    }
+
+    .glow-orb {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+/* ===== 滚动条样式 ===== */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a0a0f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1a1a24;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #8b5cf6;
+}
