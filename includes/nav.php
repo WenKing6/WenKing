@@ -91,7 +91,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             <a href="<?php echo SITE_URL; ?>/about.php" class="block text-white/70 hover:text-accent-purple transition font-medium">
                 About Us
             </a>
-            <a href="<?php echo DISCORD_URL; ?>" target="_blank" class="block px-6 py-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-lg font-semibold text-center">
+            <a href="<?php echo SITE_URL; ?>/app.php" class="block px-6 py-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-lg font-semibold text-center">
                 Dashboard
             </a>
         </div>
