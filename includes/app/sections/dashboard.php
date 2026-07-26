@@ -74,7 +74,7 @@
     <h2 class="text-xl font-display font-bold mb-4 text-white">
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Activated Mods</span>
     </h2>
-    <div class="space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- GTA V -->
         <div class="glass-card p-4 rounded-xl" style="background-color: rgba(255, 255, 255, 0.05);">
             <div class="flex items-center gap-4">
@@ -91,6 +91,7 @@
                 <div class="flex flex-col items-end gap-1">
                     <span class="status-badge status-online text-xs">Active</span>
                     <span class="text-xs text-white/40">v3.2.1</span>
+                    <span class="text-xs text-accent-purple">Expire: Lifetime</span>
                 </div>
             </div>
         </div>
@@ -111,6 +112,7 @@
                 <div class="flex flex-col items-end gap-1">
                     <span class="status-badge status-online text-xs">Active</span>
                     <span class="text-xs text-white/40">v2.1.0</span>
+                    <span class="text-xs text-accent-blue">Expire: 08/10/2026</span>
                 </div>
             </div>
         </div>
@@ -131,6 +133,7 @@
                 <div class="flex flex-col items-end gap-1">
                     <span class="status-badge status-online text-xs">Active</span>
                     <span class="text-xs text-white/40">v1.0.0</span>
+                    <span class="text-xs text-accent-cyan">Expire: 10/25/2026</span>
                 </div>
             </div>
         </div>
