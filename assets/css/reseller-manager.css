@@ -1,0 +1,181 @@
+/**
+ * Reseller & Manager 页面专属样式
+ */
+
+/* Tab 导航样式 */
+.reseller-tab,
+.manager-tab {
+    position: relative;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.reseller-tab.active,
+.manager-tab.active {
+    color: #fff;
+    border-bottom-color: #8b5cf6;
+}
+
+.reseller-tab:hover,
+.manager-tab:hover {
+    color: #fff;
+}
+
+/* Tab 面板显示/隐藏 */
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 表格行悬停效果增强 */
+table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 状态徽章脉冲动画 */
+.status-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.status-badge::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.status-online {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-online::before {
+    background-color: #10b981;
+}
+
+.status-updating {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-updating::before {
+    background-color: #f59e0b;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 代码样式 */
+code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* 按钮悬停效果 */
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* 输入框焦点效果 */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* 复选框样式 */
+.auth-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-checkbox:checked {
+    background-color: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+/* 响应式表格 */
+@media (max-width: 768px) {
+    .overflow-x-auto {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 800px;
+    }
+}
+
+/* 卡片悬停效果 */
+.glass-card {
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+}
+
+/* 渐变文字效果 */
+.bg-gradient-to-r {
+    background-size: 200% auto;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}

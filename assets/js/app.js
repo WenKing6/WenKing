@@ -39,6 +39,8 @@
                 '/settings': 'settings',
                 '/downloads': 'downloads',
                 '/redeem': 'redeem',
+                '/reseller': 'reseller',
+                '/manager': 'manager',
             };
             this.defaultRoute = 'dashboard';
         }
@@ -113,6 +115,64 @@
         _initPageScripts() {
             // 重新初始化滚动动画观察器
             this._initScrollAnimations();
+
+            // 初始化 Tab 切换功能
+            this._initTabs();
+        }
+
+        _initTabs() {
+            // Reseller 页面 Tab 切换
+            var resellerTabs = document.querySelectorAll('.reseller-tab');
+            var resellerPanels = document.querySelectorAll('.tab-panel');
+
+            resellerTabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    var targetTab = this.getAttribute('data-tab');
+
+                    // 更新 tab 激活状态
+                    resellerTabs.forEach(function(t) {
+                        t.classList.remove('active', 'text-white', 'border-accent-purple');
+                        t.classList.add('text-white/70', 'border-transparent');
+                    });
+                    this.classList.add('active', 'text-white', 'border-accent-purple');
+                    this.classList.remove('text-white/70', 'border-transparent');
+
+                    // 更新 panel 显示
+                    resellerPanels.forEach(function(panel) {
+                        panel.classList.remove('active');
+                    });
+                    var targetPanel = document.getElementById(targetTab + '-tab');
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                });
+            });
+
+            // Manager 页面 Tab 切换
+            var managerTabs = document.querySelectorAll('.manager-tab');
+
+            managerTabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    var targetTab = this.getAttribute('data-tab');
+
+                    // 更新 tab 激活状态
+                    managerTabs.forEach(function(t) {
+                        t.classList.remove('active', 'text-white', 'border-accent-purple');
+                        t.classList.add('text-white/70', 'border-transparent');
+                    });
+                    this.classList.add('active', 'text-white', 'border-accent-purple');
+                    this.classList.remove('text-white/70', 'border-transparent');
+
+                    // 更新 panel 显示
+                    resellerPanels.forEach(function(panel) {
+                        panel.classList.remove('active');
+                    });
+                    var targetPanel = document.getElementById(targetTab + '-tab');
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                });
+            });
         }
 
         _initScrollAnimations() {

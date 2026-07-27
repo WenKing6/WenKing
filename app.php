@@ -7,7 +7,7 @@
 require_once __DIR__ . '/config/config.php';
 
 // PHP 端 SSR 路由（避免首屏闪烁）
-$allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem'];
+$allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager'];
 $current_page = $_GET['page'] ?? 'dashboard';
 $current_page = basename($current_page); // 防止目录遍历
 
@@ -21,6 +21,8 @@ $page_titles = [
     'settings'  => SITE_NAME . ' - Settings',
     'downloads' => SITE_NAME . ' - Downloads',
     'redeem'    => SITE_NAME . ' - Redeem Code',
+    'reseller'  => SITE_NAME . ' - Reseller',
+    'manager'   => SITE_NAME . ' - Manager',
 ];
 
 define('PAGE_TITLE', $page_titles[$current_page]);

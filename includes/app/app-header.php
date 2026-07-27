@@ -30,6 +30,7 @@ if (!defined('SITE_NAME')) {
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/main.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/animations.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/app.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/reseller-manager.css">
 
     <!-- Tailwind Config Extension -->
     <script>
