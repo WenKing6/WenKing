@@ -16,6 +16,12 @@ class MobileMenu {
         if (this.menuBtn && this.mobileMenu) {
             this.menuBtn.addEventListener('click', () => this.toggleMenu());
             
+            // 点击遮罩层关闭菜单
+            const overlay = this.mobileMenu.querySelector('.mobile-menu-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', () => this.closeMenu());
+            }
+            
             // 点击菜单项后关闭菜单
             const menuLinks = this.mobileMenu.querySelectorAll('a');
             menuLinks.forEach(link => {
@@ -26,7 +32,12 @@ class MobileMenu {
 
     toggleMenu() {
         this.isOpen = !this.isOpen;
-        this.mobileMenu.classList.toggle('hidden');
+        
+        if (this.isOpen) {
+            this.mobileMenu.classList.add('active');
+        } else {
+            this.mobileMenu.classList.remove('active');
+        }
         
         // 更新按钮图标
         const icon = this.menuBtn.querySelector('svg');
@@ -40,7 +51,7 @@ class MobileMenu {
     closeMenu() {
         if (this.isOpen) {
             this.isOpen = false;
-            this.mobileMenu.classList.add('hidden');
+            this.mobileMenu.classList.remove('active');
             const icon = this.menuBtn.querySelector('svg');
             icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
         }

@@ -77,29 +77,32 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-bg-secondary border-t border-white/10">
-        <div class="px-4 py-4 space-y-3">
-            <a href="<?php echo SITE_URL; ?>/index.php" class="block text-white hover:text-accent-purple transition font-medium">
-                Home
-            </a>
-            <a href="<?php echo SITE_URL; ?>/index.php#features" class="block text-white/70 hover:text-accent-purple transition font-medium">
-                Features
-            </a>
-            <a href="<?php echo SITE_URL; ?>/index.php#pricing" class="block text-white/70 hover:text-accent-purple transition font-medium">
-                Pricing
-            </a>
-            <a href="<?php echo SITE_URL; ?>/index.php#faq" class="block text-white/70 hover:text-accent-purple transition font-medium">
-                FAQ
-            </a>
-            <a href="<?php echo SITE_URL; ?>/about.php" class="block text-white/70 hover:text-accent-purple transition font-medium">
-                About Us
-            </a>
-            <a href="<?php echo SITE_URL; ?>/auth.php" class="block text-white/70 hover:text-accent-purple transition font-medium">
-                Login
-            </a>
-            <a href="<?php echo SITE_URL; ?>/app.php" class="block px-6 py-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-lg font-semibold text-center">
-                Dashboard
-            </a>
+    <div id="mobile-menu" class="mobile-menu md:hidden">
+        <div class="mobile-menu-overlay"></div>
+        <div class="mobile-menu-content bg-bg-secondary border-t border-white/10">
+            <div class="px-4 py-4 space-y-3">
+                <a href="<?php echo SITE_URL; ?>/index.php" class="mobile-menu-item block text-white hover:text-accent-purple transition font-medium">
+                    Home
+                </a>
+                <a href="<?php echo SITE_URL; ?>/index.php#features" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                    Features
+                </a>
+                <a href="<?php echo SITE_URL; ?>/index.php#pricing" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                    Pricing
+                </a>
+                <a href="<?php echo SITE_URL; ?>/index.php#faq" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                    FAQ
+                </a>
+                <a href="<?php echo SITE_URL; ?>/about.php" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                    About Us
+                </a>
+                <a href="<?php echo SITE_URL; ?>/auth.php" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                    Login
+                </a>
+                <a href="<?php echo SITE_URL; ?>/app.php" class="mobile-menu-item btn-neon block text-center">
+                    Dashboard
+                </a>
+            </div>
         </div>
     </div>
 </nav>
