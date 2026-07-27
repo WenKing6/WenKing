@@ -24,8 +24,8 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     <a href="<?php echo SITE_URL; ?>/index.php#features" class="text-white/70 hover:text-accent-purple transition font-medium">
                         Features
                     </a>
-                    <a href="<?php echo SITE_URL; ?>/index.php#pricing" class="text-white/70 hover:text-accent-purple transition font-medium">
-                        Pricing
+                    <a href="<?php echo SITE_URL; ?>/index.php#products" class="text-white/70 hover:text-accent-purple transition font-medium">
+                        Products
                     </a>
                     <a href="<?php echo SITE_URL; ?>/index.php#faq" class="text-white/70 hover:text-accent-purple transition font-medium">
                         FAQ
@@ -80,26 +80,48 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     <div id="mobile-menu" class="mobile-menu md:hidden">
         <div class="mobile-menu-overlay"></div>
         <div class="mobile-menu-content bg-bg-secondary border-t border-white/10">
-            <div class="px-4 py-4 space-y-3">
-                <a href="<?php echo SITE_URL; ?>/index.php" class="mobile-menu-item block text-white hover:text-accent-purple transition font-medium">
+            <div class="px-4 py-6 space-y-2">
+                <a href="<?php echo SITE_URL; ?>/index.php" class="mobile-menu-item block text-center text-white hover:text-accent-purple transition font-medium py-2">
                     Home
                 </a>
-                <a href="<?php echo SITE_URL; ?>/index.php#features" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                <a href="<?php echo SITE_URL; ?>/index.php#features" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
                     Features
                 </a>
-                <a href="<?php echo SITE_URL; ?>/index.php#pricing" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
-                    Pricing
+                <a href="<?php echo SITE_URL; ?>/index.php#products" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
+                    Products
                 </a>
-                <a href="<?php echo SITE_URL; ?>/index.php#faq" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                <a href="<?php echo SITE_URL; ?>/index.php#faq" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
                     FAQ
                 </a>
-                <a href="<?php echo SITE_URL; ?>/about.php" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                <a href="<?php echo SITE_URL; ?>/about.php" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
                     About Us
                 </a>
-                <a href="<?php echo SITE_URL; ?>/auth.php" class="mobile-menu-item block text-white/70 hover:text-accent-purple transition font-medium">
+                <a href="<?php echo SITE_URL; ?>/auth.php" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
                     Login
                 </a>
-                <a href="<?php echo SITE_URL; ?>/app.php" class="mobile-menu-item btn-neon block text-center">
+
+                <!-- Mobile Language Switcher -->
+                <div class="mobile-menu-item mobile-lang-switcher relative">
+                    <button id="mobile-lang-btn" class="mobile-lang-btn flex items-center justify-center gap-2 w-full text-white/70 hover:text-accent-purple transition font-medium py-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>EN</span>
+                        <svg class="mobile-lang-chevron w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="mobile-lang-dropdown" class="mobile-lang-dropdown bg-bg-secondary border border-white/10 rounded-lg shadow-xl overflow-hidden opacity-0 invisible transform scale-95 transition-all duration-200 origin-top">
+                        <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
+                            🇺🇸 English
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
+                            🇨🇳 简体中文
+                        </a>
+                    </div>
+                </div>
+
+                <a href="<?php echo SITE_URL; ?>/app.php" class="mobile-menu-item btn-neon block text-center py-2">
                     Dashboard
                 </a>
             </div>

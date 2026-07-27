@@ -4,7 +4,7 @@
  * 展示3个产品卡片，带状态标签
  */
 ?>
-<section class="py-20 bg-bg-secondary" style="background-color: rgba(18, 18, 26, 0);">
+<section id="products" class="py-20 bg-bg-secondary" style="background-color: rgba(18, 18, 26, 0);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-16 fade-in-up">

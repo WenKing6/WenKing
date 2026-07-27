@@ -159,10 +159,42 @@ class NavbarScroll {
     }
 }
 
+// 移动端语言切换器
+function initMobileLanguageSwitcher() {
+    const langBtn = document.getElementById('mobile-lang-btn');
+    const langDropdown = document.getElementById('mobile-lang-dropdown');
+    const langSwitcher = document.querySelector('.mobile-lang-switcher');
+
+    if (!langBtn || !langDropdown || !langSwitcher) return;
+
+    langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langDropdown.classList.toggle('active');
+        langSwitcher.classList.toggle('active');
+    });
+
+    // 选择语言后关闭下拉
+    langDropdown.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            langDropdown.classList.remove('active');
+            langSwitcher.classList.remove('active');
+        });
+    });
+
+    // 点击外部关闭
+    document.addEventListener('click', (e) => {
+        if (!langSwitcher.contains(e.target)) {
+            langDropdown.classList.remove('active');
+            langSwitcher.classList.remove('active');
+        }
+    });
+}
+
 // 页面加载完成后初始化所有功能
 document.addEventListener('DOMContentLoaded', () => {
     new MobileMenu();
     new FAQAccordion();
     new SmoothScroll();
     new NavbarScroll();
+    initMobileLanguageSwitcher();
 });

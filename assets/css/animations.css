@@ -343,3 +343,30 @@
 .mobile-menu-item:hover {
     transform: translateX(8px);
 }
+
+/* ===== 移动端语言切换器 ===== */
+.mobile-lang-switcher {
+    text-align: center;
+}
+
+.mobile-lang-switcher:hover {
+    transform: translateX(0);
+}
+
+.mobile-lang-dropdown {
+    max-height: 0;
+    margin-top: 0;
+    transform-origin: top center;
+}
+
+.mobile-lang-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    max-height: 200px;
+    margin-top: 0.5rem;
+}
+
+.mobile-lang-switcher.active .mobile-lang-chevron {
+    transform: rotate(180deg);
+}
