@@ -49,12 +49,12 @@
                         </span>
                         <input type="text" 
                                id="customer-search"
-                               class="auth-input w-full pl-10 pr-4 py-2 rounded-lg"
+                               class="app-input w-full pl-10 pr-4 py-2"
                                placeholder="Search by username, email, or license key...">
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <select class="auth-input px-4 py-2 rounded-lg">
+                    <select class="app-select">
                         <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -71,19 +71,20 @@
         </div>
 
         <!-- 客户列表 - 卡片式布局 -->
-        <div class="space-y-4">
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-white">Customer List</h3>
+                <span class="text-sm text-white/40">3 customers</span>
+            </div>
+
+            <div class="space-y-4">
             <!-- 客户卡片 1 -->
-            <div class="glass-card p-6 rounded-xl hover:border-accent-purple/50 transition">
+            <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- 用户信息 -->
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
-                            <span class="text-sm font-semibold text-accent-purple">JD</span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium text-white">JohnDoe</div>
-                            <div class="text-xs text-white/60">john@example.com</div>
-                        </div>
+                    <div>
+                        <div class="text-sm font-medium text-white">JohnDoe</div>
+                        <div class="text-xs text-white/60">john@example.com</div>
                     </div>
                     
                     <!-- 许可证 -->
@@ -132,16 +133,11 @@
             </div>
 
             <!-- 客户卡片 2 -->
-            <div class="glass-card p-6 rounded-xl hover:border-accent-purple/50 transition">
+            <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-accent-blue/20 flex items-center justify-center shrink-0">
-                            <span class="text-sm font-semibold text-accent-blue">AS</span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium text-white">AliceSmith</div>
-                            <div class="text-xs text-white/60">alice@example.com</div>
-                        </div>
+                    <div>
+                        <div class="text-sm font-medium text-white">AliceSmith</div>
+                        <div class="text-xs text-white/60">alice@example.com</div>
                     </div>
                     
                     <div>
@@ -186,16 +182,11 @@
             </div>
 
             <!-- 客户卡片 3 -->
-            <div class="glass-card p-6 rounded-xl hover:border-accent-purple/50 transition">
+            <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center shrink-0">
-                            <span class="text-sm font-semibold text-accent-cyan">BW</span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium text-white">BobWilson</div>
-                            <div class="text-xs text-white/60">bob@example.com</div>
-                        </div>
+                    <div>
+                        <div class="text-sm font-medium text-white">BobWilson</div>
+                        <div class="text-xs text-white/60">bob@example.com</div>
                     </div>
                     
                     <div>
@@ -239,6 +230,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- 分页 -->
         <div class="mt-6 flex items-center justify-between">
@@ -260,7 +252,7 @@
                     <label class="block text-sm font-medium text-white/70 mb-2">Single License Query</label>
                     <div class="flex gap-2">
                         <input type="text" 
-                               class="auth-input flex-1 px-4 py-2 rounded-lg"
+                               class="app-input flex-1 px-4 py-2"
                                placeholder="Enter license key (e.g., WK-2024-XXXX-XXXX)">
                         <button class="btn-primary px-6 py-2 rounded-lg font-semibold whitespace-nowrap">
                             Query
@@ -269,7 +261,7 @@
                 </div>
                 <div class="border-t border-white/10 pt-4">
                     <label class="block text-sm font-medium text-white/70 mb-2">Batch Query (One per line)</label>
-                    <textarea class="auth-input w-full px-4 py-2 rounded-lg h-32 resize-none"
+                    <textarea class="app-input w-full px-4 py-2 h-32 resize-none"
                               placeholder="WK-2024-XXXX-XXXX&#10;WK-2024-YYYY-YYYY&#10;WK-2024-ZZZZ-ZZZZ"></textarea>
                     <div class="flex gap-2 mt-2">
                         <button class="btn-primary px-6 py-2 rounded-lg font-semibold">
@@ -448,7 +440,7 @@
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Website Link</label>
                     <input type="url" 
-                           class="auth-input w-full px-4 py-2 rounded-lg"
+                           class="app-input w-full px-4 py-2"
                            placeholder="https://your-website.com"
                            value="https://example-reseller.com">
                 </div>
@@ -487,21 +479,21 @@
                         <div>
                             <label class="block text-xs text-white/50 mb-1">Discord</label>
                             <input type="text" 
-                                   class="auth-input w-full px-4 py-2 rounded-lg"
+                                   class="app-input w-full px-4 py-2"
                                    placeholder="YourDiscord#1234"
                                    value="ResellerAdmin#0001">
                         </div>
                         <div>
                             <label class="block text-xs text-white/50 mb-1">Telegram</label>
                             <input type="text" 
-                                   class="auth-input w-full px-4 py-2 rounded-lg"
+                                   class="app-input w-full px-4 py-2"
                                    placeholder="@yourtelegram"
                                    value="@reseller_support">
                         </div>
                         <div>
                             <label class="block text-xs text-white/50 mb-1">Email</label>
                             <input type="email" 
-                                   class="auth-input w-full px-4 py-2 rounded-lg"
+                                   class="app-input w-full px-4 py-2"
                                    placeholder="support@example.com"
                                    value="support@reseller.com">
                         </div>
@@ -511,7 +503,7 @@
                 <!-- Description -->
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Description</label>
-                    <textarea class="auth-input w-full px-4 py-2 rounded-lg h-24 resize-none"
+                    <textarea class="app-input w-full px-4 py-2 h-24 resize-none"
                               placeholder="Tell customers about your reseller service...">Authorized WenKing reseller providing premium game mods and 24/7 support.</textarea>
                 </div>
 

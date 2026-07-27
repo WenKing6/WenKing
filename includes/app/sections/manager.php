@@ -80,12 +80,12 @@
                             </svg>
                         </span>
                         <input type="text" 
-                               class="auth-input w-full pl-10 pr-4 py-2 rounded-lg"
+                               class="app-input w-full pl-10 pr-4 py-2"
                                placeholder="Search users...">
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <select class="auth-input px-4 py-2 rounded-lg">
+                    <select class="app-select">
                         <option value="">All Roles</option>
                         <option value="admin">Admin</option>
                         <option value="reseller">Reseller</option>
@@ -313,7 +313,7 @@
             <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Product</label>
-                    <select class="auth-input w-full px-4 py-2 rounded-lg">
+                    <select class="app-select w-full">
                         <option>GTA V Menu</option>
                         <option>RDR2 Mod</option>
                         <option>GTA VI Beta</option>
@@ -321,7 +321,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Duration</label>
-                    <select class="auth-input w-full px-4 py-2 rounded-lg">
+                    <select class="app-select w-full">
                         <option>7 Days</option>
                         <option>30 Days</option>
                         <option>90 Days</option>
@@ -332,7 +332,7 @@
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Quantity</label>
                     <input type="number" 
-                           class="auth-input w-full px-4 py-2 rounded-lg"
+                           class="app-input w-full px-4 py-2"
                            placeholder="Number of licenses"
                            value="10"
                            min="1"
@@ -341,7 +341,7 @@
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Assign To (Optional)</label>
                     <input type="text" 
-                           class="auth-input w-full px-4 py-2 rounded-lg"
+                           class="app-input w-full px-4 py-2"
                            placeholder="Username or leave empty">
                 </div>
                 <div class="md:col-span-2">
@@ -366,12 +366,12 @@
                             </svg>
                         </span>
                         <input type="text" 
-                               class="auth-input w-full pl-10 pr-4 py-2 rounded-lg"
+                               class="app-input w-full pl-10 pr-4 py-2"
                                placeholder="Search licenses...">
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <select class="auth-input px-4 py-2 rounded-lg">
+                    <select class="app-select">
                         <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="expired">Expired</option>

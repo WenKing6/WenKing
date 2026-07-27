@@ -78,6 +78,18 @@
         }
     }
 
+    /** 重置字段状态（清除验证样式） */
+    function resetField(inputId) {
+        const el = document.getElementById(inputId + '-error');
+        const input = document.getElementById(inputId);
+        if (el) {
+            el.classList.add('hidden');
+        }
+        if (input) {
+            input.classList.remove('valid', 'invalid');
+        }
+    }
+
     /** 验证邮箱格式 */
     function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -170,38 +182,50 @@
 
     // ===== 登录表单实时验证 =====
     document.getElementById('login-username').addEventListener('input', function() {
-        if (this.value.trim() !== '') {
+        if (this.value.trim() === '') {
+            resetField('login-username');
+        } else {
             clearError('login-username');
         }
     });
 
     document.getElementById('login-password').addEventListener('input', function() {
-        if (this.value !== '') {
+        if (this.value === '') {
+            resetField('login-password');
+        } else {
             clearError('login-password');
         }
     });
 
     // ===== 注册表单实时验证 =====
     document.getElementById('register-username').addEventListener('input', function() {
-        if (this.value.trim().length >= 3) {
+        if (this.value.trim() === '') {
+            resetField('register-username');
+        } else if (this.value.trim().length >= 3) {
             clearError('register-username');
         }
     });
 
     document.getElementById('register-email').addEventListener('input', function() {
-        if (isValidEmail(this.value.trim())) {
+        if (this.value.trim() === '') {
+            resetField('register-email');
+        } else if (isValidEmail(this.value.trim())) {
             clearError('register-email');
         }
     });
 
     document.getElementById('register-password').addEventListener('input', function() {
-        if (this.value.length >= 6) {
+        if (this.value === '') {
+            resetField('register-password');
+        } else if (this.value.length >= 6) {
             clearError('register-password');
         }
         // 同时检查确认密码
         const confirm = document.getElementById('register-confirm');
-        if (confirm && confirm.value !== '') {
-            if (confirm.value === this.value) {
+        if (confirm) {
+            if (confirm.value === '') {
+                resetField('register-confirm');
+            } else if (confirm.value === this.value) {
                 clearError('register-confirm');
             } else {
                 showError('register-confirm', 'Passwords do not match');
@@ -211,7 +235,9 @@
 
     document.getElementById('register-confirm').addEventListener('input', function() {
         const password = document.getElementById('register-password');
-        if (password && this.value === password.value) {
+        if (this.value === '') {
+            resetField('register-confirm');
+        } else if (password && this.value === password.value) {
             clearError('register-confirm');
         }
     });
@@ -278,5 +304,429 @@
             document.getElementById('login-username').value = username;
         }, 1000);
     });
+
+    // ===== 密码强度检测 =====
+    const passwordInput = document.getElementById('register-password');
+    const confirmInput = document.getElementById('register-confirm');
+    const strengthContainer = document.getElementById('password-strength');
+    const strengthText = document.getElementById('strength-text');
+    const strengthTips = document.getElementById('strength-tips');
+    const matchContainer = document.getElementById('password-match');
+    const matchIcon = document.getElementById('match-icon');
+    const matchText = document.getElementById('match-text');
+    
+    const bars = [
+        document.getElementById('strength-bar-1'),
+        document.getElementById('strength-bar-2'),
+        document.getElementById('strength-bar-3'),
+        document.getElementById('strength-bar-4')
+    ];
+
+    // 密码强度检测函数
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        let tips = [];
+
+        if (!password) {
+            return { strength: 0, tips: [] };
+        }
+
+        // Length check
+        if (password.length >= 8) {
+            strength++;
+        } else {
+            tips.push('At least 8 characters');
+        }
+
+        // Lowercase check
+        if (/[a-z]/.test(password)) {
+            strength++;
+        } else {
+            tips.push('Add lowercase letter');
+        }
+
+        // Uppercase check
+        if (/[A-Z]/.test(password)) {
+            strength++;
+        } else {
+            tips.push('Add uppercase letter');
+        }
+
+        // Number check
+        if (/[0-9]/.test(password)) {
+            strength++;
+        } else {
+            tips.push('Add a number');
+        }
+
+        // Special character check
+        if (/[^a-zA-Z0-9]/.test(password)) {
+            strength++;
+        } else {
+            tips.push('Add special character');
+        }
+
+        // 根据得分调整强度等级
+        let level;
+        if (strength <= 1) {
+            level = 1; // 非常弱
+        } else if (strength === 2) {
+            level = 2; // 弱
+        } else if (strength === 3 || strength === 4) {
+            level = 3; // 中等
+        } else {
+            level = 4; // 强
+        }
+
+        return { strength: level, tips: tips };
+    }
+
+    // 更新强度显示
+    function updateStrengthDisplay(result) {
+        const level = result.strength;
+        const tips = result.tips;
+
+        // 显示/隐藏容器
+        if (passwordInput.value) {
+            strengthContainer.classList.remove('hidden');
+        } else {
+            strengthContainer.classList.add('hidden');
+            return;
+        }
+
+        // 更新进度条
+        bars.forEach(function(bar, index) {
+            // 移除所有等级类
+            bar.classList.remove('active', 'level-1', 'level-2', 'level-3', 'level-4');
+
+            if (index < level) {
+                bar.classList.add('active', 'level-' + level);
+            }
+        });
+
+        // 更新文本
+        const strengthLabels = ['', 'Very Weak', 'Weak', 'Good', 'Strong'];
+        strengthText.textContent = strengthLabels[level] || '';
+        strengthText.className = 'password-strength-text level-' + level;
+
+        // Update tips
+        if (tips.length > 0 && level < 4) {
+            strengthTips.textContent = 'Tip: ' + tips.slice(0, 2).join(', ');
+        } else {
+            strengthTips.textContent = level === 4 ? 'Password is strong!' : '';
+        }
+    }
+
+    // 密码匹配检测函数
+    function checkPasswordMatch() {
+        if (!confirmInput || !matchContainer) return;
+
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        if (!confirm) {
+            matchContainer.classList.add('hidden');
+            return;
+        }
+
+        matchContainer.classList.remove('hidden');
+
+        if (password === confirm) {
+            matchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            matchIcon.className = 'password-match-icon match';
+            matchText.textContent = 'Passwords match';
+            matchText.className = 'password-match-text match';
+        } else {
+            matchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            matchIcon.className = 'password-match-icon no-match';
+            matchText.textContent = 'Passwords do not match';
+            matchText.className = 'password-match-text no-match';
+        }
+    }
+
+    // 监听密码输入（密码强度）
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const result = checkPasswordStrength(password);
+            updateStrengthDisplay(result);
+            checkPasswordMatch();
+        });
+    }
+
+    // 监听确认密码输入（密码匹配）
+    if (confirmInput) {
+        confirmInput.addEventListener('input', function() {
+            checkPasswordMatch();
+        });
+    }
+
+    // ===== 忘记密码表单逻辑 =====
+    const forgotStep1 = document.getElementById('form-forgot-step1');
+    const forgotStep2 = document.getElementById('form-forgot-step2');
+    const step1Indicator = document.getElementById('step-1-indicator');
+    const step2Indicator = document.getElementById('step-2-indicator');
+    const stepConnector = document.getElementById('step-connector');
+    const displayEmail = document.getElementById('display-email');
+    const resendBtn = document.getElementById('resend-code-btn');
+    let verificationEmail = '';
+
+    // 忘记密码表单实时验证
+    const forgotEmailInput = document.getElementById('forgot-email');
+    const forgotCodeInput = document.getElementById('forgot-code');
+    const forgotNewPasswordInput = document.getElementById('forgot-new-password');
+    const forgotConfirmPasswordInput = document.getElementById('forgot-confirm-password');
+
+    if (forgotEmailInput) {
+        forgotEmailInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                resetField('forgot-email');
+            } else if (isValidEmail(this.value.trim())) {
+                clearError('forgot-email');
+            }
+        });
+    }
+
+    if (forgotCodeInput) {
+        forgotCodeInput.addEventListener('input', function() {
+            // 只允许输入数字
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value === '') {
+                resetField('forgot-code');
+            } else if (this.value.length === 6) {
+                clearError('forgot-code');
+            }
+        });
+    }
+
+    // ===== 忘记密码密码强度检测 =====
+    const forgotPasswordInput = document.getElementById('forgot-new-password');
+    const forgotConfirmInput = document.getElementById('forgot-confirm-password');
+    const forgotStrengthContainer = document.getElementById('forgot-password-strength');
+    const forgotStrengthText = document.getElementById('forgot-strength-text');
+    const forgotStrengthTips = document.getElementById('forgot-strength-tips');
+    const forgotMatchContainer = document.getElementById('forgot-password-match');
+    const forgotMatchIcon = document.getElementById('forgot-match-icon');
+    const forgotMatchText = document.getElementById('forgot-match-text');
+
+    const forgotBars = [
+        document.getElementById('forgot-strength-bar-1'),
+        document.getElementById('forgot-strength-bar-2'),
+        document.getElementById('forgot-strength-bar-3'),
+        document.getElementById('forgot-strength-bar-4')
+    ];
+
+    // 更新忘记密码密码强度显示
+    function updateForgotStrengthDisplay(result) {
+        const level = result.strength;
+        const tips = result.tips;
+
+        // 显示/隐藏容器
+        if (forgotPasswordInput.value) {
+            forgotStrengthContainer.classList.remove('hidden');
+        } else {
+            forgotStrengthContainer.classList.add('hidden');
+            return;
+        }
+
+        // 更新进度条
+        forgotBars.forEach(function(bar, index) {
+            // 移除所有等级类
+            bar.classList.remove('active', 'level-1', 'level-2', 'level-3', 'level-4');
+
+            if (index < level) {
+                bar.classList.add('active', 'level-' + level);
+            }
+        });
+
+        // 更新文本
+        const strengthLabels = ['', 'Very Weak', 'Weak', 'Good', 'Strong'];
+        forgotStrengthText.textContent = strengthLabels[level] || '';
+        forgotStrengthText.className = 'password-strength-text level-' + level;
+
+        // Update tips
+        if (tips.length > 0 && level < 4) {
+            forgotStrengthTips.textContent = 'Tip: ' + tips.slice(0, 2).join(', ');
+        } else {
+            forgotStrengthTips.textContent = level === 4 ? 'Password is strong!' : '';
+        }
+    }
+
+    // 忘记密码密码匹配检测
+    function checkForgotPasswordMatch() {
+        if (!forgotConfirmInput || !forgotMatchContainer) return;
+
+        const password = forgotPasswordInput.value;
+        const confirm = forgotConfirmInput.value;
+
+        if (!confirm) {
+            forgotMatchContainer.classList.add('hidden');
+            return;
+        }
+
+        forgotMatchContainer.classList.remove('hidden');
+
+        if (password === confirm) {
+            forgotMatchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            forgotMatchIcon.className = 'password-match-icon match';
+            forgotMatchText.textContent = 'Passwords match';
+            forgotMatchText.className = 'password-match-text match';
+        } else {
+            forgotMatchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            forgotMatchIcon.className = 'password-match-icon no-match';
+            forgotMatchText.textContent = 'Passwords do not match';
+            forgotMatchText.className = 'password-match-text no-match';
+        }
+    }
+
+    if (forgotNewPasswordInput) {
+        forgotNewPasswordInput.addEventListener('input', function() {
+            if (this.value === '') {
+                resetField('forgot-new-password');
+            } else if (this.value.length >= 6) {
+                clearError('forgot-new-password');
+            }
+
+            // 密码强度检测
+            const password = this.value;
+            const result = checkPasswordStrength(password);
+            updateForgotStrengthDisplay(result);
+
+            // 同时检查确认密码
+            if (forgotConfirmPasswordInput) {
+                if (forgotConfirmPasswordInput.value === '') {
+                    resetField('forgot-confirm-password');
+                } else if (forgotConfirmPasswordInput.value === this.value) {
+                    clearError('forgot-confirm-password');
+                } else {
+                    showError('forgot-confirm-password', 'Passwords do not match');
+                }
+            }
+
+            // 更新匹配显示
+            checkForgotPasswordMatch();
+        });
+    }
+
+    if (forgotConfirmPasswordInput) {
+        forgotConfirmPasswordInput.addEventListener('input', function() {
+            if (this.value === '') {
+                resetField('forgot-confirm-password');
+            } else if (forgotNewPasswordInput && this.value === forgotNewPasswordInput.value) {
+                clearError('forgot-confirm-password');
+            }
+
+            // 更新匹配显示
+            checkForgotPasswordMatch();
+        });
+    }
+
+    // 更新步骤指示器
+    function updateStepIndicator(step) {
+        if (step === 1) {
+            step1Indicator.classList.add('active');
+            step1Indicator.classList.remove('completed');
+            step2Indicator.classList.remove('active', 'completed');
+            stepConnector.classList.remove('active');
+        } else if (step === 2) {
+            step1Indicator.classList.remove('active');
+            step1Indicator.classList.add('completed');
+            step2Indicator.classList.add('active');
+            step2Indicator.classList.remove('completed');
+            stepConnector.classList.add('active');
+        }
+    }
+
+    // 步骤1表单提交 - 发送验证码
+    if (forgotStep1) {
+        forgotStep1.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!validateEmail('forgot-email')) return;
+
+            verificationEmail = forgotEmailInput.value.trim();
+
+            // 本地测试：检查邮箱是否存在
+            const testAccounts = {
+                'admin@qq.com': '123456'
+            };
+
+            if (!testAccounts[verificationEmail]) {
+                showError('forgot-email', 'This email is not registered');
+                return;
+            }
+
+            // 模拟发送验证码（实际应调用后端API）
+            showToast('Verification code sent to ' + verificationEmail, 'success');
+
+            // 显示邮箱
+            if (displayEmail) {
+                displayEmail.textContent = verificationEmail;
+            }
+
+            // 切换到步骤2
+            setTimeout(function() {
+                forgotStep1.classList.add('hidden');
+                forgotStep2.classList.remove('hidden');
+                updateStepIndicator(2);
+            }, 500);
+        });
+    }
+
+    // 步骤2表单提交 - 重置密码
+    if (forgotStep2) {
+        forgotStep2.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let valid = true;
+
+            // 验证码验证
+            if (forgotCodeInput.value.trim() === '') {
+                showError('forgot-code', 'Please enter the verification code');
+                valid = false;
+            } else if (forgotCodeInput.value.length !== 6) {
+                showError('forgot-code', 'Code must be 6 digits');
+                valid = false;
+            } else {
+                // 本地测试：检查验证码是否正确
+                const testAccounts = {
+                    'admin@qq.com': '123456'
+                };
+
+                if (testAccounts[verificationEmail] !== forgotCodeInput.value.trim()) {
+                    showError('forgot-code', 'Invalid verification code');
+                    valid = false;
+                }
+            }
+
+            // 新密码验证
+            if (!validatePassword('forgot-new-password')) valid = false;
+
+            // 确认密码验证
+            if (!validateConfirm('forgot-confirm-password', 'forgot-new-password')) valid = false;
+
+            if (!valid) return;
+
+            // 模拟重置密码（实际应调用后端API）
+            showToast('Password reset successfully!', 'success');
+
+            // 重置表单并切换回登录
+            setTimeout(function() {
+                forgotStep1.classList.remove('hidden');
+                forgotStep2.classList.add('hidden');
+                forgotStep1.reset();
+                forgotStep2.reset();
+                updateStepIndicator(1);
+                switchForm('login-form');
+            }, 1500);
+        });
+    }
+
+    // 重发验证码
+    if (resendBtn) {
+        resendBtn.addEventListener('click', function() {
+            showToast('Verification code resent to ' + verificationEmail, 'success');
+        });
+    }
 
 })();

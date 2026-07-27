@@ -24,13 +24,76 @@
 
 /* 侧边栏链接 */
 .sidebar-link {
-    transition: all 0.2s ease;
+    position: relative;
     text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
 }
 
-.sidebar-link.active {
-    border-left: 2px solid #8b5cf6;
-    padding-left: 14px;
+/* 背景渐变填充效果 */
+.sidebar-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.15) 0%, 
+        rgba(6, 182, 212, 0.08) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+/* 悬停状态 */
+.sidebar-link:hover::before {
+    transform: translateX(0);
+}
+
+.sidebar-link:hover svg {
+    transform: scale(1.1) rotate(-5deg);
+    color: #a78bfa;
+    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.4));
+}
+
+.sidebar-link:hover span {
+    color: rgba(255, 255, 255, 0.95);
+    transform: translateX(4px);
+}
+
+/* 点击效果 */
+.sidebar-link:active {
+    transform: scale(0.98);
+}
+
+/* 图标和文字 */
+.sidebar-link svg {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar-link span {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+    font-weight: 500;
+}
+
+/* 激活状态 */
+.sidebar-link.active::before {
+    transform: translateX(0);
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.2) 0%, 
+        rgba(6, 182, 212, 0.1) 100%);
+}
+
+.sidebar-link.active svg {
+    color: #a78bfa;
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.5));
+}
+
+.sidebar-link.active span {
+    color: #ffffff;
+    transform: translateX(4px);
 }
 
 /* 移动端遮罩层 */

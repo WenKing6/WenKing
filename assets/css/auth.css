@@ -48,6 +48,12 @@
     outline: none;
 }
 
+/* 隐藏 Edge 浏览器自带的密码显示按钮 */
+.auth-input::-ms-reveal,
+.auth-input::-ms-clear {
+    display: none;
+}
+
 .auth-input::placeholder {
     color: rgba(255, 255, 255, 0.3);
 }

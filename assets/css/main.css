@@ -50,13 +50,32 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== 按钮样式 ===== */
 .btn-primary {
-    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+    --color: #8b5cf6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color) !important;
+    border-radius: 6px !important;
+    background: var(--color) !important;
+    color: #ffffff !important;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.5;
+    white-space: nowrap;
     transition: all 0.3s ease;
+    z-index: 1;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-    transform: translateY(-2px);
+    background: transparent !important;
+    color: var(--color) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
 .btn-secondary {
