@@ -24,3 +24,7 @@ date_default_timezone_set('UTC');
 // 错误报告（开发环境）
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// 引入国际化支持
+require_once __DIR__ . '/../includes/I18n.php';
+I18n::getInstance();

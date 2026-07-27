@@ -7,8 +7,9 @@ if (!defined('SITE_NAME')) {
     require_once __DIR__ . '/../config/config.php';
 }
 ?>
+<?php $lang = I18n::getInstance()->getLang(); ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +31,13 @@ if (!defined('SITE_NAME')) {
     <!-- Custom Styles -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/main.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/animations.css">
+
+    <!-- i18n Translations for JS -->
+    <script>
+        window.i18n = <?php echo json_encode(I18n::getInstance()->all(), JSON_UNESCAPED_UNICODE); ?>;
+        window.i18nLang = <?php echo json_encode($lang); ?>;
+        window.isLoggedIn = false;
+    </script>
 
     <!-- Tailwind Config Extension -->
     <script>

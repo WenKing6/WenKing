@@ -19,16 +19,16 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             <div class="hidden md:block">
                 <div class="flex items-center space-x-8">
                     <a href="<?php echo SITE_URL; ?>/index.php" class="<?php echo $current_page === 'index' ? 'text-white' : 'text-white/70'; ?> hover:text-accent-purple transition font-medium">
-                        Home
+                        <?php _e('nav.home'); ?>
                     </a>
                     <a href="<?php echo SITE_URL; ?>/index.php#features" class="text-white/70 hover:text-accent-purple transition font-medium">
-                        Features
+                        <?php _e('nav.features'); ?>
                     </a>
                     <a href="<?php echo SITE_URL; ?>/index.php#products" class="text-white/70 hover:text-accent-purple transition font-medium">
-                        Products
+                        <?php _e('nav.products'); ?>
                     </a>
                     <a href="<?php echo SITE_URL; ?>/index.php#faq" class="text-white/70 hover:text-accent-purple transition font-medium">
-                        FAQ
+                        <?php _e('nav.faq'); ?>
                     </a>
                     <!-- 暂时隐藏 About Us 按钮 -->
                     <!-- <a href="<?php echo SITE_URL; ?>/about.php" class="<?php echo $current_page === 'about' ? 'text-white' : 'text-white/70'; ?> hover:text-accent-purple transition font-medium">
@@ -41,26 +41,26 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span>EN</span>
+                            <span><?php echo strtoupper(I18n::getInstance()->getLang()); ?></span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
                         <div class="absolute right-0 mt-2 w-32 bg-bg-secondary border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                            <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm">
-                                🇺🇸 English
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm">
-                                🇨🇳 简体中文
-                            </a>
+                            <button type="button" data-lang-switch="en" class="block w-full text-left px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm">
+                                🇺🇸 <?php _e('nav.english'); ?>
+                            </button>
+                            <button type="button" data-lang-switch="zh" class="block w-full text-left px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm">
+                                🇨🇳 <?php _e('nav.chinese'); ?>
+                            </button>
                         </div>
                     </div>
 
                     <a href="<?php echo SITE_URL; ?>/auth.php" class="text-white/70 hover:text-accent-purple transition font-medium">
-                        Login
+                        <?php _e('nav.login'); ?>
                     </a>
                     <a href="<?php echo SITE_URL; ?>/app.php" class="btn-neon" style="color: rgba(255, 255, 255, 0.7);">
-                        Dashboard
+                        <?php _e('nav.dashboard'); ?>
                     </a>
                 </div>
             </div>
@@ -82,22 +82,22 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
         <div class="mobile-menu-content bg-bg-secondary border-t border-white/10">
             <div class="px-4 py-6 space-y-2">
                 <a href="<?php echo SITE_URL; ?>/index.php" class="mobile-menu-item block text-center text-white hover:text-accent-purple transition font-medium py-2">
-                    Home
+                    <?php _e('nav.home'); ?>
                 </a>
                 <a href="<?php echo SITE_URL; ?>/index.php#features" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
-                    Features
+                    <?php _e('nav.features'); ?>
                 </a>
                 <a href="<?php echo SITE_URL; ?>/index.php#products" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
-                    Products
+                    <?php _e('nav.products'); ?>
                 </a>
                 <a href="<?php echo SITE_URL; ?>/index.php#faq" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
-                    FAQ
+                    <?php _e('nav.faq'); ?>
                 </a>
                 <a href="<?php echo SITE_URL; ?>/about.php" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
-                    About Us
+                    <?php _e('nav.about'); ?>
                 </a>
                 <a href="<?php echo SITE_URL; ?>/auth.php" class="mobile-menu-item block text-center text-white/70 hover:text-accent-purple transition font-medium py-2">
-                    Login
+                    <?php _e('nav.login'); ?>
                 </a>
 
                 <!-- Mobile Language Switcher -->
@@ -106,23 +106,23 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span>EN</span>
+                        <span><?php echo strtoupper(I18n::getInstance()->getLang()); ?></span>
                         <svg class="mobile-lang-chevron w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div id="mobile-lang-dropdown" class="mobile-lang-dropdown bg-bg-secondary border border-white/10 rounded-lg shadow-xl overflow-hidden opacity-0 invisible transform scale-95 transition-all duration-200 origin-top">
-                        <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
-                            🇺🇸 English
-                        </a>
-                        <a href="#" class="block px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
-                            🇨🇳 简体中文
-                        </a>
+                        <button type="button" data-lang-switch="en" class="block w-full px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
+                            🇺🇸 <?php _e('nav.english'); ?>
+                        </button>
+                        <button type="button" data-lang-switch="zh" class="block w-full px-4 py-2 text-white/70 hover:text-accent-purple hover:bg-white/5 transition text-sm text-center">
+                            🇨🇳 <?php _e('nav.chinese'); ?>
+                        </button>
                     </div>
                 </div>
 
                 <a href="<?php echo SITE_URL; ?>/app.php" class="mobile-menu-item btn-neon block text-center py-2">
-                    Dashboard
+                    <?php _e('nav.dashboard'); ?>
                 </a>
             </div>
         </div>

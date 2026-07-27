@@ -174,7 +174,7 @@ function initMobileLanguageSwitcher() {
     });
 
     // 选择语言后关闭下拉
-    langDropdown.querySelectorAll('a').forEach(link => {
+    langDropdown.querySelectorAll('a, button').forEach(link => {
         link.addEventListener('click', () => {
             langDropdown.classList.remove('active');
             langSwitcher.classList.remove('active');
@@ -190,6 +190,36 @@ function initMobileLanguageSwitcher() {
     });
 }
 
+// 语言切换（桌面端 + 移动端）
+function initLanguageSwitch() {
+    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const lang = e.currentTarget.dataset.langSwitch;
+            if (!lang || lang === window.i18nLang) return;
+
+            // 登录用户：同步到数据库
+            if (window.isLoggedIn) {
+                try {
+                    await fetch('/api/user-language.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ language: lang })
+                    });
+                } catch (err) {
+                    console.error('Failed to sync language preference:', err);
+                }
+            }
+
+            // 写入 Cookie
+            const maxAge = 60 * 60 * 24 * 30;
+            document.cookie = `wenking_lang=${lang}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
+            // 刷新页面以应用新语言
+            window.location.reload();
+        });
+    });
+}
+
 // 页面加载完成后初始化所有功能
 document.addEventListener('DOMContentLoaded', () => {
     new MobileMenu();
@@ -197,4 +227,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new SmoothScroll();
     new NavbarScroll();
     initMobileLanguageSwitcher();
+    initLanguageSwitch();
 });
