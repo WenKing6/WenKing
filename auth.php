@@ -27,7 +27,7 @@ require_once __DIR__ . '/includes/header.php';
                 </a>
             </div>
             <a href="<?php echo SITE_URL; ?>/index.php" class="text-white/70 hover:text-accent-purple transition font-medium text-sm">
-                ← Back to Home
+                <?php _e('nav.back_home'); ?>
             </a>
         </div>
     </div>

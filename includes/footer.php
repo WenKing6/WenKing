@@ -13,7 +13,7 @@
                         WenKing
                     </h3>
                     <p class="text-white/60 text-sm mb-4">
-                        The most advanced and secure game mod menu solution with undetected features.
+                        <?php _e('footer.description'); ?>
                     </p>
                     <div class="flex space-x-4">
                         <a href="<?php echo DISCORD_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition">
@@ -31,42 +31,42 @@
 
                 <!-- Products -->
                 <div>
-                    <h4 class="text-white font-semibold mb-4">Products</h4>
+                    <h4 class="text-white font-semibold mb-4"><?php _e('footer.products'); ?></h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="<?php echo SITE_URL; ?>/index.php#features" class="text-white/60 hover:text-accent-purple transition">Features</a></li>
-                        <li><a href="<?php echo SITE_URL; ?>/index.php#pricing" class="text-white/60 hover:text-accent-purple transition">Pricing</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Changelog</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Documentation</a></li>
+                        <li><a href="<?php echo SITE_URL; ?>/index.php#features" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.features'); ?></a></li>
+                        <li><a href="<?php echo SITE_URL; ?>/index.php#pricing" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.pricing'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.changelog'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.documentation'); ?></a></li>
                     </ul>
                 </div>
 
                 <!-- Support -->
                 <div>
-                    <h4 class="text-white font-semibold mb-4">Support</h4>
+                    <h4 class="text-white font-semibold mb-4"><?php _e('footer.support'); ?></h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="<?php echo SITE_URL; ?>/index.php#faq" class="text-white/60 hover:text-accent-purple transition">FAQ</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Tutorials</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Contact Us</a></li>
-                        <li><a href="<?php echo DISCORD_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition">Discord Support</a></li>
+                        <li><a href="<?php echo SITE_URL; ?>/index.php#faq" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.faq'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.tutorials'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.contact'); ?></a></li>
+                        <li><a href="<?php echo DISCORD_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.discord_support'); ?></a></li>
                     </ul>
                 </div>
 
                 <!-- Company -->
                 <div>
-                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <h4 class="text-white font-semibold mb-4"><?php _e('footer.company'); ?></h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="<?php echo SITE_URL; ?>/about.php" class="text-white/60 hover:text-accent-purple transition">About Us</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Privacy Policy</a></li>
-                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition">Terms of Service</a></li>
-                        <li><a href="<?php echo DISCORD_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition">Discord</a></li>
-                        <li><a href="<?php echo TELEGRAM_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition">Telegram</a></li>
+                        <li><a href="<?php echo SITE_URL; ?>/about.php" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.about'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.privacy'); ?></a></li>
+                        <li><a href="#" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.terms'); ?></a></li>
+                        <li><a href="<?php echo DISCORD_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.discord'); ?></a></li>
+                        <li><a href="<?php echo TELEGRAM_URL; ?>" target="_blank" class="text-white/60 hover:text-accent-purple transition"><?php _e('footer.telegram'); ?></a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Copyright -->
             <div class="border-t border-white/10 mt-8 pt-8 text-center text-white/40 text-sm">
-                <p>&copy; <?php echo date('Y'); ?> WenKing. All rights reserved.</p>
+                <p>&copy; <?php echo date('Y'); ?> <?php _e('footer.copyright'); ?></p>
             </div>
         </div>
     </footer>

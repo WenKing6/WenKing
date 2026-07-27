@@ -5,9 +5,9 @@
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Redeem Code</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('redeem.title'); ?></span>
     </h1>
-    <p class="text-white/60">Enter your redemption code to activate your subscription.</p>
+    <p class="text-white/60"><?php _e('redeem.subtitle'); ?></p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
@@ -16,25 +16,25 @@
         <div class="space-y-6">
             <!-- 输入框 -->
             <div>
-                <label class="block text-sm text-white/60 mb-2">Redemption Code</label>
-                <input type="text" placeholder="Enter your code here" class="app-input w-full text-center text-lg tracking-widest uppercase" id="redeem-code-input">
+                <label class="block text-sm text-white/60 mb-2"><?php _e('redeem.code_label'); ?></label>
+                <input type="text" placeholder="<?php _e('redeem.code_ph'); ?>" class="app-input w-full text-center text-lg tracking-widest uppercase" id="redeem-code-input">
             </div>
 
             <!-- 按钮 -->
             <button class="btn-primary w-full py-3 rounded-lg font-semibold text-center" id="redeem-btn">
-                Redeem
+                <?php _e('redeem.redeem_btn'); ?>
             </button>
         </div>
     </div>
 
     <!-- 使用说明 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-sm font-semibold text-white/80 mb-3">How to redeem?</h3>
+        <h3 class="text-sm font-semibold text-white/80 mb-3"><?php _e('redeem.how_to'); ?></h3>
         <ol class="space-y-2 text-sm text-white/50 list-decimal list-inside">
-            <li>Purchase a subscription from our Discord server</li>
-            <li>Copy the redemption code you received</li>
-            <li>Paste the code in the input field above</li>
-            <li>Click "Redeem" to activate your subscription</li>
+            <li><?php _e('redeem.step1'); ?></li>
+            <li><?php _e('redeem.step2'); ?></li>
+            <li><?php _e('redeem.step3'); ?></li>
+            <li><?php _e('redeem.step4'); ?></li>
         </ol>
     </div>
 </div>
@@ -47,8 +47,8 @@
             <!-- 图标将通过 JS 动态设置 -->
         </div>
         <div class="redeem-toast-body">
-            <div class="redeem-toast-title" id="redeem-toast-title">Success</div>
-            <div class="redeem-toast-message" id="redeem-toast-message">Code redeemed successfully!</div>
+            <div class="redeem-toast-title" id="redeem-toast-title"><?php _e('redeem.success'); ?></div>
+            <div class="redeem-toast-message" id="redeem-toast-message"><?php _e('redeem.subtitle'); ?></div>
         </div>
         <button class="redeem-toast-close" id="redeem-toast-close">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

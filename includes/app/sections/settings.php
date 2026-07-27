@@ -5,29 +5,29 @@
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Settings</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('settings.title'); ?></span>
     </h1>
-    <p class="text-white/60">Manage your account and preferences.</p>
+    <p class="text-white/60"><?php _e('settings.subtitle'); ?></p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- 账户信息 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Account Information</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.account_info'); ?></h3>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm text-white/60 mb-2">Username</label>
+                <label class="block text-sm text-white/60 mb-2"><?php _e('settings.username'); ?></label>
                 <input type="text" value="WenKing_User" class="app-input w-full" readonly>
             </div>
             <div>
-                <label class="block text-sm text-white/60 mb-2">Email</label>
+                <label class="block text-sm text-white/60 mb-2"><?php _e('settings.email'); ?></label>
                 <input type="email" value="user@example.com" class="app-input w-full" readonly>
             </div>
             <div>
-                <label class="block text-sm text-white/60 mb-2">Subscription</label>
+                <label class="block text-sm text-white/60 mb-2"><?php _e('settings.subscription'); ?></label>
                 <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 bg-accent-purple/20 text-accent-purple rounded-full text-sm font-medium">Pro Plan</span>
-                    <span class="text-sm text-white/40">Expires 2026-08-25</span>
+                    <span class="px-3 py-1 bg-accent-purple/20 text-accent-purple rounded-full text-sm font-medium"><?php _e('settings.pro_plan'); ?></span>
+                    <span class="text-sm text-white/40"><?php _e('settings.expires'); ?> 2026-08-25</span>
                 </div>
             </div>
         </div>
@@ -35,10 +35,10 @@
 
     <!-- 偏好设置 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Preferences</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.preferences'); ?></h3>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm text-white/60 mb-2">Language</label>
+                <label class="block text-sm text-white/60 mb-2"><?php _e('settings.language'); ?></label>
                 <select class="app-select w-full">
                     <option value="en">English</option>
                     <option value="zh">简体中文</option>
@@ -46,8 +46,8 @@
             </div>
             <div class="flex items-center justify-between py-3 border-t border-white/10">
                 <div>
-                    <p class="text-white font-medium">Email Notifications</p>
-                    <p class="text-sm text-white/40">Receive updates about your subscription</p>
+                    <p class="text-white font-medium"><?php _e('settings.email_notifications'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.email_notifications_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox" checked>
@@ -56,8 +56,8 @@
             </div>
             <div class="flex items-center justify-between py-3 border-t border-white/10">
                 <div>
-                    <p class="text-white font-medium">Auto Updates</p>
-                    <p class="text-sm text-white/40">Automatically download latest versions</p>
+                    <p class="text-white font-medium"><?php _e('settings.auto_updates'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.auto_updates_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox" checked>
@@ -69,12 +69,12 @@
 
     <!-- 安全设置 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Security</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center justify-between py-3">
                 <div>
-                    <p class="text-white font-medium">Two-Factor Authentication</p>
-                    <p class="text-sm text-white/40">Add extra security to your account</p>
+                    <p class="text-white font-medium"><?php _e('settings.two_factor'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.two_factor_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox">
@@ -83,7 +83,7 @@
             </div>
             <div class="pt-3 border-t border-white/10">
                 <button class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg text-sm transition">
-                    Change Password
+                    <?php _e('settings.change_password'); ?>
                 </button>
             </div>
         </div>
@@ -91,12 +91,12 @@
 
     <!-- 安全设置 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Security</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center justify-between py-3">
                 <div>
-                    <p class="text-white font-medium">Two-Factor Authentication</p>
-                    <p class="text-sm text-white/40">Add extra security to your account</p>
+                    <p class="text-white font-medium"><?php _e('settings.two_factor'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.two_factor_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox">
@@ -105,7 +105,7 @@
             </div>
             <div class="pt-3 border-t border-white/10">
                 <button class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg text-sm transition">
-                    Change Password
+                    <?php _e('settings.change_password'); ?>
                 </button>
             </div>
         </div>
@@ -113,12 +113,12 @@
 
     <!-- 安全设置 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Security</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center justify-between py-3">
                 <div>
-                    <p class="text-white font-medium">Two-Factor Authentication</p>
-                    <p class="text-sm text-white/40">Add extra security to your account</p>
+                    <p class="text-white font-medium"><?php _e('settings.two_factor'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.two_factor_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox">
@@ -127,7 +127,7 @@
             </div>
             <div class="pt-3 border-t border-white/10">
                 <button class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg text-sm transition">
-                    Change Password
+                    <?php _e('settings.change_password'); ?>
                 </button>
             </div>
         </div>
@@ -135,12 +135,12 @@
 
     <!-- 安全设置 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Security</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center justify-between py-3">
                 <div>
-                    <p class="text-white font-medium">Two-Factor Authentication</p>
-                    <p class="text-sm text-white/40">Add extra security to your account</p>
+                    <p class="text-white font-medium"><?php _e('settings.two_factor'); ?></p>
+                    <p class="text-sm text-white/40"><?php _e('settings.two_factor_desc'); ?></p>
                 </div>
                 <label class="app-toggle">
                     <input type="checkbox">
@@ -149,7 +149,7 @@
             </div>
             <div class="pt-3 border-t border-white/10">
                 <button class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg text-sm transition">
-                    Change Password
+                    <?php _e('settings.change_password'); ?>
                 </button>
             </div>
         </div>
@@ -159,6 +159,6 @@
 <!-- 保存按钮 -->
 <div class="flex justify-center mt-6">
     <button class="btn-primary px-6 py-3 rounded-lg font-semibold">
-        Save Changes
+        <?php _e('settings.save_changes'); ?>
     </button>
 </div>

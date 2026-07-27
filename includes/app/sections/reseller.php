@@ -5,9 +5,9 @@
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Reseller Panel</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('reseller.title'); ?></span>
     </h1>
-    <p class="text-white/60">Manage your customers, licenses, and reseller settings.</p>
+    <p class="text-white/60"><?php _e('reseller.subtitle'); ?></p>
 </div>
 
 <!-- Tab 导航 -->
@@ -16,20 +16,20 @@
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
         </svg>
-        Customers
+        <?php _e('reseller.customers'); ?>
     </button>
     <button class="reseller-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
         </svg>
-        Licenses
+        <?php _e('reseller.licenses'); ?>
     </button>
     <button class="reseller-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="settings">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
-        Settings
+        <?php _e('reseller.settings'); ?>
     </button>
 </div>
 
@@ -50,21 +50,21 @@
                         <input type="text" 
                                id="customer-search"
                                class="app-input w-full pl-10 pr-4 py-2"
-                               placeholder="Search by username, email, or license key...">
+                               placeholder="<?php _e('reseller.search_ph'); ?>">
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <select class="app-select">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="banned">Banned</option>
+                        <option value=""><?php _e('reseller.all_status'); ?></option>
+                        <option value="active"><?php _e('reseller.active'); ?></option>
+                        <option value="inactive"><?php _e('reseller.inactive'); ?></option>
+                        <option value="banned"><?php _e('reseller.banned'); ?></option>
                     </select>
                     <button class="btn-primary px-6 py-2 rounded-lg font-semibold whitespace-nowrap">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Add Customer
+                        <?php _e('reseller.add_customer'); ?>
                     </button>
                 </div>
             </div>
@@ -73,8 +73,8 @@
         <!-- 客户列表 - 卡片式布局 -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-white">Customer List</h3>
-                <span class="text-sm text-white/40">3 customers</span>
+                <h3 class="text-lg font-semibold text-white"><?php _e('reseller.customer_list'); ?></h3>
+                <span class="text-sm text-white/40"><?php _e('reseller.customers_count'); ?></span>
             </div>
 
             <div class="space-y-4">
@@ -89,20 +89,20 @@
                     
                     <!-- 许可证 -->
                     <div>
-                        <div class="text-xs text-white/40 mb-1">License</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
                         <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-XXXX-XXXX</code>
                     </div>
                     
                     <!-- 时间信息 -->
                     <div>
-                        <div class="text-xs text-white/40 mb-1">Registered</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
                         <div class="text-sm text-white">2024-01-15</div>
-                        <div class="text-xs text-white/60">Last login: 2 hours ago</div>
+                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 2 hours ago</div>
                     </div>
                     
                     <!-- IP 和机器码 -->
                     <div>
-                        <div class="text-xs text-white/40 mb-1">IP Address</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
                         <div class="text-sm text-white font-mono">192.168.1.100</div>
                         <div class="text-xs text-white/60 font-mono">MCH-8F3A2B1C</div>
                     </div>
@@ -110,7 +110,7 @@
                 
                 <!-- 底部操作栏 -->
                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-online text-xs">Active</span>
+                    <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                     <div class="flex gap-2">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,25 +141,25 @@
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">License</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
                         <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-YYYY-YYYY</code>
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">Registered</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
                         <div class="text-sm text-white">2024-02-20</div>
-                        <div class="text-xs text-white/60">Last login: 1 day ago</div>
+                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 1 day ago</div>
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">IP Address</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
                         <div class="text-sm text-white font-mono">10.0.0.50</div>
                         <div class="text-xs text-white/60 font-mono">MCH-9D4E5F6G</div>
                     </div>
                 </div>
                 
                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-online text-xs">Active</span>
+                    <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                     <div class="flex gap-2">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,25 +190,25 @@
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">License</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
                         <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-ZZZZ-ZZZZ</code>
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">Registered</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
                         <div class="text-sm text-white">2024-03-10</div>
-                        <div class="text-xs text-white/60">Last login: 3 days ago</div>
+                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 3 days ago</div>
                     </div>
                     
                     <div>
-                        <div class="text-xs text-white/40 mb-1">IP Address</div>
+                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
                         <div class="text-sm text-white font-mono">172.16.0.25</div>
                         <div class="text-xs text-white/60 font-mono">MCH-7H8I9J0K</div>
                     </div>
                 </div>
                 
                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-updating text-xs">Inactive</span>
+                    <span class="status-badge status-updating text-xs"><?php _e('reseller.inactive'); ?></span>
                     <div class="flex gap-2">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,10 +234,10 @@
 
         <!-- 分页 -->
         <div class="mt-6 flex items-center justify-between">
-            <div class="text-sm text-white/60">Showing 1 to 3 of 3 entries</div>
+            <div class="text-sm text-white/60"><?php _e('reseller.showing'); ?></div>
             <div class="flex gap-2">
-                <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Previous</button>
-                <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Next</button>
+                <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.previous'); ?></button>
+                <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.next'); ?></button>
             </div>
         </div>
     </div>
@@ -246,29 +246,29 @@
     <div id="licenses-tab" class="tab-panel">
         <!-- 批量查询 -->
         <div class="glass-card p-6 rounded-xl mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-white">License Lookup</h3>
+            <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('reseller.license_lookup'); ?></h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Single License Query</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.single_query'); ?></label>
                     <div class="flex gap-2">
                         <input type="text" 
                                class="app-input flex-1 px-4 py-2"
-                               placeholder="Enter license key (e.g., WK-2024-XXXX-XXXX)">
+                               placeholder="<?php _e('reseller.single_query_ph'); ?>">
                         <button class="btn-primary px-6 py-2 rounded-lg font-semibold whitespace-nowrap">
-                            Query
+                            <?php _e('reseller.query'); ?>
                         </button>
                     </div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <label class="block text-sm font-medium text-white/70 mb-2">Batch Query (One per line)</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.batch_query'); ?></label>
                     <textarea class="app-input w-full px-4 py-2 h-32 resize-none"
                               placeholder="WK-2024-XXXX-XXXX&#10;WK-2024-YYYY-YYYY&#10;WK-2024-ZZZZ-ZZZZ"></textarea>
                     <div class="flex gap-2 mt-2">
                         <button class="btn-primary px-6 py-2 rounded-lg font-semibold">
-                            Batch Query
+                            <?php _e('reseller.batch_btn'); ?>
                         </button>
                         <button class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition">
-                            Export Results
+                            <?php _e('reseller.export_results'); ?>
                         </button>
                     </div>
                 </div>
@@ -278,12 +278,12 @@
         <!-- 许可证分配记录 - 卡片式布局 -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-white">License Allocation Records</h3>
+                <h3 class="text-lg font-semibold text-white"><?php _e('reseller.allocation_records'); ?></h3>
                 <button class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Generate License
+                    <?php _e('reseller.generate_license'); ?>
                 </button>
             </div>
 
@@ -292,25 +292,25 @@
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <div class="text-xs text-white/40 mb-1">License Key</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-ABCD-1234</code>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Product</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
                             <div class="text-sm text-white">GTA V Menu</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Assigned To</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
                             <div class="text-sm text-white/60">JohnDoe</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Time</div>
-                            <div class="text-sm text-white">Activated: 2024-01-15</div>
-                            <div class="text-xs text-white/60">Expires: 2025-01-15</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
+                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-01-15</div>
+                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2025-01-15</div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs">Active</span>
+                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                         <div class="flex gap-2">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,25 +331,25 @@
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <div class="text-xs text-white/40 mb-1">License Key</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-EFGH-5678</code>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Product</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
                             <div class="text-sm text-white">RDR2 Mod</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Assigned To</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
                             <div class="text-sm text-white/60">AliceSmith</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Time</div>
-                            <div class="text-sm text-white">Activated: 2024-02-20</div>
-                            <div class="text-xs text-white/60">Expires: 2024-08-20</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
+                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-02-20</div>
+                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2024-08-20</div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs">Active</span>
+                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                         <div class="flex gap-2">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,25 +370,25 @@
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <div class="text-xs text-white/40 mb-1">License Key</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-IJKL-9012</code>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Product</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
                             <div class="text-sm text-white">GTA VI Beta</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Assigned To</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
                             <div class="text-sm text-white/60">BobWilson</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Time</div>
-                            <div class="text-sm text-white">Activated: 2024-03-10</div>
-                            <div class="text-xs text-white/60">Expires: 2024-06-10</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
+                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-03-10</div>
+                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2024-06-10</div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-updating text-xs">Expired</span>
+                        <span class="status-badge status-updating text-xs"><?php _e('reseller.expired'); ?></span>
                         <div class="flex gap-2">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,10 +407,10 @@
             </div>
 
             <div class="mt-6 flex items-center justify-between">
-                <div class="text-sm text-white/60">Showing 1 to 3 of 3 entries</div>
+                <div class="text-sm text-white/60"><?php _e('reseller.showing'); ?></div>
                 <div class="flex gap-2">
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Previous</button>
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Next</button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.previous'); ?></button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.next'); ?></button>
                 </div>
             </div>
         </div>
@@ -419,11 +419,11 @@
     <!-- Settings Tab -->
     <div id="settings-tab" class="tab-panel">
         <div class="glass-card p-6 rounded-xl">
-            <h3 class="text-lg font-semibold mb-6 text-white">Reseller Information</h3>
+            <h3 class="text-lg font-semibold mb-6 text-white"><?php _e('reseller.reseller_info'); ?></h3>
             <form class="space-y-6">
                 <!-- Logo -->
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Logo</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.logo'); ?></label>
                     <div class="flex items-center gap-4">
                         <div class="w-20 h-20 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
                             <svg class="w-10 h-10 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,14 +431,14 @@
                             </svg>
                         </div>
                         <button type="button" class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold">
-                            Upload Logo
+                            <?php _e('reseller.upload_logo'); ?>
                         </button>
                     </div>
                 </div>
 
                 <!-- Website Link -->
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Website Link</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.website_link'); ?></label>
                     <input type="url" 
                            class="app-input w-full px-4 py-2"
                            placeholder="https://your-website.com"
@@ -447,7 +447,7 @@
 
                 <!-- Payment Methods -->
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Supported Payment Methods</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.payment_methods'); ?></label>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <label class="flex items-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer transition">
                             <input type="checkbox" class="auth-checkbox" checked>
@@ -474,7 +474,7 @@
 
                 <!-- Contact Info -->
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Contact Information</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.contact_info'); ?></label>
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs text-white/50 mb-1">Discord</label>
@@ -502,18 +502,18 @@
 
                 <!-- Description -->
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Description</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('reseller.description'); ?></label>
                     <textarea class="app-input w-full px-4 py-2 h-24 resize-none"
-                              placeholder="Tell customers about your reseller service...">Authorized WenKing reseller providing premium game mods and 24/7 support.</textarea>
+                              placeholder="<?php _e('reseller.description_ph'); ?>">Authorized WenKing reseller providing premium game mods and 24/7 support.</textarea>
                 </div>
 
                 <!-- Save Button -->
                 <div class="flex gap-3">
                     <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold">
-                        Save Changes
+                        <?php _e('reseller.save_changes'); ?>
                     </button>
                     <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition">
-                        Cancel
+                        <?php _e('reseller.cancel'); ?>
                     </button>
                 </div>
             </form>

@@ -5,9 +5,9 @@
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Dashboard</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('dashboard.title'); ?></span>
     </h1>
-    <p class="text-white/60">Welcome back! Here's your overview.</p>
+    <p class="text-white/60"><?php _e('dashboard.subtitle'); ?></p>
 </div>
 
 <!-- 统计卡片 -->
@@ -20,10 +20,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
             </div>
-            <span class="text-sm text-white/60">Subscription</span>
+            <span class="text-sm text-white/60"><?php _e('dashboard.subscription'); ?></span>
         </div>
-        <div class="text-2xl font-bold text-white mb-1">Pro Plan</div>
-        <span class="status-badge status-online text-xs">Active</span>
+        <div class="text-2xl font-bold text-white mb-1"><?php _e('dashboard.pro_plan'); ?></div>
+        <span class="status-badge status-online text-xs"><?php _e('dashboard.active'); ?></span>
     </div>
 
     <!-- 到期日期 -->
@@ -34,10 +34,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
             </div>
-            <span class="text-sm text-white/60">Expires</span>
+            <span class="text-sm text-white/60"><?php _e('dashboard.expires'); ?></span>
         </div>
         <div class="text-2xl font-bold text-white mb-1">2026-08-25</div>
-        <span class="text-xs text-status-online">30 days remaining</span>
+        <span class="text-xs text-status-online"><?php _e('dashboard.days_remaining'); ?></span>
     </div>
 
     <!-- 下载次数 -->
@@ -48,10 +48,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
             </div>
-            <span class="text-sm text-white/60">Downloads</span>
+            <span class="text-sm text-white/60"><?php _e('dashboard.downloads'); ?></span>
         </div>
         <div class="text-2xl font-bold text-white mb-1">12</div>
-        <span class="text-xs text-white/40">This month</span>
+        <span class="text-xs text-white/40"><?php _e('dashboard.this_month'); ?></span>
     </div>
 
     <!-- 在线状态 -->
@@ -62,17 +62,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"></path>
                 </svg>
             </div>
-            <span class="text-sm text-white/60">Status</span>
+            <span class="text-sm text-white/60"><?php _e('dashboard.status'); ?></span>
         </div>
-        <div class="text-2xl font-bold text-white mb-1">Online</div>
-        <span class="status-badge status-online text-xs">Undetected</span>
+        <div class="text-2xl font-bold text-white mb-1"><?php _e('dashboard.online'); ?></div>
+        <span class="status-badge status-online text-xs"><?php _e('dashboard.undetected'); ?></span>
     </div>
 </div>
 
 <!-- 已激活模组 -->
 <div class="mb-8 p-6 rounded-xl" style="background-color: rgba(18, 18, 26, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
     <h2 class="text-xl font-display font-bold mb-4 text-white">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Activated Mods</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('dashboard.activated_mods'); ?></span>
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- GTA V -->
@@ -89,9 +89,9 @@
                     <p class="text-xs text-white/40">Grand Theft Auto V</p>
                 </div>
                 <div class="flex flex-col items-end gap-1">
-                    <span class="status-badge status-online text-xs">Active</span>
+                    <span class="status-badge status-online text-xs"><?php _e('dashboard.active'); ?></span>
                     <span class="text-xs text-white/40">v3.2.1</span>
-                    <span class="text-xs text-accent-purple">Expire: Lifetime</span>
+                    <span class="text-xs text-accent-purple"><?php _e('dashboard.expire_lifetime'); ?></span>
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
                     <p class="text-xs text-white/40">Red Dead Redemption 2</p>
                 </div>
                 <div class="flex flex-col items-end gap-1">
-                    <span class="status-badge status-online text-xs">Active</span>
+                    <span class="status-badge status-online text-xs"><?php _e('dashboard.active'); ?></span>
                     <span class="text-xs text-white/40">v2.1.0</span>
                     <span class="text-xs text-accent-blue">Expire: 08/10/2026</span>
                 </div>
@@ -131,7 +131,7 @@
                     <p class="text-xs text-white/40">Grand Theft Auto VI</p>
                 </div>
                 <div class="flex flex-col items-end gap-1">
-                    <span class="status-badge status-online text-xs">Active</span>
+                    <span class="status-badge status-online text-xs"><?php _e('dashboard.active'); ?></span>
                     <span class="text-xs text-white/40">v1.0.0</span>
                     <span class="text-xs text-accent-cyan">Expire: 10/25/2026</span>
                 </div>
@@ -144,7 +144,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- 最近活动 -->
     <div class="glass-card p-6 rounded-xl lg:col-span-2">
-        <h3 class="text-lg font-semibold mb-4 text-white">Recent Activity</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('dashboard.recent_activity'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
                 <div class="w-8 h-8 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
@@ -153,8 +153,8 @@
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm text-white font-medium">Downloaded GTA V Menu v3.2.1</p>
-                    <p class="text-xs text-white/40">2 hours ago</p>
+                    <p class="text-sm text-white font-medium"><?php _e('dashboard.downloaded'); ?></p>
+                    <p class="text-xs text-white/40"><?php _e('dashboard.downloaded_time'); ?></p>
                 </div>
             </div>
             <div class="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
@@ -165,8 +165,8 @@
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm text-white font-medium">Updated settings</p>
-                    <p class="text-xs text-white/40">Yesterday</p>
+                    <p class="text-sm text-white font-medium"><?php _e('dashboard.updated_settings'); ?></p>
+                    <p class="text-xs text-white/40"><?php _e('dashboard.updated_time'); ?></p>
                 </div>
             </div>
             <div class="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
@@ -176,8 +176,8 @@
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm text-white font-medium">Subscription renewed</p>
-                    <p class="text-xs text-white/40">3 days ago</p>
+                    <p class="text-sm text-white font-medium"><?php _e('dashboard.sub_renewed'); ?></p>
+                    <p class="text-xs text-white/40"><?php _e('dashboard.renewed_time'); ?></p>
                 </div>
             </div>
         </div>
@@ -185,16 +185,16 @@
 
     <!-- 快速操作 -->
     <div class="glass-card p-6 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-white">Quick Actions</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('dashboard.quick_actions'); ?></h3>
         <div class="space-y-3">
             <a href="#/downloads" class="block w-full py-3 px-4 bg-accent-purple/20 hover:bg-accent-purple/30 text-accent-purple rounded-lg font-medium text-center transition">
-                Download Latest
+                <?php _e('dashboard.download_latest'); ?>
             </a>
             <a href="#/settings" class="block w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg font-medium text-center transition">
-                Manage Settings
+                <?php _e('dashboard.manage_settings'); ?>
             </a>
             <a href="<?php echo DISCORD_URL; ?>" target="_blank" class="block w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg font-medium text-center transition">
-                Join Discord
+                <?php _e('dashboard.join_discord'); ?>
             </a>
         </div>
     </div>

@@ -18,7 +18,7 @@
                         Welcome Back
                     </span>
                 </h2>
-                <p class="text-white/50 text-sm">Sign in to your account to continue</p>
+                <p class="text-white/50 text-sm"><?php _e('auth.login_subtitle'); ?></p>
             </div>
 
             <!-- 表单 -->
@@ -26,7 +26,7 @@
                 <!-- 用户名/邮箱 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Username or Email
+                        <?php _e('auth.username_email'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -38,7 +38,7 @@
                                id="login-username"
                                name="username"
                                class="auth-input w-full pl-10 pr-4 py-3 rounded-lg"
-                               placeholder="Enter your username or email"
+                               placeholder="<?php _e('auth.username_email_ph'); ?>"
                                required
                                autocomplete="username">
                     </div>
@@ -48,7 +48,7 @@
                 <!-- 密码 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Password
+                        <?php _e('auth.password'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -60,7 +60,7 @@
                                id="login-password"
                                name="password"
                                class="auth-input w-full pl-10 pr-12 py-3 rounded-lg"
-                               placeholder="Enter your password"
+                               placeholder="<?php _e('auth.password_ph'); ?>"
                                required
                                autocomplete="current-password">
                         <button type="button"
@@ -82,16 +82,16 @@
                                id="remember-me"
                                name="remember"
                                class="auth-checkbox">
-                        <span class="text-sm text-white/50 select-none">Remember me</span>
+                        <span class="text-sm text-white/50 select-none"><?php _e('auth.remember_me'); ?></span>
                     </label>
                     <a href="#" class="auth-switch-btn text-sm text-accent-purple hover:text-accent-cyan transition" data-show="forgot-form">
-                        Forgot password?
+                        <?php _e('auth.forgot_password'); ?>
                     </a>
                 </div>
 
                 <!-- 登录按钮 -->
                 <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text">Sign In</span>
+                    <span class="btn-uiverse-text"><?php _e('auth.sign_in'); ?></span>
                     <span class="btn-uiverse-shine"></span>
                     <span class="btn-uiverse-border"></span>
                 </button>
@@ -99,11 +99,11 @@
 
             <!-- 切换到注册 -->
             <div class="mt-6 text-center">
-                <span class="text-white/50 text-sm">Don't have an account?</span>
+                <span class="text-white/50 text-sm"><?php _e('auth.no_account'); ?></span>
                 <button type="button"
                         class="auth-switch-btn text-accent-purple hover:text-accent-cyan transition font-medium ml-1"
                         data-show="register-form">
-                    Register
+                    <?php _e('auth.register'); ?>
                 </button>
             </div>
         </div>
@@ -117,7 +117,7 @@
                         Create Account
                     </span>
                 </h2>
-                <p class="text-white/50 text-sm">Join WenKing and get started today</p>
+                <p class="text-white/50 text-sm"><?php _e('auth.register_subtitle'); ?></p>
             </div>
 
             <!-- 表单 -->
@@ -125,7 +125,7 @@
                 <!-- 用户名 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Username
+                        <?php _e('auth.username'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -137,7 +137,7 @@
                                id="register-username"
                                name="username"
                                class="auth-input w-full pl-10 pr-4 py-3 rounded-lg"
-                               placeholder="Choose a username"
+                               placeholder="<?php _e('auth.username_ph'); ?>"
                                required
                                minlength="3"
                                maxlength="20"
@@ -149,7 +149,7 @@
                 <!-- 邮箱 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Email
+                        <?php _e('auth.email'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -161,7 +161,7 @@
                                id="register-email"
                                name="email"
                                class="auth-input w-full pl-10 pr-4 py-3 rounded-lg"
-                               placeholder="Enter your email"
+                               placeholder="<?php _e('auth.email_ph'); ?>"
                                required
                                autocomplete="email">
                     </div>
@@ -171,7 +171,7 @@
                 <!-- 密码 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Password
+                        <?php _e('auth.password'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -183,7 +183,7 @@
                                id="register-password"
                                name="password"
                                class="auth-input w-full pl-10 pr-12 py-3 rounded-lg"
-                               placeholder="Create a password"
+                               placeholder="<?php _e('auth.create_password'); ?>"
                                required
                                minlength="6"
                                autocomplete="new-password">
@@ -215,7 +215,7 @@
                 <!-- 确认密码 -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Confirm Password
+                        <?php _e('auth.confirm_password'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -227,7 +227,7 @@
                                id="register-confirm"
                                name="confirm"
                                class="auth-input w-full pl-10 pr-12 py-3 rounded-lg"
-                               placeholder="Confirm your password"
+                               placeholder="<?php _e('auth.confirm_password_ph'); ?>"
                                required
                                autocomplete="new-password">
                         <button type="button"
@@ -249,7 +249,7 @@
 
                 <!-- 注册按钮 -->
                 <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text">Create Account</span>
+                    <span class="btn-uiverse-text"><?php _e('auth.create_account'); ?></span>
                     <span class="btn-uiverse-shine"></span>
                     <span class="btn-uiverse-border"></span>
                 </button>
@@ -257,11 +257,11 @@
 
             <!-- 切换到登录 -->
             <div class="mt-6 text-center">
-                <span class="text-white/50 text-sm">Already have an account?</span>
+                <span class="text-white/50 text-sm"><?php _e('auth.has_account'); ?></span>
                 <button type="button"
                         class="auth-switch-btn text-accent-purple hover:text-accent-cyan transition font-medium ml-1"
                         data-show="login-form">
-                    Sign In
+                    <?php _e('auth.sign_in'); ?>
                 </button>
             </div>
         </div>
@@ -275,7 +275,7 @@
                         Forgot Password
                     </span>
                 </h2>
-                <p class="text-white/50 text-sm">Reset your password in two simple steps</p>
+                <p class="text-white/50 text-sm"><?php _e('auth.forgot_subtitle'); ?></p>
             </div>
 
             <!-- 步骤指示器 -->
@@ -283,12 +283,12 @@
                 <div class="flex items-center">
                     <div class="step-indicator active" id="step-1-indicator">
                         <span class="step-number">1</span>
-                        <span class="step-label">Verify Email</span>
+                        <span class="step-label"><?php _e('auth.step1'); ?></span>
                     </div>
                     <div class="step-connector" id="step-connector"></div>
                     <div class="step-indicator" id="step-2-indicator">
                         <span class="step-number">2</span>
-                        <span class="step-label">Reset Password</span>
+                        <span class="step-label"><?php _e('auth.step2'); ?></span>
                     </div>
                 </div>
             </div>
@@ -297,7 +297,7 @@
             <form id="form-forgot-step1" class="space-y-5">
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Email Address
+                        <?php _e('auth.email_address'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -309,7 +309,7 @@
                                id="forgot-email"
                                name="email"
                                class="auth-input w-full pl-10 pr-4 py-3 rounded-lg"
-                               placeholder="Enter your registered email"
+                               placeholder="<?php _e('auth.email_registered_ph'); ?>"
                                required
                                autocomplete="email">
                     </div>
@@ -317,7 +317,7 @@
                 </div>
 
                 <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text">Send Verification Code</span>
+                    <span class="btn-uiverse-text"><?php _e('auth.send_code'); ?></span>
                     <span class="btn-uiverse-shine"></span>
                     <span class="btn-uiverse-border"></span>
                 </button>
@@ -330,13 +330,13 @@
                         <svg class="w-5 h-5 inline mr-2 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        We've sent a verification code to <strong id="display-email" class="text-accent-cyan"></strong>
+                        <?php _e('auth.code_sent'); ?> <strong id="display-email" class="text-accent-cyan"></strong>
                     </p>
                 </div>
 
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Verification Code
+                        <?php _e('auth.verification_code'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -348,23 +348,23 @@
                                id="forgot-code"
                                name="code"
                                class="auth-input w-full px-10 py-3 rounded-lg text-center tracking-widest"
-                               placeholder="Enter 6-digit code"
+                               placeholder="<?php _e('auth.code_ph'); ?>"
                                required
                                maxlength="6"
                                pattern="[0-9]{6}">
                     </div>
                     <p class="form-error hidden text-red-400 text-xs mt-1" id="forgot-code-error"></p>
                     <p class="text-xs text-white/50 mt-2">
-                        Didn't receive the code? 
+                        <?php _e('auth.no_code'); ?> 
                         <button type="button" id="resend-code-btn" class="text-accent-purple hover:text-accent-cyan transition">
-                            Resend
+                            <?php _e('auth.resend'); ?>
                         </button>
                     </p>
                 </div>
 
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        New Password
+                        <?php _e('auth.new_password'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -376,7 +376,7 @@
                                id="forgot-new-password"
                                name="new-password"
                                class="auth-input w-full pl-10 pr-12 py-3 rounded-lg"
-                               placeholder="Enter new password"
+                               placeholder="<?php _e('auth.new_password_ph'); ?>"
                                required
                                minlength="6"
                                autocomplete="new-password">
@@ -407,7 +407,7 @@
 
                 <div class="form-group">
                     <label class="block text-sm font-medium text-white/70 mb-2">
-                        Confirm New Password
+                        <?php _e('auth.confirm_new_password'); ?>
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
@@ -419,7 +419,7 @@
                                id="forgot-confirm-password"
                                name="confirm-password"
                                class="auth-input w-full pl-10 pr-12 py-3 rounded-lg"
-                               placeholder="Confirm new password"
+                               placeholder="<?php _e('auth.confirm_new_ph'); ?>"
                                required
                                autocomplete="new-password">
                         <button type="button"
@@ -440,7 +440,7 @@
                 </div>
 
                 <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text">Reset Password</span>
+                    <span class="btn-uiverse-text"><?php _e('auth.reset_password'); ?></span>
                     <span class="btn-uiverse-shine"></span>
                     <span class="btn-uiverse-border"></span>
                 </button>
@@ -448,11 +448,11 @@
 
             <!-- 切换到登录 -->
             <div class="mt-6 text-center">
-                <span class="text-white/50 text-sm">Remember your password?</span>
+                <span class="text-white/50 text-sm"><?php _e('auth.remember_pwd'); ?></span>
                 <button type="button"
                         class="auth-switch-btn text-accent-purple hover:text-accent-cyan transition font-medium ml-1"
                         data-show="login-form">
-                    Back to Login
+                    <?php _e('auth.back_to_login'); ?>
                 </button>
             </div>
         </div>

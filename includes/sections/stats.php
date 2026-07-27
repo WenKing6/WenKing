@@ -12,7 +12,7 @@
                 <div class="text-5xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent counter" data-target="10000">
                     0
                 </div>
-                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide">Active Users</div>
+                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide"><?php _e('stats.active_users'); ?></div>
             </div>
 
             <!-- Stat 2 -->
@@ -20,7 +20,7 @@
                 <div class="text-5xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent counter" data-target="500">
                     0
                 </div>
-                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide">User Online</div>
+                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide"><?php _e('stats.user_online'); ?></div>
             </div>
 
             <!-- Stat 3 -->
@@ -28,7 +28,7 @@
                 <div class="text-5xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent counter" data-target="99">
                     0
                 </div>
-                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide">Reseller</div>
+                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide"><?php _e('stats.reseller'); ?></div>
             </div>
 
             <!-- Stat 4 -->
@@ -36,7 +36,7 @@
                 <div class="text-5xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent counter" data-target="24">
                     0
                 </div>
-                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide">Hours Support</div>
+                <div class="text-white/60 mt-2 text-sm uppercase tracking-wide"><?php _e('stats.hours_support'); ?></div>
             </div>
         </div>
     </div>

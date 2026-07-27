@@ -5,9 +5,9 @@
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Manager Panel</span>
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('manager.title'); ?></span>
     </h1>
-    <p class="text-white/60">System administration and user management.</p>
+    <p class="text-white/60"><?php _e('manager.subtitle'); ?></p>
 </div>
 
 <!-- Tab 导航 -->
@@ -16,13 +16,13 @@
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </svg>
-        User Management
+        <?php _e('manager.user_management'); ?>
     </button>
     <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
         </svg>
-        License Management
+        <?php _e('manager.license_management'); ?>
     </button>
 </div>
 
@@ -39,7 +39,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Total Users</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.total_users'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">1,247</div>
             </div>
@@ -51,7 +51,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Resellers</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.resellers'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">23</div>
             </div>
@@ -63,7 +63,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Admins</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.admins'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">5</div>
             </div>
@@ -81,21 +81,21 @@
                         </span>
                         <input type="text" 
                                class="app-input w-full pl-10 pr-4 py-2"
-                               placeholder="Search users...">
+                               placeholder="<?php _e('manager.search_users'); ?>">
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <select class="app-select">
-                        <option value="">All Roles</option>
-                        <option value="admin">Admin</option>
-                        <option value="reseller">Reseller</option>
-                        <option value="user">User</option>
+                        <option value=""><?php _e('manager.all_roles'); ?></option>
+                        <option value="admin"><?php _e('manager.admin'); ?></option>
+                        <option value="reseller"><?php _e('manager.reseller'); ?></option>
+                        <option value="user"><?php _e('manager.user'); ?></option>
                     </select>
                     <button class="btn-primary px-6 py-2 rounded-lg font-semibold whitespace-nowrap">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Add User
+                        <?php _e('manager.add_user'); ?>
                     </button>
                 </div>
             </div>
@@ -115,18 +115,18 @@
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Role</div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-status-online/20 text-status-online">Admin</span>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.role'); ?></div>
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-status-online/20 text-status-online"><?php _e('manager.admin'); ?></span>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Registered</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
                             <div class="text-sm text-white">2024-01-01</div>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Status</div>
-                            <span class="status-badge status-online text-xs">Active</span>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                            <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
                     </div>
                     
@@ -160,17 +160,17 @@
                         
                         <div>
                             <div class="text-xs text-white/40 mb-1">Role</div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-cyan/20 text-accent-cyan">Reseller</span>
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-cyan/20 text-accent-cyan"><?php _e('manager.reseller'); ?></span>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Registered</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
                             <div class="text-sm text-white">2024-02-15</div>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Status</div>
-                            <span class="status-badge status-online text-xs">Active</span>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                            <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
                     </div>
                     
@@ -209,17 +209,17 @@
                         
                         <div>
                             <div class="text-xs text-white/40 mb-1">Role</div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-purple/20 text-accent-purple">User</span>
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-purple/20 text-accent-purple"><?php _e('manager.user'); ?></span>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Registered</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
                             <div class="text-sm text-white">2024-03-20</div>
                         </div>
                         
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Status</div>
-                            <span class="status-badge status-online text-xs">Active</span>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                            <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
                     </div>
                     
@@ -245,10 +245,10 @@
             </div>
 
             <div class="mt-6 flex items-center justify-between">
-                <div class="text-sm text-white/60">Showing 1 to 3 of 3 entries</div>
+                <div class="text-sm text-white/60"><?php _e('manager.showing'); ?></div>
                 <div class="flex gap-2">
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Previous</button>
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Next</button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('manager.previous'); ?></button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('manager.next'); ?></button>
                 </div>
             </div>
         </div>
@@ -265,7 +265,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Total Licenses</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.total_licenses'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">3,892</div>
             </div>
@@ -277,7 +277,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Active</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.active'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">2,156</div>
             </div>
@@ -289,7 +289,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Expired</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.expired'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">1,689</div>
             </div>
@@ -301,7 +301,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                         </svg>
                     </div>
-                    <span class="text-sm text-white/60">Revoked</span>
+                    <span class="text-sm text-white/60"><?php _e('manager.revoked'); ?></span>
                 </div>
                 <div class="text-3xl font-bold text-white">47</div>
             </div>
@@ -309,10 +309,10 @@
 
         <!-- 生成许可证 -->
         <div class="glass-card p-6 rounded-xl mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-white">Generate New Licenses</h3>
+            <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('manager.generate_new'); ?></h3>
             <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Product</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('manager.product'); ?></label>
                     <select class="app-select w-full">
                         <option>GTA V Menu</option>
                         <option>RDR2 Mod</option>
@@ -320,36 +320,36 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Duration</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('manager.duration'); ?></label>
                     <select class="app-select w-full">
-                        <option>7 Days</option>
-                        <option>30 Days</option>
-                        <option>90 Days</option>
-                        <option>1 Year</option>
-                        <option>Lifetime</option>
+                        <option><?php _e('manager.days_7'); ?></option>
+                        <option><?php _e('manager.days_30'); ?></option>
+                        <option><?php _e('manager.days_90'); ?></option>
+                        <option><?php _e('manager.year_1'); ?></option>
+                        <option><?php _e('manager.lifetime'); ?></option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Quantity</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('manager.quantity'); ?></label>
                     <input type="number" 
                            class="app-input w-full px-4 py-2"
-                           placeholder="Number of licenses"
+                           placeholder="<?php _e('manager.quantity_ph'); ?>"
                            value="10"
                            min="1"
                            max="1000">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-white/70 mb-2">Assign To (Optional)</label>
+                    <label class="block text-sm font-medium text-white/70 mb-2"><?php _e('manager.assign_to'); ?></label>
                     <input type="text" 
                            class="app-input w-full px-4 py-2"
-                           placeholder="Username or leave empty">
+                           placeholder="<?php _e('manager.assign_ph'); ?>">
                 </div>
                 <div class="md:col-span-2">
                     <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Generate Licenses
+                        <?php _e('manager.generate_btn'); ?>
                     </button>
                 </div>
             </form>
@@ -367,18 +367,18 @@
                         </span>
                         <input type="text" 
                                class="app-input w-full pl-10 pr-4 py-2"
-                               placeholder="Search licenses...">
+                               placeholder="<?php _e('manager.search_licenses'); ?>">
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <select class="app-select">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="expired">Expired</option>
-                        <option value="revoked">Revoked</option>
+                        <option value=""><?php _e('manager.all_status'); ?></option>
+                        <option value="active"><?php _e('manager.active'); ?></option>
+                        <option value="expired"><?php _e('manager.expired'); ?></option>
+                        <option value="revoked"><?php _e('manager.revoked'); ?></option>
                     </select>
                     <button class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition whitespace-nowrap">
-                        Export CSV
+                        <?php _e('manager.export_csv'); ?>
                     </button>
                 </div>
             </div>
@@ -388,25 +388,25 @@
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <div class="text-xs text-white/40 mb-1">License Key</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-AAAA-1111</code>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Product</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.product'); ?></div>
                             <div class="text-sm text-white">GTA V Menu</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">User</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.user_label'); ?></div>
                             <div class="text-sm text-white/60">JohnDoe</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Time</div>
-                            <div class="text-sm text-white">Created: 2024-01-15</div>
-                            <div class="text-xs text-white/60">Expires: 2025-01-15</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.time'); ?></div>
+                            <div class="text-sm text-white"><?php _e('manager.created'); ?>: 2024-01-15</div>
+                            <div class="text-xs text-white/60"><?php _e('manager.expires'); ?>: 2025-01-15</div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs">Active</span>
+                        <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         <div class="flex gap-2">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -427,25 +427,25 @@
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <div class="text-xs text-white/40 mb-1">License Key</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-BBBB-2222</code>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Product</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.product'); ?></div>
                             <div class="text-sm text-white">RDR2 Mod</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">User</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.user_label'); ?></div>
                             <div class="text-sm text-white/60">AliceSmith</div>
                         </div>
                         <div>
-                            <div class="text-xs text-white/40 mb-1">Time</div>
-                            <div class="text-sm text-white">Created: 2024-02-20</div>
-                            <div class="text-xs text-white/60">Expires: 2024-08-20</div>
+                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.time'); ?></div>
+                            <div class="text-sm text-white"><?php _e('manager.created'); ?>: 2024-02-20</div>
+                            <div class="text-xs text-white/60"><?php _e('manager.expires'); ?>: 2024-08-20</div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-updating text-xs">Expired</span>
+                        <span class="status-badge status-updating text-xs"><?php _e('manager.expired'); ?></span>
                         <div class="flex gap-2">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,10 +464,10 @@
             </div>
 
             <div class="mt-6 flex items-center justify-between">
-                <div class="text-sm text-white/60">Showing 1 to 2 of 2 entries</div>
+                <div class="text-sm text-white/60"><?php _e('manager.showing_2'); ?></div>
                 <div class="flex gap-2">
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Previous</button>
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed">Next</button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('manager.previous'); ?></button>
+                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('manager.next'); ?></button>
                 </div>
             </div>
         </div>
