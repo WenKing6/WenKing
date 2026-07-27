@@ -14,22 +14,22 @@
         <div class="fade-in-up">
             <h1 class="text-hero font-display font-bold mb-6">
                 <span class="bg-gradient-to-r from-accent-purple via-accent-blue to-accent-cyan bg-clip-text text-transparent">
-                    WenKing Mod Menu
+                    <?php _e('hero.title'); ?>
                 </span>
                 <br>
-                <span class="text-white">MOD MENU</span>
+                <span class="text-white"><?php _e('hero.subtitle'); ?></span>
             </h1>
 
             <p class="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
-                Experience the most advanced game mod menu with undetected features, lightning-fast performance, and 24/7 dedicated support.
+                <?php _e('hero.description'); ?>
             </p>
 
             <div class="flex flex-row gap-4 justify-center">
                 <a href="#pricing" class="button type1 flex items-center justify-center" style="width: 175px; height: 62px; padding: 0; color: #ffffff; backdrop-filter: none;">
-                    <span class="btn-txt">Dashboard</span>
+                    <span class="btn-txt"><?php _e('hero.dashboard'); ?></span>
                 </a>
                 <a href="<?php echo DISCORD_URL; ?>" target="_blank" class="button type1 flex items-center justify-center" style="width: 175px; height: 62px; padding: 0; color: #ffffff; backdrop-filter: none;">
-                    <span class="btn-txt">Discord</span>
+                    <span class="btn-txt"><?php _e('hero.discord'); ?></span>
                 </a>
             </div>
         </div>

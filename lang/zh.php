@@ -15,4 +15,11 @@ return [
     'mobile_menu' => [
         'language' => '语言',
     ],
+    'hero' => [
+        'title'       => 'WenKing 模组菜单',
+        'subtitle'    => '模组菜单',
+        'description' => '体验最先进的游戏模组菜单，具备反检测功能、闪电般性能和 24/7 专属支持。',
+        'dashboard'   => '控制台',
+        'discord'     => 'Discord',
+    ],
 ];

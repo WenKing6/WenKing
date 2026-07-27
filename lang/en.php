@@ -15,4 +15,11 @@ return [
     'mobile_menu' => [
         'language' => 'Language',
     ],
+    'hero' => [
+        'title'       => 'WenKing Mod Menu',
+        'subtitle'    => 'MOD MENU',
+        'description' => 'Experience the most advanced game mod menu with undetected features, lightning-fast performance, and 24/7 dedicated support.',
+        'dashboard'   => 'Dashboard',
+        'discord'     => 'Discord',
+    ],
 ];
