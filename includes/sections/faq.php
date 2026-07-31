@@ -28,7 +28,7 @@
                     </svg>
                 </button>
                 <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-4 text-white/70"><?php _e('faq.a1'); ?></p>
+                    <p class="px-6 py-4 text-white/70"><?php _e('faq.a1'); ?></p>
                 </div>
             </div>
 
@@ -41,7 +41,7 @@
                     </svg>
                 </button>
                 <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-4 text-white/70"><?php _e('faq.a2'); ?></p>
+                    <p class="px-6 py-4 text-white/70"><?php _e('faq.a2'); ?></p>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
                     </svg>
                 </button>
                 <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-4 text-white/70"><?php _e('faq.a3'); ?></p>
+                    <p class="px-6 py-4 text-white/70"><?php _e('faq.a3'); ?></p>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
                     </svg>
                 </button>
                 <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-4 text-white/70"><?php _e('faq.a4'); ?></p>
+                    <p class="px-6 py-4 text-white/70"><?php _e('faq.a4'); ?></p>
                 </div>
             </div>
 
@@ -80,7 +80,7 @@
                     </svg>
                 </button>
                 <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-4 text-white/70"><?php _e('faq.a5'); ?></p>
+                    <p class="px-6 py-4 text-white/70"><?php _e('faq.a5'); ?></p>
                 </div>
             </div>
         </div>

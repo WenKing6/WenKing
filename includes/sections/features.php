@@ -28,7 +28,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.security'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.security_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.security_desc'); ?></p>
             </div>
 
             <!-- Feature 2 -->
@@ -39,7 +39,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.feature2'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.feature2_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.feature2_desc'); ?></p>
             </div>
 
             <!-- Feature 3 -->
@@ -51,7 +51,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.feature3'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.feature3_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.feature3_desc'); ?></p>
             </div>
 
             <!-- Feature 4 -->
@@ -62,7 +62,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.feature4'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.feature4_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.feature4_desc'); ?></p>
             </div>
 
             <!-- Feature 5 -->
@@ -73,7 +73,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.feature5'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.feature5_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.feature5_desc'); ?></p>
             </div>
 
             <!-- Feature 6 -->
@@ -84,7 +84,7 @@
                     </svg>
                     <h3 class="text-xl font-semibold mb-0"><?php _e('features.feature6'); ?></h3>
                 </div>
-                <p class="text-white/60"><?php _e('features.feature6_desc'); ?></p>
+                <p class="text-white/60 text-center"><?php _e('features.feature6_desc'); ?></p>
             </div>
         </div>
     </div>

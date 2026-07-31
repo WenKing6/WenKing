@@ -25,7 +25,7 @@
             </p>
 
             <div class="flex flex-row gap-4 justify-center">
-                <a href="#pricing" class="button type1 flex items-center justify-center" style="width: 175px; height: 62px; padding: 0; color: #ffffff; backdrop-filter: none;">
+                <a href="<?php echo SITE_URL; ?>/app.php" class="button type1 flex items-center justify-center" style="width: 175px; height: 62px; padding: 0; color: #ffffff; backdrop-filter: none;">
                     <span class="btn-txt"><?php _e('hero.dashboard'); ?></span>
                 </a>
                 <a href="<?php echo DISCORD_URL; ?>" target="_blank" class="button type1 flex items-center justify-center" style="width: 175px; height: 62px; padding: 0; color: #ffffff; backdrop-filter: none;">
