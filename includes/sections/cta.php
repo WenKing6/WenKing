@@ -6,7 +6,7 @@
 ?>
 <section class="py-20">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="glass-card py-12 px-12 rounded-2xl fade-in-up flex flex-col items-center justify-center">
+        <div class="glass-card p-12 rounded-2xl fade-in-up flex flex-col items-center justify-center">
             <h2 class="text-h2 font-display font-bold mb-4 text-center">
                 <?php _e('cta.title'); ?>
             </h2>
