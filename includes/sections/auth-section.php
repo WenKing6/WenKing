@@ -280,7 +280,7 @@
 
             <!-- 步骤指示器 -->
             <div class="flex items-center justify-center mb-8">
-                <div class="flex items-center">
+                <div class="flex items-center justify-center">
                     <div class="step-indicator active" id="step-1-indicator">
                         <span class="step-number">1</span>
                         <span class="step-label"><?php _e('auth.step1'); ?></span>
@@ -466,6 +466,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    width: 95px;
     opacity: 0.5;
     transition: all 0.3s ease;
 }
@@ -509,6 +510,7 @@
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.5);
     font-weight: 500;
+    text-align: center;
 }
 
 .step-indicator.active .step-label,
@@ -523,6 +525,7 @@
     margin: 0 1rem;
     position: relative;
     overflow: hidden;
+    align-self: center;
 }
 
 .step-connector.active::after {
