@@ -90,10 +90,8 @@
                 </div>
 
                 <!-- 登录按钮 -->
-                <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text"><?php _e('auth.sign_in'); ?></span>
-                    <span class="btn-uiverse-shine"></span>
-                    <span class="btn-uiverse-border"></span>
+                <button type="submit" class="btn-primary w-full">
+                    <?php _e('auth.sign_in'); ?>
                 </button>
             </form>
 
@@ -248,10 +246,8 @@
                 </div>
 
                 <!-- 注册按钮 -->
-                <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text"><?php _e('auth.create_account'); ?></span>
-                    <span class="btn-uiverse-shine"></span>
-                    <span class="btn-uiverse-border"></span>
+                <button type="submit" class="btn-primary w-full">
+                    <?php _e('auth.create_account'); ?>
                 </button>
             </form>
 
@@ -316,10 +312,8 @@
                     <p class="form-error hidden text-red-400 text-xs mt-1" id="forgot-email-error"></p>
                 </div>
 
-                <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text"><?php _e('auth.send_code'); ?></span>
-                    <span class="btn-uiverse-shine"></span>
-                    <span class="btn-uiverse-border"></span>
+                <button type="submit" class="btn-primary w-full">
+                    <?php _e('auth.send_code'); ?>
                 </button>
             </form>
 
@@ -439,10 +433,8 @@
                     <p class="form-error hidden text-red-400 text-xs mt-1" id="forgot-confirm-password-error"></p>
                 </div>
 
-                <button type="submit" class="btn-uiverse w-full">
-                    <span class="btn-uiverse-text"><?php _e('auth.reset_password'); ?></span>
-                    <span class="btn-uiverse-shine"></span>
-                    <span class="btn-uiverse-border"></span>
+                <button type="submit" class="btn-primary w-full">
+                    <?php _e('auth.reset_password'); ?>
                 </button>
             </form>
 
@@ -460,6 +452,11 @@
 </div>
 
 <style>
+/* 认证表单提交按钮统一高度 */
+.auth-form button[type="submit"].btn-primary {
+    height: 50px;
+}
+
 /* 步骤指示器样式 */
 .step-indicator {
     display: flex;
