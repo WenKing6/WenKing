@@ -47,7 +47,7 @@
                             <?php _e('products.gta5_f3'); ?>
                         </li>
                     </ul>
-                    <a href="#pricing" class="btn-primary block w-full py-3 rounded-lg font-semibold text-center">
+                    <a href="<?php echo SITE_URL; ?>/partners.php" class="btn-primary block w-full py-3 rounded-lg font-semibold text-center">
                         <?php _e('products.gta5_btn'); ?>
                     </a>
                 </div>

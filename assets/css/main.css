@@ -78,6 +78,11 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
+/* 认证表单提交按钮统一高度 */
+.auth-form button[type="submit"].btn-primary {
+    height: 50px;
+}
+
 .btn-secondary {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);

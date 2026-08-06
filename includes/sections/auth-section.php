@@ -452,11 +452,6 @@
 </div>
 
 <style>
-/* 认证表单提交按钮统一高度 */
-.auth-form button[type="submit"].btn-primary {
-    height: 50px;
-}
-
 /* 步骤指示器样式 */
 .step-indicator {
     display: flex;
