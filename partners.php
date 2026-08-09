@@ -16,9 +16,7 @@ require_once __DIR__ . '/includes/nav.php';
 <main>
     <!-- Page Header -->
     <section class="relative pt-32 pb-16 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-accent-purple/10 via-bg-primary to-accent-blue/10"></div>
-        <div class="glow-orb glow-orb-1"></div>
-        <div class="glow-orb glow-orb-2"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-h1 font-display font-bold mb-6 fade-in-up">
