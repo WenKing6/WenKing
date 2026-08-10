@@ -100,146 +100,110 @@
                 </div>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-3">
                 <!-- Admin 用户卡片 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <div class="w-10 h-10 rounded-full bg-status-online/20 flex items-center justify-center shrink-0">
                                 <span class="text-sm font-semibold text-status-online">AD</span>
                             </div>
-                            <div>
-                                <div class="text-sm font-medium text-white">AdminUser</div>
-                                <div class="text-xs text-white/60">admin@wenking.com</div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-white truncate">AdminUser</div>
+                                <div class="text-xs text-white/60 truncate hidden sm:block">admin@wenking.com</div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.role'); ?></div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-status-online/20 text-status-online"><?php _e('manager.admin'); ?></span>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
-                            <div class="text-sm text-white">2024-01-01</div>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-status-online/20 text-status-online hidden sm:inline-block"><?php _e('manager.admin'); ?></span>
                             <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
-                    </div>
-                    
-                    <div class="flex items-center justify-end mt-4 pt-4 border-t border-white/10 gap-2">
-                        <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </button>
-                        <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Reseller 用户卡片 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <div class="w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center shrink-0">
                                 <span class="text-sm font-semibold text-accent-cyan">RS</span>
                             </div>
-                            <div>
-                                <div class="text-sm font-medium text-white">ResellerPro</div>
-                                <div class="text-xs text-white/60">reseller@example.com</div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-white truncate">ResellerPro</div>
+                                <div class="text-xs text-white/60 truncate hidden sm:block">reseller@example.com</div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1">Role</div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-cyan/20 text-accent-cyan"><?php _e('manager.reseller'); ?></span>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
-                            <div class="text-sm text-white">2024-02-15</div>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-cyan/20 text-accent-cyan hidden sm:inline-block"><?php _e('manager.reseller'); ?></span>
                             <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
-                    </div>
-                    
-                    <div class="flex items-center justify-end mt-4 pt-4 border-t border-white/10 gap-2">
-                        <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </button>
-                        <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
-                        <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                            </svg>
-                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 普通用户卡片 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
                                 <span class="text-sm font-semibold text-accent-purple">JD</span>
                             </div>
-                            <div>
-                                <div class="text-sm font-medium text-white">JohnDoe</div>
-                                <div class="text-xs text-white/60">john@example.com</div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-white truncate">JohnDoe</div>
+                                <div class="text-xs text-white/60 truncate hidden sm:block">john@example.com</div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1">Role</div>
-                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-purple/20 text-accent-purple"><?php _e('manager.user'); ?></span>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.registered'); ?></div>
-                            <div class="text-sm text-white">2024-03-20</div>
-                        </div>
-                        
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.status'); ?></div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-accent-purple/20 text-accent-purple hidden sm:inline-block"><?php _e('manager.user'); ?></span>
                             <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
-                    </div>
-                    
-                    <div class="flex items-center justify-end mt-4 pt-4 border-t border-white/10 gap-2">
-                        <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </button>
-                        <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
-                        <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                            </svg>
-                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit Role">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -383,82 +347,84 @@
                 </div>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-3">
                 <!-- 许可证卡片 1 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.license_key'); ?></div>
-                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-AAAA-1111</code>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <div class="w-10 h-10 rounded-lg bg-accent-cyan/20 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-white truncate">GTA V Menu</div>
+                                <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan inline-block truncate max-w-[180px]">WK-2024-AAAA-1111</code>
+                            </div>
                         </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.product'); ?></div>
-                            <div class="text-sm text-white">GTA V Menu</div>
+                        <div class="flex items-center gap-3 shrink-0">
+                            <div class="text-xs text-white/50 hidden sm:block">
+                                <span><?php _e('manager.user_label'); ?>: JohnDoe</span>
+                            </div>
+                            <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
                         </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.user_label'); ?></div>
-                            <div class="text-sm text-white/60">JohnDoe</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.time'); ?></div>
-                            <div class="text-sm text-white"><?php _e('manager.created'); ?>: 2024-01-15</div>
-                            <div class="text-xs text-white/60"><?php _e('manager.expires'); ?>: 2025-01-15</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs"><?php _e('manager.active'); ?></span>
-                        <div class="flex gap-2">
+                        <div class="flex items-center gap-1 shrink-0">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                 </svg>
                             </button>
                             <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Revoke">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                                 </svg>
                             </button>
                         </div>
+                    </div>
+                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-white/5 text-xs text-white/40 sm:hidden">
+                        <span><?php _e('manager.user_label'); ?>: JohnDoe</span>
+                        <span><?php _e('manager.expires'); ?>: 2025-01-15</span>
                     </div>
                 </div>
 
                 <!-- 许可证卡片 2 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.license_key'); ?></div>
-                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-BBBB-2222</code>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-white truncate">RDR2 Mod</div>
+                                <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan inline-block truncate max-w-[180px]">WK-2024-BBBB-2222</code>
+                            </div>
                         </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.product'); ?></div>
-                            <div class="text-sm text-white">RDR2 Mod</div>
+                        <div class="flex items-center gap-3 shrink-0">
+                            <div class="text-xs text-white/50 hidden sm:block">
+                                <span><?php _e('manager.user_label'); ?>: AliceSmith</span>
+                            </div>
+                            <span class="status-badge status-updating text-xs"><?php _e('manager.expired'); ?></span>
                         </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.user_label'); ?></div>
-                            <div class="text-sm text-white/60">AliceSmith</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('manager.time'); ?></div>
-                            <div class="text-sm text-white"><?php _e('manager.created'); ?>: 2024-02-20</div>
-                            <div class="text-xs text-white/60"><?php _e('manager.expires'); ?>: 2024-08-20</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-updating text-xs"><?php _e('manager.expired'); ?></span>
-                        <div class="flex gap-2">
+                        <div class="flex items-center gap-1 shrink-0">
                             <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                 </svg>
                             </button>
                             <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Revoke">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                                 </svg>
                             </button>
                         </div>
+                    </div>
+                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-white/5 text-xs text-white/40 sm:hidden">
+                        <span><?php _e('manager.user_label'); ?>: AliceSmith</span>
+                        <span><?php _e('manager.expires'); ?>: 2024-08-20</span>
                     </div>
                 </div>
             </div>

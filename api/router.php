@@ -8,7 +8,7 @@
 require_once __DIR__ . '/../config/config.php';
 
 // 白名单验证
-$allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager'];
+$allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager', 'admin'];
 $page = $_GET['page'] ?? 'dashboard';
 
 // 防止目录遍历

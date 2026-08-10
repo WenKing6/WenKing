@@ -269,16 +269,38 @@
 
         if (!valid) return;
 
-        // 模拟登录（后续接入后端 API）
         const username = document.getElementById('login-username').value.trim();
-        const remember = document.getElementById('remember-me').checked;
+        const password = document.getElementById('login-password').value;
 
-        showToast('Logged in as ' + username + ' (demo)', 'success');
+        // 禁用按钮防止重复提交
+        const submitBtn = formLogin.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
 
-        // 跳转到仪表盘
-        setTimeout(function() {
-            window.location.href = '/app.php';
-        }, 1000);
+        fetch('/api/auth.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=login&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+
+            if (data.success) {
+                showToast('Logged in as ' + data.user.username, 'success');
+                setTimeout(function() {
+                    window.location.href = '/app.php';
+                }, 1000);
+            } else {
+                showToast(data.message || 'Login failed', 'error');
+            }
+        })
+        .catch(function(err) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+            showToast('Network error, please try again', 'error');
+        });
     });
 
     // ===== 注册表单提交 =====
@@ -293,16 +315,40 @@
 
         if (!valid) return;
 
-        // 模拟注册（后续接入后端 API）
         const username = document.getElementById('register-username').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
 
-        showToast('Account created for ' + username + '! (demo)', 'success');
+        // 禁用按钮防止重复提交
+        const submitBtn = formRegister.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
 
-        // 切换到登录表单
-        setTimeout(function() {
-            switchForm('login-form');
-            document.getElementById('login-username').value = username;
-        }, 1000);
+        fetch('/api/auth.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=register&username=' + encodeURIComponent(username) + '&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+
+            if (data.success) {
+                showToast('Account created for ' + username + '!', 'success');
+                setTimeout(function() {
+                    switchForm('login-form');
+                    document.getElementById('login-username').value = username;
+                }, 1000);
+            } else {
+                showToast(data.message || 'Registration failed', 'error');
+            }
+        })
+        .catch(function(err) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+            showToast('Network error, please try again', 'error');
+        });
     });
 
     // ===== 密码强度检测 =====
@@ -646,30 +692,41 @@
 
             verificationEmail = forgotEmailInput.value.trim();
 
-            // 本地测试：检查邮箱是否存在
-            const testAccounts = {
-                'admin@qq.com': '123456'
-            };
+            // 禁用按钮
+            const submitBtn = forgotStep1.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
 
-            if (!testAccounts[verificationEmail]) {
-                showError('forgot-email', 'This email is not registered');
-                return;
-            }
+            fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=check_email&email=' + encodeURIComponent(verificationEmail)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Verification Code';
 
-            // 模拟发送验证码（实际应调用后端API）
-            showToast('Verification code sent to ' + verificationEmail, 'success');
-
-            // 显示邮箱
-            if (displayEmail) {
-                displayEmail.textContent = verificationEmail;
-            }
-
-            // 切换到步骤2
-            setTimeout(function() {
-                forgotStep1.classList.add('hidden');
-                forgotStep2.classList.remove('hidden');
-                updateStepIndicator(2);
-            }, 500);
+                if (data.success) {
+                    showToast('Verification code sent to ' + verificationEmail, 'success');
+                    if (displayEmail) {
+                        displayEmail.textContent = verificationEmail;
+                    }
+                    setTimeout(function() {
+                        forgotStep1.classList.add('hidden');
+                        forgotStep2.classList.remove('hidden');
+                        updateStepIndicator(2);
+                    }, 500);
+                } else {
+                    showToast(data.message || 'Email not found', 'error');
+                    showError('forgot-email', data.message || 'This email is not registered');
+                }
+            })
+            .catch(function(err) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Verification Code';
+                showToast('Network error, please try again', 'error');
+            });
         });
     }
 
@@ -687,16 +744,6 @@
             } else if (forgotCodeInput.value.length !== 6) {
                 showError('forgot-code', 'Code must be 6 digits');
                 valid = false;
-            } else {
-                // 本地测试：检查验证码是否正确
-                const testAccounts = {
-                    'admin@qq.com': '123456'
-                };
-
-                if (testAccounts[verificationEmail] !== forgotCodeInput.value.trim()) {
-                    showError('forgot-code', 'Invalid verification code');
-                    valid = false;
-                }
             }
 
             // 新密码验证
@@ -707,25 +754,67 @@
 
             if (!valid) return;
 
-            // 模拟重置密码（实际应调用后端API）
-            showToast('Password reset successfully!', 'success');
+            // 禁用按钮
+            const submitBtn = forgotStep2.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Resetting...';
 
-            // 重置表单并切换回登录
-            setTimeout(function() {
-                forgotStep1.classList.remove('hidden');
-                forgotStep2.classList.add('hidden');
-                forgotStep1.reset();
-                forgotStep2.reset();
-                updateStepIndicator(1);
-                switchForm('login-form');
-            }, 1500);
+            fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=reset_password&code=' + encodeURIComponent(forgotCodeInput.value.trim()) + '&new_password=' + encodeURIComponent(forgotNewPasswordInput.value)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Reset Password';
+
+                if (data.success) {
+                    showToast('Password reset successfully!', 'success');
+                    setTimeout(function() {
+                        forgotStep1.classList.remove('hidden');
+                        forgotStep2.classList.add('hidden');
+                        forgotStep1.reset();
+                        forgotStep2.reset();
+                        updateStepIndicator(1);
+                        switchForm('login-form');
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Password reset failed', 'error');
+                    if (data.message && data.message.includes('验证码')) {
+                        showError('forgot-code', data.message);
+                    }
+                }
+            })
+            .catch(function(err) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Reset Password';
+                showToast('Network error, please try again', 'error');
+            });
         });
     }
 
     // 重发验证码
     if (resendBtn) {
         resendBtn.addEventListener('click', function() {
-            showToast('Verification code resent to ' + verificationEmail, 'success');
+            if (!verificationEmail) return;
+
+            fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=check_email&email=' + encodeURIComponent(verificationEmail)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('Verification code resent to ' + verificationEmail, 'success');
+                } else {
+                    showToast(data.message || 'Failed to resend code', 'error');
+                }
+            })
+            .catch(function(err) {
+                showToast('Network error, please try again', 'error');
+            });
         });
     }
 

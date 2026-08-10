@@ -155,27 +155,57 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== 状态标签 ===== */
 .status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
     border-radius: 9999px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+}
+
+.status-badge::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .status-online {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-online::before {
     background: #10b981;
-    color: white;
+    box-shadow: 0 0 6px #10b981;
 }
 
 .status-updating {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.status-updating::before {
     background: #f59e0b;
-    color: white;
+    box-shadow: 0 0 6px #f59e0b;
 }
 
-.status-dev {
-    background: #6366f1;
-    color: white;
+.status-dev,
+.status-development {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+.status-dev::before,
+.status-development::before {
+    background: #818cf8;
+    box-shadow: 0 0 6px #818cf8;
 }
 
 /* ===== FAQ手风琴 ===== */
@@ -272,6 +302,138 @@ h1, h2, h3, h4, h5, h6 {
         width: 200px;
         height: 200px;
     }
+}
+
+/* ===== 数字输入框箭头隐藏 ===== */
+.number-input {
+    -moz-appearance: textfield;
+}
+
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ===== 自定义确认对话框 ===== */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.confirm-overlay.show {
+    opacity: 1;
+}
+
+.confirm-dialog {
+    background: #1a1a24;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 380px;
+    width: 90%;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+}
+
+.confirm-overlay.show .confirm-dialog {
+    transform: scale(1);
+}
+
+.confirm-dialog-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.confirm-dialog-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #ef4444;
+}
+
+.confirm-dialog-title {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.confirm-dialog-message {
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-dialog-actions button {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.confirm-btn-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.confirm-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.confirm-btn-confirm {
+    background: #ef4444;
+    color: #fff;
+}
+
+.confirm-btn-confirm:hover {
+    background: #dc2626;
+}
+
+.confirm-btn-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 删除按钮加载状态 */
+.btn-admin-delete.is-loading {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.btn-admin-delete.is-loading svg {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* ===== 滚动条样式 ===== */

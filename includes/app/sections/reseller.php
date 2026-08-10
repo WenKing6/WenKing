@@ -77,156 +77,127 @@
                 <span class="text-sm text-white/40"><?php _e('reseller.customers_count'); ?></span>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-3">
             <!-- 客户卡片 1 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- 用户信息 -->
-                    <div>
-                        <div class="text-sm font-medium text-white">JohnDoe</div>
-                        <div class="text-xs text-white/60">john@example.com</div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
+                            <span class="text-sm font-semibold text-accent-purple">JD</span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-sm font-medium text-white truncate">JohnDoe</div>
+                            <div class="text-xs text-white/60 truncate hidden sm:block">john@example.com</div>
+                        </div>
                     </div>
-                    
-                    <!-- 许可证 -->
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
-                        <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-XXXX-XXXX</code>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan hidden sm:inline-block">WK-2024-XXXX-XXXX</code>
+                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                     </div>
-                    
-                    <!-- 时间信息 -->
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
-                        <div class="text-sm text-white">2024-01-15</div>
-                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 2 hours ago</div>
-                    </div>
-                    
-                    <!-- IP 和机器码 -->
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
-                        <div class="text-sm text-white font-mono">192.168.1.100</div>
-                        <div class="text-xs text-white/60 font-mono">MCH-8F3A2B1C</div>
-                    </div>
-                </div>
-                
-                <!-- 底部操作栏 -->
-                <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-1 shrink-0">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                             </svg>
                         </button>
                     </div>
+                </div>
+                <div class="flex items-center gap-4 mt-3 pt-3 border-t border-white/5 text-xs text-white/40 sm:hidden">
+                    <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan">WK-2024-XXXX-XXXX</code>
+                    <span>192.168.1.100</span>
                 </div>
             </div>
 
             <!-- 客户卡片 2 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <div class="text-sm font-medium text-white">AliceSmith</div>
-                        <div class="text-xs text-white/60">alice@example.com</div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center shrink-0">
+                            <span class="text-sm font-semibold text-accent-cyan">AS</span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-sm font-medium text-white truncate">AliceSmith</div>
+                            <div class="text-xs text-white/60 truncate hidden sm:block">alice@example.com</div>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
-                        <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-YYYY-YYYY</code>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan hidden sm:inline-block">WK-2024-YYYY-YYYY</code>
+                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
                     </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
-                        <div class="text-sm text-white">2024-02-20</div>
-                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 1 day ago</div>
-                    </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
-                        <div class="text-sm text-white font-mono">10.0.0.50</div>
-                        <div class="text-xs text-white/60 font-mono">MCH-9D4E5F6G</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-1 shrink-0">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                             </svg>
                         </button>
                     </div>
+                </div>
+                <div class="flex items-center gap-4 mt-3 pt-3 border-t border-white/5 text-xs text-white/40 sm:hidden">
+                    <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan">WK-2024-YYYY-YYYY</code>
+                    <span>10.0.0.50</span>
                 </div>
             </div>
 
             <!-- 客户卡片 3 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <div class="text-sm font-medium text-white">BobWilson</div>
-                        <div class="text-xs text-white/60">bob@example.com</div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-sm font-semibold text-amber-400">BW</span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-sm font-medium text-white truncate">BobWilson</div>
+                            <div class="text-xs text-white/60 truncate hidden sm:block">bob@example.com</div>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license'); ?></div>
-                        <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-ZZZZ-ZZZZ</code>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan hidden sm:inline-block">WK-2024-ZZZZ-ZZZZ</code>
+                        <span class="status-badge status-updating text-xs"><?php _e('reseller.inactive'); ?></span>
                     </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.registered'); ?></div>
-                        <div class="text-sm text-white">2024-03-10</div>
-                        <div class="text-xs text-white/60"><?php _e('reseller.last_login'); ?>: 3 days ago</div>
-                    </div>
-                    
-                    <div>
-                        <div class="text-xs text-white/40 mb-1"><?php _e('reseller.ip_address'); ?></div>
-                        <div class="text-sm text-white font-mono">172.16.0.25</div>
-                        <div class="text-xs text-white/60 font-mono">MCH-7H8I9J0K</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <span class="status-badge status-updating text-xs"><?php _e('reseller.inactive'); ?></span>
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-1 shrink-0">
                         <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                         </button>
                         <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Disable">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                             </svg>
                         </button>
                     </div>
+                </div>
+                <div class="flex items-center gap-4 mt-3 pt-3 border-t border-white/5 text-xs text-white/40 sm:hidden">
+                    <code class="text-xs bg-white/10 px-2 py-0.5 rounded text-accent-cyan">WK-2024-ZZZZ-ZZZZ</code>
+                    <span>172.16.0.25</span>
                 </div>
             </div>
         </div>

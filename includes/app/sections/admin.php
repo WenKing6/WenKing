@@ -1,0 +1,494 @@
+<?php
+/**
+ * Admin 页面 - 产品管理控制面板
+ * 风格与 Manager 页面一致
+ */
+require_once __DIR__ . '/../../models/Product.php';
+require_once __DIR__ . '/../../models/User.php';
+$productModel = new Product();
+$userModel = new User();
+$products = $productModel->getAll();
+$users = $userModel->getAll();
+?>
+<div class="app-page-header mb-8">
+    <h1 class="text-3xl font-display font-bold mb-2">
+        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Admin Panel</span>
+    </h1>
+    <p class="text-white/60">Manage products, users, and system settings</p>
+</div>
+
+<!-- Tab 导航 -->
+<div class="manager-tabs mb-6 flex gap-2 border-b border-white/10">
+    <button class="manager-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="products">
+        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        Products
+    </button>
+    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="users">
+        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        Users
+    </button>
+</div>
+
+<!-- Tab 内容区域 -->
+<div class="manager-tab-content">
+    <!-- Products Tab -->
+    <div id="products-tab" class="tab-panel active">
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Total Products</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count($products); ?></div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-online/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-online" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Online</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count(array_filter($products, fn($p) => $p['status'] === 'online')); ?></div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-updating/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-updating" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Updating</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count(array_filter($products, fn($p) => $p['status'] === 'updating')); ?></div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-dev/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-dev" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Development</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count(array_filter($products, fn($p) => $p['status'] === 'development')); ?></div>
+            </div>
+        </div>
+
+        <!-- 产品列表 -->
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-white">Product List (<?php echo count($products); ?>)</h3>
+                <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm" onclick="openProductModal()">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Product
+                </button>
+            </div>
+
+            <!-- 桌面端表格布局 -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-white/50 border-b border-white/10">
+                            <th class="text-left py-3 px-4">ID</th>
+                            <th class="text-left py-3 px-4">Name</th>
+                            <th class="text-left py-3 px-4">Tagline</th>
+                            <th class="text-left py-3 px-4">Status</th>
+                            <th class="text-left py-3 px-4">Sort</th>
+                            <th class="text-left py-3 px-4">Visible</th>
+                            <th class="text-left py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-list">
+                        <?php foreach ($products as $p): ?>
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $p['id']; ?>">
+                            <td class="py-3 px-4 text-white/40"><?php echo $p['id']; ?></td>
+                            <td class="py-3 px-4 font-medium text-white"><?php echo htmlspecialchars($p['name']); ?></td>
+                            <td class="py-3 px-4 text-white/60 max-w-xs truncate"><?php echo htmlspecialchars($p['tagline']); ?></td>
+                            <td class="py-3 px-4">
+                                <span class="status-badge status-<?php echo $p['status']; ?> text-xs"><?php echo ucfirst($p['status']); ?></span>
+                            </td>
+                            <td class="py-3 px-4 text-white/40"><?php echo $p['sort_order']; ?></td>
+                            <td class="py-3 px-4"><?php echo $p['is_visible'] ? '<span class="text-status-online">✅</span>' : '<span class="text-white/30">❌</span>'; ?></td>
+                            <td class="py-3 px-4 flex gap-2">
+                                <button class="btn-admin-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-product='<?php echo htmlspecialchars(json_encode($p), ENT_QUOTES); ?>'>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-admin-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $p['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 移动端卡片布局 -->
+            <div id="product-list-mobile" class="md:hidden space-y-3">
+                <?php foreach ($products as $p): ?>
+                <div class="relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center shrink-0">
+                                <span class="text-sm font-semibold text-accent-purple"><?php echo $p['id']; ?></span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-sm font-medium text-white truncate"><?php echo htmlspecialchars($p['name']); ?></div>
+                                <div class="text-xs text-white/60 truncate"><?php echo htmlspecialchars($p['tagline']); ?></div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-<?php echo $p['status']; ?> text-xs shrink-0"><?php echo ucfirst($p['status']); ?></span>
+                    </div>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                        <div class="flex items-center gap-4 text-xs text-white/40">
+                            <span>Sort: <?php echo $p['sort_order']; ?></span>
+                            <span><?php echo $p['is_visible'] ? '<span class="text-status-online">✅ Visible</span>' : '<span class="text-white/30">❌ Hidden</span>'; ?></span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button class="btn-admin-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-product='<?php echo htmlspecialchars(json_encode($p), ENT_QUOTES); ?>'>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-admin-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $p['id']; ?>">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="users-tab" class="tab-panel">
+        <!-- 用户统计卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Total Users</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count($users); ?></div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-online/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-online" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Active</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count(array_filter($users, fn($u) => $u['status'] === 'active')); ?></div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Inactive / Banned</span>
+                </div>
+                <div class="text-3xl font-bold text-white"><?php echo count(array_filter($users, fn($u) => $u['status'] !== 'active')); ?></div>
+            </div>
+        </div>
+
+        <!-- 用户列表 -->
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <h3 class="text-lg font-semibold text-white">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div class="relative w-full sm:w-56">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </span>
+                        <input type="text" id="user-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by username...">
+                    </div>
+                    <select id="user-role-filter" class="app-select w-full sm:w-36">
+                        <option value="">All Roles</option>
+                        <?php foreach ($userModel->getAvailableRoles() as $key => $label): ?>
+                        <option value="<?php echo $key; ?>"><?php echo $label; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 桌面端表格 -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-white/50 border-b border-white/10">
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('id')">ID</th>
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('username')">Username</th>
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('email')">Email</th>
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('role')">Role</th>
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('status')">Status</th>
+                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('created_at')">Created</th>
+                            <th class="text-left py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-list">
+                        <?php if (empty($users)): ?>
+                        <tr>
+                            <td colspan="7" class="text-center py-12 text-white/40">
+                                <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                No users found
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                            <?php $rowIndex = 1; foreach ($users as $u): ?>
+                            <tr class="user-row border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
+                                <td class="py-3 px-4 text-white/40 user-cell-id"><?php echo $rowIndex++; ?></td>
+                                <td class="py-3 px-4 font-medium text-white user-cell-username"><?php echo htmlspecialchars($u['username']); ?></td>
+                                <td class="py-3 px-4 text-white/60 user-cell-email"><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td class="py-3 px-4 user-cell-role">
+                                    <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
+                                        <?php echo ucfirst($u['role']); ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 user-cell-status">
+                                    <span class="status-badge <?php echo $u['status'] === 'active' ? 'status-online' : 'bg-red-500/20 text-red-400 border-red-500/30'; ?> text-xs">
+                                        <?php echo ucfirst($u['status']); ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-white/40 user-cell-created"><?php echo date('Y-m-d', strtotime($u['created_at'])); ?></td>
+                                <td class="py-3 px-4 flex gap-2">
+                                    <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 移动端卡片列表 -->
+            <div class="md:hidden space-y-3" id="user-cards">
+                <?php if (empty($users)): ?>
+                <div class="text-center py-12 text-white/40">
+                    <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    No users found
+                </div>
+                <?php else: ?>
+                    <?php $rowIndex = 1; foreach ($users as $u): ?>
+                    <div class="user-card bg-white/5 rounded-xl p-4 border border-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-sm font-bold text-accent-purple user-card-index">
+                                    <?php echo $rowIndex++; ?>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
+                                    <div class="text-sm text-white/50 user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
+                                    <?php echo ucfirst($u['role']); ?>
+                                </span>
+                                <span class="status-badge <?php echo $u['status'] === 'active' ? 'status-online' : 'bg-red-500/20 text-red-400 border-red-500/30'; ?> text-xs user-card-status">
+                                    <?php echo ucfirst($u['status']); ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-white/40 user-card-created">
+                                <?php echo date('Y-m-d', strtotime($u['created_at'])); ?>
+                            </span>
+                            <div class="flex gap-2">
+                                <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 用户编辑弹窗（放在 tab-panel 外部，避免被 display:none 影响） -->
+<div id="user-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-md w-full mx-4 transform scale-95 opacity-0 transition-all duration-200" id="user-edit-dialog">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white" id="user-edit-title">Edit User</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="user-edit-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="user-edit-form" class="space-y-4">
+            <input type="hidden" id="ue-id">
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Username</label>
+                <input type="text" id="ue-username" class="app-input w-full px-4 py-2" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Email</label>
+                <input type="email" id="ue-email" class="app-input w-full px-4 py-2" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Status</label>
+                <select id="ue-status" class="app-select w-full">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="banned">Banned</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Role</label>
+                <select id="ue-role" class="app-select w-full">
+                    <option value="user">User</option>
+                    <option value="reseller">Reseller</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">New Password <span class="text-white/40">(leave blank to keep current)</span></label>
+                <input type="password" id="ue-password" class="app-input w-full px-4 py-2" placeholder="Enter new password...">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
+                    Save Changes
+                </button>
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="user-edit-cancel">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 产品编辑弹窗（放在 tab-panel 外部，避免被 display:none 影响） -->
+<div id="product-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-2xl w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="product-edit-dialog">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white" id="product-edit-title">Add New Product</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="product-edit-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" id="edit-id" value="">
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Product Name *</label>
+                <input type="text" id="f-name" class="app-input w-full px-4 py-2" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Tagline</label>
+                <input type="text" id="f-tagline" class="app-input w-full px-4 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Status</label>
+                <select id="f-status" class="app-select w-full">
+                    <option value="online">Online</option>
+                    <option value="updating">Updating</option>
+                    <option value="development">Development</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Image Path</label>
+                <input type="text" id="f-image" class="app-input w-full px-4 py-2" placeholder="/assets/images/hero-bg.jpg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Button Text</label>
+                <input type="text" id="f-button-text" class="app-input w-full px-4 py-2" value="Now Buy">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Button Link</label>
+                <input type="text" id="f-button-link" class="app-input w-full px-4 py-2" placeholder="/partners.php">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Sort Order</label>
+                <input type="number" id="f-sort-order" class="app-input w-full px-4 py-2 number-input" value="0">
+            </div>
+            <div class="flex items-end">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="f-is-visible" checked class="w-4 h-4 rounded">
+                    <span class="text-sm text-white/60">Visible on Frontend</span>
+                </label>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-white/70 mb-2">Features (separated by |)</label>
+                <input type="text" id="f-features" class="app-input w-full px-4 py-2" placeholder="100+ Features|Daily Updates|Undetected">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-white/70 mb-2">Description</label>
+                <textarea id="f-description" class="app-input w-full px-4 py-2" rows="2"></textarea>
+            </div>
+            <div class="md:col-span-2 flex gap-3 pt-2">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1" id="submit-btn">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Product
+                </button>
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+

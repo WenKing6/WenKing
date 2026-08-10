@@ -37,6 +37,7 @@ if (!defined('SITE_NAME')) {
         window.i18n = <?php echo json_encode(I18n::getInstance()->all(), JSON_UNESCAPED_UNICODE); ?>;
         window.i18nLang = <?php echo json_encode($lang); ?>;
         window.isLoggedIn = false;
+        window.SITE_URL = '<?php echo SITE_URL; ?>';
     </script>
 
     <!-- Tailwind Config Extension -->
