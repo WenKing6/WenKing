@@ -57,3 +57,24 @@ INSERT INTO `products` (`name`, `tagline`, `description`, `status`, `image`, `bu
 ('GTA V Menu', 'Complete lobby dominance with advanced features', '100+ Features|Daily Updates|Undetected Status', 'online', '/assets/images/hero-bg.jpg', 'Now Buy', '/partners.php', '100+ Features|Daily Updates|Undetected Status', 1, 1),
 ('RDR 2 Menu', 'Wild West adventure with premium enhancements', '80+ Features|Weekly Updates|Security Protection', 'updating', '/assets/images/hero-bg.jpg', 'Coming Soon', '', '80+ Features|Weekly Updates|Security Protection', 2, 1),
 ('Fortnite Menu', 'Competitive edge with advanced aiming systems', 'Advanced Aimbot|Visual Enhancements|Movement Assistance', 'development', '/assets/images/hero-bg.jpg', 'In Development', '', 'Advanced Aimbot|Visual Enhancements|Movement Assistance', 3, 1);
+
+-- 许可证表
+CREATE TABLE IF NOT EXISTS `licenses` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `license_key` VARCHAR(100) NOT NULL,
+    `product_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED DEFAULT NULL,
+    `duration_days` INT NOT NULL DEFAULT 30,
+    `status` ENUM('unused', 'active', 'expired', 'disabled') NOT NULL DEFAULT 'unused',
+    `activated_at` TIMESTAMP NULL DEFAULT NULL,
+    `expires_at` TIMESTAMP NULL DEFAULT NULL,
+    `note` VARCHAR(255) DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_license_key` (`license_key`),
+    KEY `idx_product_id` (`product_id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_status` (`status`),
+    KEY `idx_expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

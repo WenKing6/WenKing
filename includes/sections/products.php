@@ -38,7 +38,7 @@ $statusLabels = [
             <div class="relative group fade-in-up <?php echo $delayClass; ?>">
                 <div class="product-card p-8 rounded-xl h-full">
                     <div class="card-bg" style="background-image: url('<?php echo SITE_URL . htmlspecialchars($p['image']); ?>'); background-position: center <?php echo $index === 0 ? 'top' : ($index === 1 ? 'center' : 'bottom'); ?>;"></div>
-                    <span class="status-badge status-<?php echo htmlspecialchars($p['status']); ?> mb-4 inline-block"><?php echo htmlspecialchars($statusLabels[$p['status']] ?? ucfirst($p['status'])); ?></span>
+                    <span class="status-badge status-<?php echo htmlspecialchars($p['status']); ?> mb-4"><?php echo htmlspecialchars($statusLabels[$p['status']] ?? ucfirst($p['status'])); ?></span>
                     <h3 class="text-2xl font-display font-bold mb-2"><?php echo htmlspecialchars($p['name']); ?></h3>
                     <p class="text-white/60 mb-6 <?php echo $index === 0 ? 'text-left' : ''; ?>"><?php echo htmlspecialchars($p['tagline']); ?></p>
                     <?php if (!empty($features)): ?>

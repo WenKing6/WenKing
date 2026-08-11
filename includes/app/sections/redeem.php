@@ -1,6 +1,6 @@
 <?php
 /**
- * 兑换码页面内容
+ * Redeem Code Page Content
  */
 ?>
 <div class="app-page-header mb-8">
@@ -11,23 +11,23 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-    <!-- 兑换表单 -->
+    <!-- Redeem Form -->
     <div class="glass-card p-8 rounded-xl">
         <div class="space-y-6">
-            <!-- 输入框 -->
+            <!-- Input Field -->
             <div>
                 <label class="block text-sm text-white/60 mb-2"><?php _e('redeem.code_label'); ?></label>
                 <input type="text" placeholder="<?php _e('redeem.code_ph'); ?>" class="app-input w-full text-center text-lg tracking-widest uppercase" id="redeem-code-input">
             </div>
 
-            <!-- 按钮 -->
+            <!-- Button -->
             <button class="btn-primary w-full py-3 rounded-lg font-semibold text-center" id="redeem-btn">
                 <?php _e('redeem.redeem_btn'); ?>
             </button>
         </div>
     </div>
 
-    <!-- 使用说明 -->
+    <!-- How to Use -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-sm font-semibold text-white/80 mb-3"><?php _e('redeem.how_to'); ?></h3>
         <ol class="space-y-2 text-sm text-white/50 list-decimal list-inside">
@@ -39,12 +39,12 @@
     </div>
 </div>
 
-<!-- 浮动提示框 -->
+<!-- Floating Toast Notification -->
 <div id="redeem-toast" class="redeem-toast">
     <div class="redeem-toast-progress"></div>
     <div class="redeem-toast-content">
         <div class="redeem-toast-icon" id="redeem-toast-icon">
-            <!-- 图标将通过 JS 动态设置 -->
+            <!-- Icon will be set dynamically via JS -->
         </div>
         <div class="redeem-toast-body">
             <div class="redeem-toast-title" id="redeem-toast-title"><?php _e('redeem.success'); ?></div>
@@ -59,7 +59,7 @@
 </div>
 
 <style>
-/* 提示框容器 */
+/* Toast container */
 .redeem-toast {
     position: fixed;
     top: 2rem;
@@ -85,7 +85,7 @@
     pointer-events: auto;
 }
 
-/* 绿色 - 成功提示 */
+/* Green - Success toast */
 .redeem-toast.toast-success {
     border-color: rgba(16, 185, 129, 0.3);
     box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2), 0 0 40px rgba(16, 185, 129, 0.1);
@@ -100,7 +100,7 @@
     color: #10b981;
 }
 
-/* 橙色 - 警告提示 */
+/* Orange - Warning toast */
 .redeem-toast.toast-warning {
     border-color: rgba(245, 158, 11, 0.3);
     box-shadow: 0 20px 60px rgba(245, 158, 11, 0.2), 0 0 40px rgba(245, 158, 11, 0.1);
@@ -115,7 +115,7 @@
     color: #f59e0b;
 }
 
-/* 红色 - 错误提示 */
+/* Red - Error toast */
 .redeem-toast.toast-error {
     border-color: rgba(239, 68, 68, 0.3);
     box-shadow: 0 20px 60px rgba(239, 68, 68, 0.2), 0 0 40px rgba(239, 68, 68, 0.1);
@@ -130,7 +130,7 @@
     color: #ef4444;
 }
 
-/* 进度条 */
+/* Progress bar */
 .redeem-toast-progress {
     position: absolute;
     top: 0;
@@ -155,7 +155,7 @@
     }
 }
 
-/* 内容区域 */
+/* Content area */
 .redeem-toast-content {
     display: flex;
     align-items: center;
@@ -163,7 +163,7 @@
     padding: 1.25rem 1.5rem;
 }
 
-/* 图标 */
+/* Icon */
 .redeem-toast-icon {
     flex-shrink: 0;
     width: 2.5rem;
@@ -176,7 +176,7 @@
     color: #10b981;
 }
 
-/* 文本内容 */
+/* Text content */
 .redeem-toast-body {
     flex: 1;
     min-width: 0;
@@ -195,7 +195,7 @@
     line-height: 1.4;
 }
 
-/* 关闭按钮 */
+/* Close button */
 .redeem-toast-close {
     flex-shrink: 0;
     width: 2rem;
@@ -217,7 +217,7 @@
     transform: scale(1.05);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 640px) {
     .redeem-toast {
         top: 1rem;

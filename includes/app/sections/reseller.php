@@ -1,6 +1,6 @@
 <?php
 /**
- * Reseller 页面 - 分销商管理面板
+ * Reseller Page - Reseller Management Panel
  */
 ?>
 <div class="app-page-header mb-8">
@@ -10,7 +10,7 @@
     <p class="text-white/60"><?php _e('reseller.subtitle'); ?></p>
 </div>
 
-<!-- Tab 导航 -->
+<!-- Tab Navigation -->
 <div class="reseller-tabs mb-6 flex gap-2 border-b border-white/10">
     <button class="reseller-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="customers">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,11 +33,11 @@
     </button>
 </div>
 
-<!-- Tab 内容区域 -->
+<!-- Tab Content Area -->
 <div class="reseller-tab-content">
     <!-- Customers Tab -->
     <div id="customers-tab" class="tab-panel active">
-        <!-- 搜索和筛选 -->
+        <!-- Search and Filter -->
         <div class="glass-card p-4 rounded-xl mb-6">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        <!-- 客户列表 - 卡片式布局 -->
+        <!-- Customer List - Card Layout -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-white"><?php _e('reseller.customer_list'); ?></h3>
@@ -78,7 +78,7 @@
             </div>
 
             <div class="space-y-3">
-            <!-- 客户卡片 1 -->
+            <!-- Customer Card 1 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -119,7 +119,7 @@
                 </div>
             </div>
 
-            <!-- 客户卡片 2 -->
+            <!-- Customer Card 2 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -160,7 +160,7 @@
                 </div>
             </div>
 
-            <!-- 客户卡片 3 -->
+            <!-- Customer Card 3 -->
             <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -203,7 +203,7 @@
         </div>
     </div>
 
-        <!-- 分页 -->
+        <!-- Pagination -->
         <div class="mt-6 flex items-center justify-between">
             <div class="text-sm text-white/60"><?php _e('reseller.showing'); ?></div>
             <div class="flex gap-2">
@@ -215,7 +215,7 @@
 
     <!-- Licenses Tab -->
     <div id="licenses-tab" class="tab-panel">
-        <!-- 批量查询 -->
+        <!-- Batch Query -->
         <div class="glass-card p-6 rounded-xl mb-6">
             <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('reseller.license_lookup'); ?></h3>
             <div class="space-y-4">
@@ -246,7 +246,7 @@
             </div>
         </div>
 
-        <!-- 许可证分配记录 - 卡片式布局 -->
+        <!-- License Allocation Records - Card Layout -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-white"><?php _e('reseller.allocation_records'); ?></h3>
@@ -259,7 +259,7 @@
             </div>
 
             <div class="space-y-4">
-                <!-- 许可证卡片 1 -->
+                <!-- License Card 1 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
@@ -298,7 +298,7 @@
                     </div>
                 </div>
 
-                <!-- 许可证卡片 2 -->
+                <!-- License Card 2 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
@@ -337,7 +337,7 @@
                     </div>
                 </div>
 
-                <!-- 许可证卡片 3 -->
+                <!-- License Card 3 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>

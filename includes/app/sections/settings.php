@@ -1,6 +1,6 @@
 <?php
 /**
- * 设置页面内容
+ * Settings page content
  */
 ?>
 <div class="app-page-header mb-8">
@@ -11,7 +11,7 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- 账户信息 -->
+    <!-- Account Information -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.account_info'); ?></h3>
         <div class="space-y-4">
@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <!-- 偏好设置 -->
+    <!-- Preferences -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.preferences'); ?></h3>
         <div class="space-y-4">
@@ -41,7 +41,7 @@
                 <label class="block text-sm text-white/60 mb-2"><?php _e('settings.language'); ?></label>
                 <select class="app-select w-full">
                     <option value="en">English</option>
-                    <option value="zh">简体中文</option>
+                    <option value="zh">Simplified Chinese</option>
                 </select>
             </div>
             <div class="flex items-center justify-between py-3 border-t border-white/10">
@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <!-- 安全设置 -->
+    <!-- Security Settings -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <!-- 安全设置 -->
+    <!-- Security Settings -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    <!-- 安全设置 -->
+    <!-- Security Settings -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <!-- 安全设置 -->
+    <!-- Security Settings -->
     <div class="glass-card p-6 rounded-xl">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('settings.security'); ?></h3>
         <div class="space-y-4">
@@ -156,7 +156,7 @@
     </div>
 </div>
 
-<!-- 保存按钮 -->
+<!-- Save Button -->
 <div class="flex justify-center mt-6">
     <button class="btn-primary px-6 py-3 rounded-lg font-semibold">
         <?php _e('settings.save_changes'); ?>

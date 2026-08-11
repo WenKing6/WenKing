@@ -1,23 +1,40 @@
 <?php
 /**
- * Admin 页面 - 产品管理控制面板
- * 风格与 Manager 页面一致
+ * Admin Page - Product Management Control Panel
+ * Consistent style with Manager page
  */
 require_once __DIR__ . '/../../models/Product.php';
 require_once __DIR__ . '/../../models/User.php';
+require_once __DIR__ . '/../../models/License.php';
 $productModel = new Product();
 $userModel = new User();
+$licenseModel = new License();
 $products = $productModel->getAll();
 $users = $userModel->getAll();
+$licenses = $licenseModel->getAll();
+
+// Group users by role for license assignment
+$usersByRole = [];
+foreach ($users as $u) {
+    $role = $u['role'];
+    if (!isset($usersByRole[$role])) {
+        $usersByRole[$role] = [];
+    }
+    $usersByRole[$role][] = [
+        'id' => $u['id'],
+        'username' => $u['username'],
+        'email' => $u['email']
+    ];
+}
 ?>
-<div class="app-page-header mb-8">
+<div class="app-page-header mb-8" data-users-by-role='<?php echo htmlspecialchars(json_encode($usersByRole), ENT_QUOTES); ?>'>
     <h1 class="text-3xl font-display font-bold mb-2">
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Admin Panel</span>
     </h1>
     <p class="text-white/60">Manage products, users, and system settings</p>
 </div>
 
-<!-- Tab 导航 -->
+<!-- Tab Navigation -->
 <div class="manager-tabs mb-6 flex gap-2 border-b border-white/10">
     <button class="manager-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="products">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,13 +48,19 @@ $users = $userModel->getAll();
         </svg>
         Users
     </button>
+    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
+        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+        </svg>
+        License
+    </button>
 </div>
 
-<!-- Tab 内容区域 -->
+<!-- Tab Content Area -->
 <div class="manager-tab-content">
     <!-- Products Tab -->
     <div id="products-tab" class="tab-panel active">
-        <!-- 统计卡片 -->
+        <!-- Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
             <div class="glass-card p-6 rounded-xl">
                 <div class="flex items-center gap-3 mb-2">
@@ -88,7 +111,7 @@ $users = $userModel->getAll();
             </div>
         </div>
 
-        <!-- 产品列表 -->
+        <!-- Product List -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-white">Product List (<?php echo count($products); ?>)</h3>
@@ -100,7 +123,7 @@ $users = $userModel->getAll();
                 </button>
             </div>
 
-            <!-- 桌面端表格布局 -->
+            <!-- Desktop Table Layout -->
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
@@ -143,7 +166,7 @@ $users = $userModel->getAll();
                 </table>
             </div>
 
-            <!-- 移动端卡片布局 -->
+            <!-- Mobile Card Layout -->
             <div id="product-list-mobile" class="md:hidden space-y-3">
                 <?php foreach ($products as $p): ?>
                 <div class="relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>">
@@ -185,7 +208,7 @@ $users = $userModel->getAll();
 
     <!-- Users Tab -->
     <div id="users-tab" class="tab-panel">
-        <!-- 用户统计卡片 -->
+        <!-- User Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
             <div class="glass-card p-6 rounded-xl">
                 <div class="flex items-center gap-3 mb-2">
@@ -224,7 +247,7 @@ $users = $userModel->getAll();
             </div>
         </div>
 
-        <!-- 用户列表 -->
+        <!-- User List -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
                 <h3 class="text-lg font-semibold text-white">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
@@ -246,7 +269,7 @@ $users = $userModel->getAll();
                 </div>
             </div>
 
-            <!-- 桌面端表格 -->
+            <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
@@ -306,7 +329,7 @@ $users = $userModel->getAll();
                 </table>
             </div>
 
-            <!-- 移动端卡片列表 -->
+            <!-- Mobile Card List -->
             <div class="md:hidden space-y-3" id="user-cards">
                 <?php if (empty($users)): ?>
                 <div class="text-center py-12 text-white/40">
@@ -361,9 +384,326 @@ $users = $userModel->getAll();
         </div>
 
     </div>
+
+    <!-- Licenses Tab -->
+    <div id="licenses-tab" class="tab-panel">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Total Licenses</span>
+                </div>
+                <div class="text-3xl font-bold text-white" id="license-total">0</div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-online/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-online" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Active</span>
+                </div>
+                <div class="text-3xl font-bold text-white" id="license-active">0</div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-status-updating/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-status-updating" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Unused</span>
+                </div>
+                <div class="text-3xl font-bold text-white" id="license-unused">0</div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm text-white/60">Expired / Disabled</span>
+                </div>
+                <div class="text-3xl font-bold text-white" id="license-expired">0</div>
+            </div>
+        </div>
+
+        <!-- License List -->
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <h3 class="text-lg font-semibold text-white">License Keys (<span id="license-count">0</span>)</h3>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div class="relative w-full sm:w-56">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </span>
+                        <input type="text" id="license-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by key...">
+                    </div>
+                    <select id="license-product-filter" class="app-select w-full sm:w-40">
+                        <option value="">All Products</option>
+                        <?php foreach ($products as $p): ?>
+                        <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select id="license-status-filter" class="app-select w-full sm:w-36">
+                        <option value="">All Status</option>
+                        <option value="unused">Unused</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                    <select id="license-per-page" class="app-select w-full sm:w-28">
+                        <option value="10">10 / page</option>
+                        <option value="20">20 / page</option>
+                        <option value="50">50 / page</option>
+                        <option value="100">100 / page</option>
+                    </select>
+                    <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add License
+                    </button>
+                </div>
+            </div>
+
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-white/50 border-b border-white/10">
+                            <th class="text-left py-3 px-4">License Key</th>
+                            <th class="text-left py-3 px-4">Product</th>
+                            <th class="text-left py-3 px-4">Duration</th>
+                            <th class="text-left py-3 px-4">Assigned To</th>
+                            <th class="text-left py-3 px-4">Status</th>
+                            <th class="text-left py-3 px-4">Created</th>
+                            <th class="text-left py-3 px-4">Expires</th>
+                            <th class="text-left py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="license-list">
+                        <?php if (empty($licenses)): ?>
+                        <tr>
+                            <td colspan="8" class="text-center py-12 text-white/40">
+                                <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                                No licenses yet. Click "Add License" to create one.
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                            <?php foreach ($licenses as $lic): ?>
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                                <td class="py-3 px-4 font-mono text-sm text-white/80"><?php echo htmlspecialchars($lic['license_key']); ?></td>
+                                <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></td>
+                                <td class="py-3 px-4 text-white/60">
+                                    <?php
+                                    $days = (int)$lic['duration_days'];
+                                    if ($days === 1) echo '1 Day';
+                                    elseif ($days === 7) echo '7 Days';
+                                    elseif ($days === 30) echo '30 Days';
+                                    elseif ($days === 90) echo '90 Days';
+                                    elseif ($days === 365) echo '1 Year';
+                                    elseif ($days >= 9999) echo 'Lifetime';
+                                    else echo $days . ' Days';
+                                    ?>
+                                </td>
+                                <td class="py-3 px-4 text-white/60">
+                                    <?php if ($lic['user_id']): ?>
+                                        <?php echo htmlspecialchars($lic['user_name'] ?? 'Unknown'); ?>
+                                    <?php else: ?>
+                                        <span class="text-accent-purple">Admin</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs">
+                                        <?php echo ucfirst($lic['status']); ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-white/40 text-xs"><?php echo date('Y-m-d', strtotime($lic['created_at'])); ?></td>
+                                <td class="py-3 px-4 text-white/40 text-xs">
+                                    <?php
+                                    if ($lic['activated_at'] && $lic['duration_days'] < 9999) {
+                                        $expiresAt = date('Y-m-d', strtotime($lic['activated_at'] . ' + ' . $lic['duration_days'] . ' days'));
+                                        echo $expiresAt;
+                                    } elseif ($lic['duration_days'] >= 9999) {
+                                        echo '<span class="text-accent-cyan">Never</span>';
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
+                                <td class="py-3 px-4 flex gap-2">
+                                    <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card List -->
+            <div class="md:hidden space-y-3" id="license-cards">
+                <?php if (empty($licenses)): ?>
+                <div class="text-center py-12 text-white/40">
+                    <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    No licenses yet. Click "Add License" to create one.
+                </div>
+                <?php else: ?>
+                    <?php foreach ($licenses as $lic): ?>
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
+                                <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
+                            </div>
+                            <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs shrink-0">
+                                <?php echo ucfirst($lic['status']); ?>
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-white/40">
+                            <div class="flex gap-3">
+                                <?php
+                                $days = (int)$lic['duration_days'];
+                                if ($days === 1) $durationText = '1 Day';
+                                elseif ($days === 7) $durationText = '7 Days';
+                                elseif ($days === 30) $durationText = '30 Days';
+                                elseif ($days === 90) $durationText = '90 Days';
+                                elseif ($days === 365) $durationText = '1 Year';
+                                elseif ($days >= 9999) $durationText = 'Lifetime';
+                                else $durationText = $days . ' Days';
+                                ?>
+                                <span><?php echo $durationText; ?></span>
+                                <span>
+                                    <?php if ($lic['user_id']): ?>
+                                        <?php echo htmlspecialchars($lic['user_name'] ?? 'Unknown'); ?>
+                                    <?php else: ?>
+                                        <span class="text-accent-purple">Admin</span>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                            <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
+                <div class="text-sm text-white/40">
+                    Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <span class="text-sm text-white/60">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
+                    <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 用户编辑弹窗（放在 tab-panel 外部，避免被 display:none 影响） -->
+<!-- License Edit Modal -->
+<div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="license-edit-dialog">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white" id="license-edit-title">Add License</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="license-edit-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="license-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
+                <select id="lf-product" class="app-select w-full" required>
+                    <option value="">-- Select Product --</option>
+                    <?php foreach ($products as $p): ?>
+                    <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
+                <select id="lf-duration" class="app-select w-full" required>
+                    <option value="">-- Select Time --</option>
+                    <option value="1">1 Day</option>
+                    <option value="7">7 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="90">90 Days</option>
+                    <option value="365">1 Year</option>
+                    <option value="9999">Lifetime</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
+                <select id="lf-role" class="app-select w-full" required>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="reseller">Reseller</option>
+                </select>
+            </div>
+            <div id="lf-user-container" style="display: none;">
+                <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
+                <select id="lf-user" class="app-select w-full">
+                    <option value="">-- Select User --</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">License Keys *</label>
+                <textarea id="lf-license-keys" class="app-input w-full px-4 py-2 font-mono text-sm" rows="6" placeholder="Enter one key per line, e.g.&#10;ABCD-1234-EFGH-5678&#10;IJKL-9012-MNOP-3456&#10;QRST-7890-UVWX-1234" required></textarea>
+                <p class="text-xs text-white/40 mt-1">One key per line. You can paste multiple keys at once.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add License
+                </button>
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="license-cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- User Edit Modal (outside tab-panel to avoid display:none) -->
 <div id="user-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="glass-card p-6 rounded-xl max-w-md w-full mx-4 transform scale-95 opacity-0 transition-all duration-200" id="user-edit-dialog">
         <div class="flex items-center justify-between mb-6">
@@ -417,7 +757,7 @@ $users = $userModel->getAll();
     </div>
 </div>
 
-<!-- 产品编辑弹窗（放在 tab-panel 外部，避免被 display:none 影响） -->
+<!-- Product Edit Modal (outside tab-panel to avoid display:none) -->
 <div id="product-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="glass-card p-6 rounded-xl max-w-2xl w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="product-edit-dialog">
         <div class="flex items-center justify-between mb-6">

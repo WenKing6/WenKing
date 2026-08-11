@@ -1,15 +1,15 @@
 /**
- * WenKing App - 应用核心 JavaScript
- * 包含路由管理、AJAX 加载、状态管理、侧边栏控制
+ * WenKing App - Core Application JavaScript
+ * Includes routing management, AJAX loading, state management, sidebar control
  */
 
-// 全局模态框函数 - 确保在任何情况下都可用
+// Global modal functions - ensure availability in all cases
 window.openProductModal = function(resetForm) {
     var overlay = document.getElementById('product-edit-overlay');
     var dialog = document.getElementById('product-edit-dialog');
 
     if (overlay && dialog) {
-        // 获取 PageLoader 实例并调用重置表单
+        // Get PageLoader instance and call reset form
         var loader = window.appInstance ? window.appInstance.pageLoader : null;
         if (resetForm !== false && loader && loader._resetAdminForm) {
             loader._resetAdminForm();
@@ -35,11 +35,43 @@ window.closeProductModal = function() {
     }
 };
 
+// License modal functions
+window.openLicenseModal = function() {
+    var overlay = document.getElementById('license-edit-overlay');
+    var dialog = document.getElementById('license-edit-dialog');
+    var form = document.getElementById('license-form');
+
+    if (overlay && dialog) {
+        // Reset form
+        if (form) form.reset();
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        setTimeout(function() {
+            dialog.classList.remove('scale-95', 'opacity-0');
+            dialog.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+};
+
+window.closeLicenseModal = function() {
+    var overlay = document.getElementById('license-edit-overlay');
+    var dialog = document.getElementById('license-edit-dialog');
+    
+    if (overlay && dialog) {
+        dialog.classList.remove('scale-100', 'opacity-100');
+        dialog.classList.add('scale-95', 'opacity-0');
+        setTimeout(function() {
+            overlay.classList.remove('flex');
+            overlay.classList.add('hidden');
+        }, 200);
+    }
+};
+
 (function () {
     'use strict';
 
     // ============================================
-    // 1. AppState - 状态管理（发布-订阅模式）
+    // 1. AppState - State Management (Publish-Subscribe Pattern)
     // ============================================
     class AppState {
         constructor() {
@@ -62,7 +94,7 @@ window.closeProductModal = function() {
     }
 
     // ============================================
-    // 2. Router - Hash 路由管理
+    // 2. Router - Hash Route Management
     // ============================================
     class Router {
         constructor() {
@@ -89,7 +121,7 @@ window.closeProductModal = function() {
     }
 
     // ============================================
-    // 3. PageLoader - AJAX 页面加载
+    // 3. PageLoader - AJAX Page Loading
     // ============================================
     class PageLoader {
         constructor(container) {
@@ -98,21 +130,21 @@ window.closeProductModal = function() {
         }
 
         async loadPage(page) {
-            // 取消之前的请求
+            // Cancel previous request
             if (this.abortController) {
                 this.abortController.abort();
             }
             this.abortController = new AbortController();
 
-            // 淡出当前内容
+            // Fade out current content
             this.container.classList.add('page-exit');
             await this._wait(200);
 
-            // 显示加载指示器
+            // Show loading indicator
             this.container.innerHTML = '<div class="page-loading"><div class="spinner"></div></div>';
 
             try {
-                // 发起 AJAX 请求
+                // Make AJAX request
                 var response = await fetch(
                     'api/router.php?page=' + page,
                     { signal: this.abortController.signal }
@@ -125,14 +157,14 @@ window.closeProductModal = function() {
                 var html = await response.text();
                 this.container.innerHTML = html;
 
-                // 移除退出动画，添加进入动画
+                // Remove exit animation, add enter animation
                 this.container.classList.remove('page-exit');
                 this.container.classList.add('page-enter');
 
-                // 重新初始化页面内的交互
+                // Reinitialize page interactions
                 this._initPageScripts();
 
-                // 动画结束后移除类名
+                // Remove class after animation ends
                 var self = this;
                 setTimeout(function () {
                     self.container.classList.remove('page-enter');
@@ -146,26 +178,26 @@ window.closeProductModal = function() {
         }
 
         _initPageScripts() {
-            // 重新初始化滚动动画观察器
+            // Reinitialize scroll animation observer
             this._initScrollAnimations();
 
-            // 初始化 Tab 切换功能
+            // Initialize tab switching
             this._initTabs();
 
-            // 初始化 Redeem 页面功能
+            // Initialize Redeem page functionality
             this._initRedeemPage();
 
-            // 初始化密码强度检测
+            // Initialize password strength detection
             this._initPasswordStrength();
 
-            // 初始化 Admin 页面功能
+            // Initialize Admin page functionality
             this._initAdminPage();
         }
 
         _initTabs() {
             var allPanels = document.querySelectorAll('.tab-panel');
 
-            // Reseller 页面 Tab 切换
+            // Reseller page tab switching
             var resellerTabs = document.querySelectorAll('.reseller-tab');
             resellerTabs.forEach(function(tab) {
                 if (tab.dataset.tabBound) return;
@@ -188,7 +220,7 @@ window.closeProductModal = function() {
                 });
             });
 
-            // Manager 页面 Tab 切换
+            // Manager page tab switching
             var managerTabs = document.querySelectorAll('.manager-tab');
             managerTabs.forEach(function(tab) {
                 if (tab.dataset.tabBound) return;
@@ -221,23 +253,23 @@ window.closeProductModal = function() {
             var toastIcon = document.getElementById('redeem-toast-icon');
             var toastClose = document.getElementById('redeem-toast-close');
 
-            // 如果不在 Redeem 页面，跳过
+            // Skip if not on Redeem page
             if (!btn || !input || !toast) return;
 
             var toastTimer = null;
 
-            // 图标 SVG
+            // Icon SVG
             var icons = {
                 success: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
                 warning: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>',
                 error: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'
             };
 
-            // 显示提示框
+            // Show toast notification
             function showToast(message, type) {
                 type = type || 'success';
                 
-                // 根据类型设置显示时间
+                // Set display duration based on type
                 var duration;
                 var title;
                 switch(type) {
@@ -262,26 +294,26 @@ window.closeProductModal = function() {
                     clearTimeout(toastTimer);
                 }
 
-                // 移除所有类型类
+                // Remove all type classes
                 toast.classList.remove('toast-success', 'toast-warning', 'toast-error');
-                // 添加当前类型类
+                // Add current type class
                 toast.classList.add('toast-' + type);
 
-                // 设置标题和消息
+                // Set title and message
                 toastTitle.textContent = title;
                 toastMsg.textContent = message;
                 
-                // 设置图标
+                // Set icon
                 toastIcon.innerHTML = icons[type] || icons.success;
 
-                // 设置 CSS 变量用于动画时长
+                // Set CSS variable for animation duration
                 toast.style.setProperty('--toast-duration', duration + 'ms');
 
-                // 重置动画
+                // Reset animation
                 toast.classList.remove('show');
                 void toast.offsetWidth;
 
-                // 设置进度条动画时长
+                // Set progress bar animation duration
                 var progress = toast.querySelector('.redeem-toast-progress');
                 if (progress) {
                     progress.style.animationDuration = duration + 'ms';
@@ -294,7 +326,7 @@ window.closeProductModal = function() {
                 }, duration);
             }
 
-            // 隐藏提示框
+            // Hide toast notification
             function hideToast() {
                 toast.classList.remove('show');
                 if (toastTimer) {
@@ -303,12 +335,12 @@ window.closeProductModal = function() {
                 }
             }
 
-            // 关闭按钮
+            // Close button
             if (toastClose) {
                 toastClose.addEventListener('click', hideToast);
             }
 
-            // Redeem 按钮
+            // Redeem button
             btn.addEventListener('click', function() {
                 var code = input.value.trim();
 
@@ -345,7 +377,7 @@ window.closeProductModal = function() {
 
             if (!passwordInput || !strengthContainer) return;
 
-            // 密码强度检测函数
+            // Password strength detection function
             function checkPasswordStrength(password) {
                 var strength = 0;
                 var tips = [];
@@ -354,62 +386,62 @@ window.closeProductModal = function() {
                     return { strength: 0, tips: [] };
                 }
 
-                // 长度检查
+                // Length check
                 if (password.length >= 8) {
                     strength++;
                 } else {
-                    tips.push('至少8个字符');
+                    tips.push('At least 8 characters');
                 }
 
-                // 小写字母检查
+                // Lowercase letter check
                 if (/[a-z]/.test(password)) {
                     strength++;
                 } else {
-                    tips.push('添加小写字母');
+                    tips.push('Add lowercase letters');
                 }
 
-                // 大写字母检查
+                // Uppercase letter check
                 if (/[A-Z]/.test(password)) {
                     strength++;
                 } else {
-                    tips.push('添加大写字母');
+                    tips.push('Add uppercase letters');
                 }
 
-                // 数字检查
+                // Number check
                 if (/[0-9]/.test(password)) {
                     strength++;
                 } else {
-                    tips.push('添加数字');
+                    tips.push('Add numbers');
                 }
 
-                // 特殊字符检查
+                // Special character check
                 if (/[^a-zA-Z0-9]/.test(password)) {
                     strength++;
                 } else {
-                    tips.push('添加特殊字符');
+                    tips.push('Add special characters');
                 }
 
-                // 根据得分调整强度等级
+                // Adjust strength level based on score
                 var level;
                 if (strength <= 1) {
-                    level = 1; // 非常弱
+                    level = 1; // Very weak
                 } else if (strength === 2) {
-                    level = 2; // 弱
+                    level = 2; // Weak
                 } else if (strength === 3 || strength === 4) {
-                    level = 3; // 中等
+                    level = 3; // Medium
                 } else {
-                    level = 4; // 强
+                    level = 4; // Strong
                 }
 
                 return { strength: level, tips: tips };
             }
 
-            // 更新强度显示
+            // Update strength display
             function updateStrengthDisplay(result) {
                 var level = result.strength;
                 var tips = result.tips;
 
-                // 显示/隐藏容器
+                // Show/hide container
                 if (passwordInput.value) {
                     strengthContainer.classList.remove('hidden');
                 } else {
@@ -417,9 +449,9 @@ window.closeProductModal = function() {
                     return;
                 }
 
-                // 更新进度条
+                // Update progress bars
                 bars.forEach(function(bar, index) {
-                    // 移除所有等级类
+                    // Remove all level classes
                     bar.classList.remove('active', 'level-1', 'level-2', 'level-3', 'level-4');
 
                     if (index < level) {
@@ -427,20 +459,20 @@ window.closeProductModal = function() {
                     }
                 });
 
-                // 更新文本
+                // Update text
                 var strengthLabels = ['', 'Very Weak', 'Weak', 'Good', 'Strong'];
                 strengthText.textContent = strengthLabels[level] || '';
                 strengthText.className = 'password-strength-text level-' + level;
 
-                // 更新提示
+                // Update tips
                 if (tips.length > 0 && level < 4) {
-                    strengthTips.textContent = '建议: ' + tips.slice(0, 2).join(', ');
+                    strengthTips.textContent = 'Tips: ' + tips.slice(0, 2).join(', ');
                 } else {
-                    strengthTips.textContent = level === 4 ? '密码强度很好!' : '';
+                    strengthTips.textContent = level === 4 ? 'Password strength is good!' : '';
                 }
             }
 
-            // 密码匹配检测函数
+            // Password match detection function
             function checkPasswordMatch() {
                 if (!confirmInput || !matchContainer) return;
 
@@ -457,17 +489,17 @@ window.closeProductModal = function() {
                 if (password === confirm) {
                     matchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
                     matchIcon.className = 'password-match-icon match';
-                    matchText.textContent = '密码匹配';
+                    matchText.textContent = 'Passwords match';
                     matchText.className = 'password-match-text match';
                 } else {
                     matchIcon.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
                     matchIcon.className = 'password-match-icon no-match';
-                    matchText.textContent = '密码不匹配';
+                    matchText.textContent = 'Passwords do not match';
                     matchText.className = 'password-match-text no-match';
                 }
             }
 
-            // 监听密码输入
+            // Listen to password input
             passwordInput.addEventListener('input', function() {
                 var password = this.value;
                 var result = checkPasswordStrength(password);
@@ -475,7 +507,7 @@ window.closeProductModal = function() {
                 checkPasswordMatch();
             });
 
-            // 监听确认密码输入
+            // Listen to confirm password input
             if (confirmInput) {
                 confirmInput.addEventListener('input', function() {
                     checkPasswordMatch();
@@ -509,6 +541,179 @@ window.closeProductModal = function() {
                     if (e.target === overlay) {
                         window.closeProductModal();
                     }
+                });
+            }
+
+            // License 模态框事件绑定
+            var licenseCloseBtn = document.getElementById('license-edit-close');
+            if (licenseCloseBtn && !licenseCloseBtn.dataset.bound) {
+                licenseCloseBtn.dataset.bound = '1';
+                licenseCloseBtn.addEventListener('click', window.closeLicenseModal);
+            }
+
+            var licenseCancelBtn = document.getElementById('license-cancel-btn');
+            if (licenseCancelBtn && !licenseCancelBtn.dataset.bound) {
+                licenseCancelBtn.dataset.bound = '1';
+                licenseCancelBtn.addEventListener('click', window.closeLicenseModal);
+            }
+
+            var licenseOverlay = document.getElementById('license-edit-overlay');
+            if (licenseOverlay && !licenseOverlay.dataset.bound) {
+                licenseOverlay.dataset.bound = '1';
+                licenseOverlay.addEventListener('click', function(e) {
+                    if (e.target === licenseOverlay) {
+                        window.closeLicenseModal();
+                    }
+                });
+            }
+
+            // 角色选择动态加载用户列表
+            var roleSelect = document.getElementById('lf-role');
+            var userSelect = document.getElementById('lf-user');
+            var userContainer = document.getElementById('lf-user-container');
+            if (roleSelect && userSelect && userContainer && !roleSelect.dataset.bound) {
+                roleSelect.dataset.bound = '1';
+
+                // 从 DOM 中读取用户数据
+                var pageHeader = document.querySelector('.app-page-header[data-users-by-role]');
+                var usersByRole = {};
+                if (pageHeader && pageHeader.dataset.usersByRole) {
+                    try {
+                        usersByRole = JSON.parse(pageHeader.dataset.usersByRole);
+                    } catch (e) {
+                        console.error('Failed to parse usersByRole:', e);
+                    }
+                }
+
+                // 根据角色加载用户
+                function loadUsersByRole(role) {
+                    // 清空现有选项
+                    userSelect.innerHTML = '<option value="">-- Select User --</option>';
+
+                    // Admin 角色不需要选择用户，隐藏容器
+                    if (role === 'admin') {
+                        userContainer.style.display = 'none';
+                        userSelect.removeAttribute('required');
+                        return;
+                    }
+
+                    // 其他角色需要选择用户，显示容器
+                    userContainer.style.display = 'block';
+                    userSelect.setAttribute('required', 'required');
+
+                    if (!role) return;
+
+                    var users = usersByRole[role] || [];
+                    if (users.length > 0) {
+                        users.forEach(function(user) {
+                            var option = document.createElement('option');
+                            option.value = user.id;
+                            option.textContent = user.username + ' (' + user.email + ')';
+                            userSelect.appendChild(option);
+                        });
+                    }
+                }
+
+                // 监听角色选择变化
+                roleSelect.addEventListener('change', function() {
+                    loadUsersByRole(this.value);
+                });
+            }
+
+            // License 表单提交
+            var licenseForm = document.getElementById('license-form');
+            if (licenseForm && !licenseForm.dataset.bound) {
+                licenseForm.dataset.bound = '1';
+                licenseForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    var productId = document.getElementById('lf-product').value;
+                    var duration = document.getElementById('lf-duration').value;
+                    var role = document.getElementById('lf-role').value;
+                    var userId = document.getElementById('lf-user').value;
+                    var licenseKeysText = document.getElementById('lf-license-keys').value;
+
+                    if (!productId) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please select a product', 'error');
+                        }
+                        return;
+                    }
+
+                    // 非 Admin 角色需要选择用户
+                    if (role !== 'admin' && !userId) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please select a user', 'error');
+                        }
+                        return;
+                    }
+
+                    if (!licenseKeysText || !licenseKeysText.trim()) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please enter at least one license key', 'error');
+                        }
+                        return;
+                    }
+
+                    // 解析多行许可证键
+                    var licenseKeys = licenseKeysText.split('\n')
+                        .map(function(key) { return key.trim(); })
+                        .filter(function(key) { return key.length > 0; });
+
+                    if (licenseKeys.length === 0) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please enter at least one license key', 'error');
+                        }
+                        return;
+                    }
+
+                    // 构建批量数据
+                    var licensesData = licenseKeys.map(function(key) {
+                        return {
+                            license_key: key,
+                            product_id: parseInt(productId),
+                            user_id: role === 'admin' ? null : parseInt(userId),
+                            duration_days: parseInt(duration),
+                            status: 'unused'
+                        };
+                    });
+
+                    console.log('Batch license data:', licensesData);
+
+                    // 提交到 API
+                    var formData = new FormData();
+                    formData.append('action', 'batch_create');
+                    formData.append('licenses', JSON.stringify(licensesData));
+
+                    fetch(window.SITE_URL + '/api/licenses.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var msg = 'Successfully created ' + data.created + ' license(s)';
+                            if (data.failed > 0) {
+                                msg += ', ' + data.failed + ' failed';
+                            }
+                            if (typeof showToast !== 'undefined') {
+                                showToast(msg, data.failed > 0 ? 'warning' : 'success');
+                            }
+                            window.closeLicenseModal();
+                            // 刷新页面以显示新数据
+                            setTimeout(function() { location.reload(); }, 1000);
+                        } else {
+                            if (typeof showToast !== 'undefined') {
+                                showToast(data.message || 'Failed to create licenses', 'error');
+                            }
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Error:', err);
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Network error', 'error');
+                        }
+                    });
                 });
             }
 
@@ -640,6 +845,9 @@ window.closeProductModal = function() {
                 });
             }
 
+            // 初始化 Status 切换自动更新 Button Text
+            self._bindStatusChange();
+
             // 初始化用户搜索
             self._initUserSearch();
 
@@ -648,6 +856,254 @@ window.closeProductModal = function() {
 
             // 初始化用户编辑表单
             self._initUserEditForm();
+
+            // 初始化许可证搜索/筛选/分页
+            self._initLicenseFilters();
+        }
+
+        _initLicenseFilters() {
+            // 检查是否在 License 页面
+            var searchInput = document.getElementById('license-search');
+            if (!searchInput) return;
+
+            var self = this;
+            var productFilter = document.getElementById('license-product-filter');
+            var statusFilter = document.getElementById('license-status-filter');
+            var perPageSelect = document.getElementById('license-per-page');
+            var prevBtn = document.getElementById('license-prev-page');
+            var nextBtn = document.getElementById('license-next-page');
+
+            // 当前页码
+            var currentPage = 1;
+            var perPage = perPageSelect ? parseInt(perPageSelect.value) : 10;
+
+            // 获取所有许可证行
+            var allRows = [];
+            var tbody = document.getElementById('license-list');
+            if (tbody) {
+                allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+            }
+
+            // 更新统计数字
+            self._updateLicenseStats();
+
+            // 搜索功能
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 产品筛选
+            if (productFilter) {
+                productFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 状态筛选
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 每页显示数量
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    perPage = parseInt(this.value);
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 上一页
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        self._filterLicenses();
+                    }
+                });
+            }
+
+            // 下一页
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    var totalPages = Math.ceil(self._getFilteredLicenseCount() / perPage);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        self._filterLicenses();
+                    }
+                });
+            }
+
+            // 初始筛选
+            self._filterLicenses();
+
+            // 保存引用供后续使用
+            this._licenseCurrentPage = function() { return currentPage; };
+            this._licenseSetCurrentPage = function(page) { currentPage = page; };
+            this._licensePerPage = function() { return perPage; };
+        }
+
+        _filterLicenses() {
+            var searchInput = document.getElementById('license-search');
+            var productFilter = document.getElementById('license-product-filter');
+            var statusFilter = document.getElementById('license-status-filter');
+            var tbody = document.getElementById('license-list');
+
+            if (!tbody) return;
+
+            var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            var productValue = productFilter ? productFilter.value : '';
+            var statusValue = statusFilter ? statusFilter.value : '';
+
+            var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+            var visibleRows = [];
+
+            // 筛选行
+            allRows.forEach(function(row) {
+                var licenseKey = row.querySelector('td:nth-child(1)');
+                var productCell = row.querySelector('td:nth-child(2)');
+                var statusCell = row.querySelector('td:nth-child(5)');
+
+                var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
+                var productId = productFilter ? productFilter.options[productFilter.selectedIndex].value : '';
+                var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
+
+                var matchSearch = !searchTerm || keyText.includes(searchTerm);
+                var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
+                var matchStatus = !statusValue || statusText.includes(statusValue);
+
+                if (matchSearch && matchProduct && matchStatus) {
+                    visibleRows.push(row);
+                }
+            });
+
+            // 分页
+            var currentPage = this._licenseCurrentPage ? this._licenseCurrentPage() : 1;
+            var perPage = this._licensePerPage ? this._licensePerPage() : 10;
+            var startIndex = (currentPage - 1) * perPage;
+            var endIndex = startIndex + perPage;
+
+            // 隐藏所有行
+            allRows.forEach(function(row) {
+                row.style.display = 'none';
+            });
+
+            // 显示当前页的行
+            var pageRows = visibleRows.slice(startIndex, endIndex);
+            pageRows.forEach(function(row) {
+                row.style.display = '';
+            });
+
+            // 更新分页信息
+            this._updateLicensePagination(visibleRows.length, currentPage, perPage);
+        }
+
+        _getFilteredLicenseCount() {
+            var tbody = document.getElementById('license-list');
+            if (!tbody) return 0;
+
+            var searchInput = document.getElementById('license-search');
+            var productFilter = document.getElementById('license-product-filter');
+            var statusFilter = document.getElementById('license-status-filter');
+
+            var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            var productValue = productFilter ? productFilter.value : '';
+            var statusValue = statusFilter ? statusFilter.value : '';
+
+            var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+            var count = 0;
+
+            allRows.forEach(function(row) {
+                var licenseKey = row.querySelector('td:nth-child(1)');
+                var statusCell = row.querySelector('td:nth-child(5)');
+
+                var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
+                var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
+
+                var matchSearch = !searchTerm || keyText.includes(searchTerm);
+                var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
+                var matchStatus = !statusValue || statusText.includes(statusValue);
+
+                if (matchSearch && matchProduct && matchStatus) {
+                    count++;
+                }
+            });
+
+            return count;
+        }
+
+        _updateLicensePagination(totalCount, currentPage, perPage) {
+            var totalPages = Math.ceil(totalCount / perPage);
+            var startIndex = (currentPage - 1) * perPage + 1;
+            var endIndex = Math.min(currentPage * perPage, totalCount);
+
+            // 更新显示信息
+            var showingStart = document.getElementById('license-showing-start');
+            var showingEnd = document.getElementById('license-showing-end');
+            var totalCountEl = document.getElementById('license-total-count');
+            var currentPageEl = document.getElementById('license-current-page');
+            var totalPagesEl = document.getElementById('license-total-pages');
+            var prevBtn = document.getElementById('license-prev-page');
+            var nextBtn = document.getElementById('license-next-page');
+
+            if (showingStart) showingStart.textContent = totalCount > 0 ? startIndex : 0;
+            if (showingEnd) showingEnd.textContent = endIndex;
+            if (totalCountEl) totalCountEl.textContent = totalCount;
+            if (currentPageEl) currentPageEl.textContent = currentPage;
+            if (totalPagesEl) totalPagesEl.textContent = totalPages || 1;
+
+            // 更新按钮状态
+            if (prevBtn) {
+                prevBtn.disabled = currentPage <= 1;
+            }
+            if (nextBtn) {
+                nextBtn.disabled = currentPage >= totalPages;
+            }
+
+            // 更新计数
+            var countEl = document.getElementById('license-count');
+            if (countEl) {
+                countEl.textContent = totalCount;
+            }
+        }
+
+        _updateLicenseStats() {
+            var tbody = document.getElementById('license-list');
+            if (!tbody) return;
+
+            var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+            var total = allRows.length;
+            var active = 0;
+            var unused = 0;
+            var expired = 0;
+
+            allRows.forEach(function(row) {
+                var statusCell = row.querySelector('td:nth-child(5)');
+                if (statusCell) {
+                    var statusText = statusCell.textContent.toLowerCase();
+                    if (statusText.includes('active')) active++;
+                    else if (statusText.includes('unused')) unused++;
+                    else if (statusText.includes('expired') || statusText.includes('disabled')) expired++;
+                }
+            });
+
+            // 更新统计卡片
+            var totalEl = document.getElementById('license-total');
+            var activeEl = document.getElementById('license-active');
+            var unusedEl = document.getElementById('license-unused');
+            var expiredEl = document.getElementById('license-expired');
+
+            if (totalEl) totalEl.textContent = total;
+            if (activeEl) activeEl.textContent = active;
+            if (unusedEl) unusedEl.textContent = unused;
+            if (expiredEl) expiredEl.textContent = expired;
         }
 
         _toggleUserStatus(id, newStatus, triggerBtn) {
@@ -927,6 +1383,7 @@ window.closeProductModal = function() {
 
         _resetAdminForm() {
             var form = document.getElementById('product-form');
+            var statusSelect = document.getElementById('f-status');
             if (!form) return;
             form.reset();
             document.getElementById('edit-id').value = '';
@@ -936,8 +1393,34 @@ window.closeProductModal = function() {
                 modalTitle.textContent = 'Add New Product';
             }
             document.getElementById('submit-btn').innerHTML = '<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Add Product';
-            document.getElementById('f-button-text').value = 'Now Buy';
             document.getElementById('f-is-visible').checked = true;
+            // 根据默认 status 设置 button text
+            this._updateDefaultButtonText(statusSelect ? statusSelect.value : 'online');
+            this._bindStatusChange();
+        }
+
+        _updateDefaultButtonText(status) {
+            var buttonTextInput = document.getElementById('f-button-text');
+            if (!buttonTextInput) return;
+            var map = {
+                online: 'Now Buy',
+                updating: 'Coming Soon',
+                development: 'In Development'
+            };
+            buttonTextInput.value = map[status] || 'Now Buy';
+        }
+
+        _bindStatusChange() {
+            var statusSelect = document.getElementById('f-status');
+            if (!statusSelect || statusSelect.dataset.changeBound) return;
+            statusSelect.dataset.changeBound = '1';
+            var self = this;
+            statusSelect.addEventListener('change', function() {
+                // 只在新增模式下自动更新 button text
+                if (!document.getElementById('edit-id').value) {
+                    self._updateDefaultButtonText(this.value);
+                }
+            });
         }
 
         _editAdminProduct(p) {
