@@ -248,6 +248,17 @@
     box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3);
 }
 
+/* 紧凑数字下拉（如"每页显示数量"）：宽度自适应内容，确保数字（如 100）完整可见，
+   避免固定宽度（w-16 = 64px）在减去内边距/箭头后剩余空间不足导致文本被截断 */
+.wk-select--fit {
+    width: auto;
+}
+
+.wk-select--fit .wk-select__trigger {
+    width: max-content;
+    min-width: 4rem;
+}
+
 /* 当前值文本 */
 .wk-select__value {
     flex: 1;

@@ -258,7 +258,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             '20' => '20',
                             '50' => '50',
                             '100' => '100'
-                        ], '10', 'w-16'); ?>
+                        ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
@@ -461,7 +461,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             '20' => '20',
                             '50' => '50',
                             '100' => '100'
-                        ], '10', 'w-16'); ?>
+                        ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
@@ -718,7 +718,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             '20' => '20',
                             '50' => '50',
                             '100' => '100'
-                        ], '10', 'w-16'); ?>
+                        ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
