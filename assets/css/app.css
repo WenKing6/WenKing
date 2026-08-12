@@ -269,7 +269,7 @@
     transform: rotate(180deg);
 }
 
-/* 下拉面板：玻璃态，简洁淡入，高度自适应内容（无滚动条） */
+/* 下拉面板：玻璃态，简洁淡入淡出（关闭时直接消失，无位移），高度自适应内容（无滚动条） */
 .wk-select__menu {
     position: absolute;
     top: calc(100% + 0.25rem);
@@ -284,14 +284,12 @@
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
 .wk-select.is-open .wk-select__menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
 }
 
 /* 底部空间不足时向上展开：避免菜单被弹窗滚动容器底部裁剪 */

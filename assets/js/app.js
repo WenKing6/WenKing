@@ -751,7 +751,8 @@ window.closeLicenseModal = function() {
             if (trigger) trigger.setAttribute('aria-expanded', 'false');
             if (menu) {
                 menu.setAttribute('aria-hidden', 'true');
-                menu.classList.remove('wk-select__menu--up');
+                // 注意：不移除 wk-select__menu--up，避免关闭时菜单瞬间从上方跳回下方（先下移再消失）。
+                // 下一次展开时 _openCustomSelect 会重新根据可用空间计算该类。
             }
             wrapper.querySelectorAll('.wk-select__option').forEach(function(o) {
                 o.classList.remove('is-highlighted');
@@ -1140,14 +1141,17 @@ window.closeLicenseModal = function() {
             // 初始化 Status 切换自动更新 Button Text
             self._bindStatusChange();
 
+            // 初始化用户分页
+            self._initUserPagination();
+
             // 初始化用户搜索
             self._initUserSearch();
 
-            // 初始化用户排序（默认按 ID 升序）
-            self._initUserSort();
-
             // 初始化用户编辑表单
             self._initUserEditForm();
+
+            // 初始化产品分页
+            self._initProductPagination();
 
             // 初始化许可证搜索/筛选/分页
             self._initLicenseFilters();
@@ -1584,55 +1588,12 @@ window.closeLicenseModal = function() {
             var roleFilter = document.getElementById('user-role-filter');
             if (!searchInput) return;
 
+            var self = this;
+
             function applyFilters() {
-                var keyword = searchInput.value.toLowerCase();
-                var role = roleFilter ? roleFilter.value : '';
-                var rows = document.querySelectorAll('.user-row');
-                var cards = document.querySelectorAll('.user-card');
-                var visibleCount = 0;
-                var index = 1;
-
-                rows.forEach(function(row) {
-                    var username = row.getAttribute('data-username');
-                    var email = row.getAttribute('data-email');
-                    var rowRole = row.getAttribute('data-role');
-                    var matchSearch = username.includes(keyword) || email.includes(keyword);
-                    var matchRole = !role || rowRole === role;
-                    if (matchSearch && matchRole) {
-                        row.style.display = '';
-                        var idCell = row.querySelector('.user-cell-id');
-                        if (idCell) {
-                            idCell.textContent = index++;
-                        }
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // 同步移动端卡片
-                var cardIndex = 1;
-                cards.forEach(function(card) {
-                    var username = card.getAttribute('data-username');
-                    var email = card.getAttribute('data-email');
-                    var cardRole = card.getAttribute('data-role');
-                    var matchSearch = username.includes(keyword) || email.includes(keyword);
-                    var matchRole = !role || cardRole === role;
-                    if (matchSearch && matchRole) {
-                        card.style.display = '';
-                        var idxEl = card.querySelector('.user-card-index');
-                        if (idxEl) {
-                            idxEl.textContent = cardIndex++;
-                        }
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                var countEl = document.getElementById('user-count');
-                if (countEl) {
-                    countEl.textContent = visibleCount;
-                }
+                // 搜索/筛选变化时回到第一页
+                if (self._userSetCurrentPage) self._userSetCurrentPage(1);
+                self._filterUsers();
             }
 
             searchInput.addEventListener('input', applyFilters);
@@ -1641,39 +1602,267 @@ window.closeLicenseModal = function() {
             }
         }
 
-        _initUserSort() {
-            // 默认按 ID 升序排列
-            this._sortUsersBy('id', true);
+        _initUserPagination() {
+            var self = this;
+            var perPageSelect = document.getElementById('user-per-page');
+            if (!perPageSelect) return;
+
+            var currentPage = 1;
+            var perPage = parseInt(perPageSelect.value) || 10;
+            var prevBtn = document.getElementById('user-prev-page');
+            var nextBtn = document.getElementById('user-next-page');
+
+            // 每页显示数量
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    perPage = parseInt(this.value) || 10;
+                    currentPage = 1;
+                    self._filterUsers();
+                });
+            }
+
+            // 上一页
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        self._filterUsers();
+                    }
+                });
+            }
+
+            // 下一页
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    var totalPages = Math.ceil(self._getFilteredUserCount() / perPage);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        self._filterUsers();
+                    }
+                });
+            }
+
+            // 保存状态供其他方法读取
+            this._userCurrentPage = function() { return currentPage; };
+            this._userSetCurrentPage = function(p) { currentPage = p; };
+            this._userPerPage = function() { return perPage; };
+
+            // 初始筛选
+            self._filterUsers();
         }
 
-        _sortUsersBy(field, ascending) {
-            var tbody = document.getElementById('user-list');
-            if (!tbody) return;
+        _getFilteredUserCount() {
+            var searchInput = document.getElementById('user-search');
+            var roleFilter = document.getElementById('user-role-filter');
+            var keyword = searchInput ? searchInput.value.toLowerCase() : '';
+            var role = roleFilter ? roleFilter.value : '';
 
-            var rows = Array.from(tbody.querySelectorAll('.user-row'));
-
-            rows.sort(function(a, b) {
-                var aVal = a.getAttribute('data-' + field) || '';
-                var bVal = b.getAttribute('data-' + field) || '';
-
-                // 数字比较
-                if (field === 'id') {
-                    aVal = parseInt(aVal) || 0;
-                    bVal = parseInt(bVal) || 0;
-                    return ascending ? aVal - bVal : bVal - aVal;
-                }
-
-                // 字符串比较
-                aVal = aVal.toLowerCase();
-                bVal = bVal.toLowerCase();
-                if (aVal < bVal) return ascending ? -1 : 1;
-                if (aVal > bVal) return ascending ? 1 : -1;
-                return 0;
+            var rows = document.querySelectorAll('.user-row');
+            var count = 0;
+            rows.forEach(function(row) {
+                var username = row.getAttribute('data-username');
+                var email = row.getAttribute('data-email');
+                var rowRole = row.getAttribute('data-role');
+                var matchSearch = username.includes(keyword) || email.includes(keyword);
+                var matchRole = !role || rowRole === role;
+                if (matchSearch && matchRole) count++;
             });
+            return count;
+        }
+
+        _filterUsers() {
+            var searchInput = document.getElementById('user-search');
+            var roleFilter = document.getElementById('user-role-filter');
+            var rows = Array.prototype.slice.call(document.querySelectorAll('.user-row'));
+            var cards = Array.prototype.slice.call(document.querySelectorAll('.user-card'));
+
+            var keyword = searchInput ? searchInput.value.toLowerCase() : '';
+            var role = roleFilter ? roleFilter.value : '';
+
+            // 筛选出符合条件的行与卡片
+            var visibleRows = [];
+            var visibleCards = [];
 
             rows.forEach(function(row) {
-                tbody.appendChild(row);
+                var username = row.getAttribute('data-username');
+                var email = row.getAttribute('data-email');
+                var rowRole = row.getAttribute('data-role');
+                var matchSearch = username.includes(keyword) || email.includes(keyword);
+                var matchRole = !role || rowRole === role;
+                if (matchSearch && matchRole) {
+                    visibleRows.push(row);
+                }
             });
+            cards.forEach(function(card) {
+                var username = card.getAttribute('data-username');
+                var email = card.getAttribute('data-email');
+                var cardRole = card.getAttribute('data-role');
+                var matchSearch = username.includes(keyword) || email.includes(keyword);
+                var matchRole = !role || cardRole === role;
+                if (matchSearch && matchRole) {
+                    visibleCards.push(card);
+                }
+            });
+
+            // 分页
+            var currentPage = this._userCurrentPage ? this._userCurrentPage() : 1;
+            var perPage = this._userPerPage ? this._userPerPage() : 10;
+            var totalPages = Math.max(1, Math.ceil(visibleRows.length / perPage));
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+                if (this._userSetCurrentPage) this._userSetCurrentPage(currentPage);
+            }
+
+            var startIndex = (currentPage - 1) * perPage;
+            var endIndex = Math.min(startIndex + perPage, visibleRows.length);
+
+            // 隐藏所有行/卡片
+            rows.forEach(function(row) { row.style.display = 'none'; });
+            cards.forEach(function(card) { card.style.display = 'none'; });
+
+            // 显示当前页的行/卡片
+            visibleRows.slice(startIndex, endIndex).forEach(function(row) { row.style.display = ''; });
+            visibleCards.slice(startIndex, endIndex).forEach(function(card) { card.style.display = ''; });
+
+            // 更新计数
+            var countEl = document.getElementById('user-count');
+            if (countEl) countEl.textContent = visibleRows.length;
+
+            // 更新分页信息
+            this._updateUserPagination(visibleRows.length, currentPage, perPage);
+        }
+
+        _updateUserPagination(totalCount, currentPage, perPage) {
+            var totalPages = Math.ceil(totalCount / perPage);
+            var startIndex = (currentPage - 1) * perPage + 1;
+            var endIndex = Math.min(currentPage * perPage, totalCount);
+
+            // 更新显示信息
+            var showingStart = document.getElementById('user-showing-start');
+            var showingEnd = document.getElementById('user-showing-end');
+            var totalCountEl = document.getElementById('user-total-count');
+            var currentPageEl = document.getElementById('user-current-page');
+            var totalPagesEl = document.getElementById('user-total-pages');
+            var prevBtn = document.getElementById('user-prev-page');
+            var nextBtn = document.getElementById('user-next-page');
+
+            if (showingStart) showingStart.textContent = totalCount > 0 ? startIndex : 0;
+            if (showingEnd) showingEnd.textContent = endIndex;
+            if (totalCountEl) totalCountEl.textContent = totalCount;
+            if (currentPageEl) currentPageEl.textContent = currentPage;
+            if (totalPagesEl) totalPagesEl.textContent = totalPages || 1;
+            if (prevBtn) prevBtn.disabled = currentPage <= 1;
+            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        _initProductPagination() {
+            var self = this;
+            var perPageSelect = document.getElementById('product-per-page');
+            if (!perPageSelect) return;
+
+            var currentPage = 1;
+            var perPage = parseInt(perPageSelect.value) || 10;
+            var prevBtn = document.getElementById('product-prev-page');
+            var nextBtn = document.getElementById('product-next-page');
+
+            // 每页显示数量
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    perPage = parseInt(this.value) || 10;
+                    currentPage = 1;
+                    self._filterProducts();
+                });
+            }
+
+            // 上一页
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        self._filterProducts();
+                    }
+                });
+            }
+
+            // 下一页
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    var totalPages = Math.ceil(self._getProductCount() / perPage);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        self._filterProducts();
+                    }
+                });
+            }
+
+            // 保存状态供其他方法读取
+            this._productCurrentPage = function() { return currentPage; };
+            this._productSetCurrentPage = function(p) { currentPage = p; };
+            this._productPerPage = function() { return perPage; };
+
+            // 初始分页
+            self._filterProducts();
+        }
+
+        _getProductCount() {
+            var tbody = document.getElementById('product-list');
+            return tbody ? tbody.querySelectorAll('tr[data-id]').length : 0;
+        }
+
+        _filterProducts() {
+            var tbody = document.getElementById('product-list');
+            if (!tbody) return;
+
+            var cardsContainer = document.getElementById('product-list-mobile');
+            var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-id]'));
+            var cards = cardsContainer ? Array.prototype.slice.call(cardsContainer.querySelectorAll('.product-card')) : [];
+            var total = rows.length;
+
+            // 分页
+            var currentPage = this._productCurrentPage ? this._productCurrentPage() : 1;
+            var perPage = this._productPerPage ? this._productPerPage() : 10;
+            var totalPages = Math.max(1, Math.ceil(total / perPage));
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+                if (this._productSetCurrentPage) this._productSetCurrentPage(currentPage);
+            }
+
+            var startIndex = (currentPage - 1) * perPage;
+            var endIndex = Math.min(startIndex + perPage, total);
+
+            // 仅显示当前页的行/卡片，其余隐藏
+            rows.forEach(function(row, i) {
+                row.style.display = (i >= startIndex && i < endIndex) ? '' : 'none';
+            });
+            cards.forEach(function(card, i) {
+                card.style.display = (i >= startIndex && i < endIndex) ? '' : 'none';
+            });
+
+            // 更新分页信息
+            this._updateProductPagination(total, currentPage, perPage);
+        }
+
+        _updateProductPagination(totalCount, currentPage, perPage) {
+            var totalPages = Math.ceil(totalCount / perPage);
+            var startIndex = (currentPage - 1) * perPage + 1;
+            var endIndex = Math.min(currentPage * perPage, totalCount);
+
+            // 更新显示信息
+            var showingStart = document.getElementById('product-showing-start');
+            var showingEnd = document.getElementById('product-showing-end');
+            var totalCountEl = document.getElementById('product-total-count');
+            var currentPageEl = document.getElementById('product-current-page');
+            var totalPagesEl = document.getElementById('product-total-pages');
+            var prevBtn = document.getElementById('product-prev-page');
+            var nextBtn = document.getElementById('product-next-page');
+
+            if (showingStart) showingStart.textContent = totalCount > 0 ? startIndex : 0;
+            if (showingEnd) showingEnd.textContent = endIndex;
+            if (totalCountEl) totalCountEl.textContent = totalCount;
+            if (currentPageEl) currentPageEl.textContent = currentPage;
+            if (totalPagesEl) totalPagesEl.textContent = totalPages || 1;
+            if (prevBtn) prevBtn.disabled = currentPage <= 1;
+            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
         }
 
         _resetAdminForm() {
@@ -2017,7 +2206,7 @@ window.closeLicenseModal = function() {
     // ============================================
     // 全局排序函数（供 onclick 调用）
     // ============================================
-    var currentSortField = 'id';
+    var currentSortField = 'username';
     var currentSortAsc = true;
 
     window.sortUsers = function(field) {
@@ -2036,12 +2225,6 @@ window.closeLicenseModal = function() {
         rows.sort(function(a, b) {
             var aVal = a.getAttribute('data-' + field) || '';
             var bVal = b.getAttribute('data-' + field) || '';
-
-            if (field === 'id') {
-                aVal = parseInt(aVal) || 0;
-                bVal = parseInt(bVal) || 0;
-                return currentSortAsc ? aVal - bVal : bVal - aVal;
-            }
 
             aVal = aVal.toLowerCase();
             bVal = bVal.toLowerCase();
@@ -2062,12 +2245,6 @@ window.closeLicenseModal = function() {
                 var aVal = a.getAttribute('data-' + field) || '';
                 var bVal = b.getAttribute('data-' + field) || '';
 
-                if (field === 'id') {
-                    aVal = parseInt(aVal) || 0;
-                    bVal = parseInt(bVal) || 0;
-                    return currentSortAsc ? aVal - bVal : bVal - aVal;
-                }
-
                 aVal = aVal.toLowerCase();
                 bVal = bVal.toLowerCase();
                 if (aVal < bVal) return currentSortAsc ? -1 : 1;
@@ -2079,31 +2256,7 @@ window.closeLicenseModal = function() {
                 cardsContainer.appendChild(card);
             });
         }
-
-        // 重新编号
-        renumberRows();
     };
-
-    function renumberRows() {
-        var rows = document.querySelectorAll('.user-row');
-        var index = 1;
-        rows.forEach(function(row) {
-            var idCell = row.querySelector('.user-cell-id');
-            if (idCell) {
-                idCell.textContent = index++;
-            }
-        });
-
-        // 同步移动端卡片编号
-        var cards = document.querySelectorAll('.user-card');
-        var cardIndex = 1;
-        cards.forEach(function(card) {
-            var idxEl = card.querySelector('.user-card-index');
-            if (idxEl) {
-                idxEl.textContent = cardIndex++;
-            }
-        });
-    }
 
     // ============================================
     // 启动应用

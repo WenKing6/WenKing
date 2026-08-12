@@ -176,7 +176,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
-                            <th class="text-left py-3 px-4">ID</th>
                             <th class="text-left py-3 px-4">Name</th>
                             <th class="text-left py-3 px-4">Tagline</th>
                             <th class="text-left py-3 px-4">Status</th>
@@ -188,7 +187,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     <tbody id="product-list">
                         <?php foreach ($products as $p): ?>
                         <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $p['id']; ?>">
-                            <td class="py-3 px-4 text-white/40"><?php echo $p['id']; ?></td>
                             <td class="py-3 px-4 font-medium text-white"><?php echo htmlspecialchars($p['name']); ?></td>
                             <td class="py-3 px-4 text-white/60 max-w-xs truncate"><?php echo htmlspecialchars($p['tagline']); ?></td>
                             <td class="py-3 px-4">
@@ -217,16 +215,11 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             <!-- Mobile Card Layout -->
             <div id="product-list-mobile" class="md:hidden space-y-3">
                 <?php foreach ($products as $p): ?>
-                <div class="relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>">
+                <div class="product-card relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>">
                     <div class="flex items-start justify-between gap-3 mb-3">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                            <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center shrink-0">
-                                <span class="text-sm font-semibold text-accent-purple"><?php echo $p['id']; ?></span>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="text-sm font-medium text-white truncate"><?php echo htmlspecialchars($p['name']); ?></div>
-                                <div class="text-xs text-white/60 truncate"><?php echo htmlspecialchars($p['tagline']); ?></div>
-                            </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-white truncate"><?php echo htmlspecialchars($p['name']); ?></div>
+                            <div class="text-xs text-white/60 truncate"><?php echo htmlspecialchars($p['tagline']); ?></div>
                         </div>
                         <span class="status-badge status-<?php echo $p['status']; ?> text-xs shrink-0"><?php echo ucfirst($p['status']); ?></span>
                     </div>
@@ -250,6 +243,37 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     </div>
                 </div>
                 <?php endforeach; ?>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-white/40">
+                        Showing <span id="product-showing-start">0</span>-<span id="product-showing-end">0</span> of <span id="product-total-count"><?php echo count($products); ?></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-white/40">Per page</span>
+                        <?php renderCustomSelect('product-per-page', [
+                            '10' => '10',
+                            '20' => '20',
+                            '50' => '50',
+                            '100' => '100'
+                        ], '10', 'w-16'); ?>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button type="button" id="product-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="product-current-page">1</span> of <span id="product-total-pages">1</span></span>
+                    <button type="button" id="product-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -323,7 +347,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
-                            <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('id')">ID</th>
                             <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('username')">Username</th>
                             <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('email')">Email</th>
                             <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('role')">Role</th>
@@ -335,7 +358,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     <tbody id="user-list">
                         <?php if (empty($users)): ?>
                         <tr>
-                            <td colspan="7" class="text-center py-12 text-white/40">
+                            <td colspan="6" class="text-center py-12 text-white/40">
                                 <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                 </svg>
@@ -343,9 +366,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             </td>
                         </tr>
                         <?php else: ?>
-                            <?php $rowIndex = 1; foreach ($users as $u): ?>
+                            <?php foreach ($users as $u): ?>
                             <tr class="user-row border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
-                                <td class="py-3 px-4 text-white/40 user-cell-id"><?php echo $rowIndex++; ?></td>
                                 <td class="py-3 px-4 font-medium text-white user-cell-username"><?php echo htmlspecialchars($u['username']); ?></td>
                                 <td class="py-3 px-4 text-white/60 user-cell-email"><?php echo htmlspecialchars($u['email']); ?></td>
                                 <td class="py-3 px-4 user-cell-role">
@@ -388,17 +410,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     No users found
                 </div>
                 <?php else: ?>
-                    <?php $rowIndex = 1; foreach ($users as $u): ?>
+                    <?php foreach ($users as $u): ?>
                     <div class="user-card bg-white/5 rounded-xl p-4 border border-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
                         <div class="flex items-start justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-sm font-bold text-accent-purple user-card-index">
-                                    <?php echo $rowIndex++; ?>
-                                </div>
-                                <div>
-                                    <div class="font-semibold text-white user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
-                                    <div class="text-sm text-white/50 user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
-                                </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold text-white user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
+                                <div class="text-sm text-white/50 user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
                             </div>
                             <div class="flex flex-col items-end gap-1">
                                 <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
@@ -429,6 +446,37 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-white/40">
+                        Showing <span id="user-showing-start">0</span>-<span id="user-showing-end">0</span> of <span id="user-total-count"><?php echo count($users); ?></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-white/40">Per page</span>
+                        <?php renderCustomSelect('user-per-page', [
+                            '10' => '10',
+                            '20' => '20',
+                            '50' => '50',
+                            '100' => '100'
+                        ], '10', 'w-16'); ?>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button type="button" id="user-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="user-current-page">1</span> of <span id="user-total-pages">1</span></span>
+                    <button type="button" id="user-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
