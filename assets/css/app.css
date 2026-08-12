@@ -200,6 +200,207 @@
     color: #fff;
 }
 
+/* ============================================
+   自定义选择器组件 (wk-select)
+   视觉与 .app-input / .app-select 保持一致
+   ============================================ */
+
+/* 组件容器：宽度由外部传入的宽度类控制 */
+.wk-select {
+    position: relative;
+    z-index: 20;
+}
+
+/* 展开时提升层叠层级：超过同级兄弟选择器，避免下拉面板被后续选择器遮挡 */
+.wk-select.is-open {
+    z-index: 60;
+}
+
+/* 触发器按钮：与输入框同高、同圆角、同配色 */
+.wk-select__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: rgba(10, 10, 15, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wk-select__trigger:hover {
+    transform: none; /* 覆盖全局 button:hover 上浮效果，保持与输入框对齐 */
+    border-color: rgba(139, 92, 246, 0.4);
+    background: rgba(10, 10, 15, 0.9);
+}
+
+.wk-select__trigger:focus-visible,
+.wk-select.is-open .wk-select__trigger {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3);
+}
+
+/* 当前值文本 */
+.wk-select__value {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 箭头图标：展开时旋转 */
+.wk-select__chevron {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+    transition: transform 0.2s ease;
+}
+
+.wk-select.is-open .wk-select__chevron {
+    transform: rotate(180deg);
+}
+
+/* 下拉面板：玻璃态，简洁淡入，高度自适应内容（无滚动条） */
+.wk-select__menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    width: 100%;
+    z-index: 30;
+    background: rgba(18, 18, 26, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+.wk-select.is-open .wk-select__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 底部空间不足时向上展开：避免菜单被弹窗滚动容器底部裁剪 */
+.wk-select__menu--up {
+    top: auto;
+    bottom: calc(100% + 0.25rem);
+}
+
+/* 选项列表容器：无滚动条，通过分页控制一次展示的选项数 */
+.wk-select__options {
+    max-height: none;
+    overflow-y: visible;
+}
+
+/* 选项按钮 */
+.wk-select__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.wk-select__option:hover {
+    transform: none; /* 覆盖全局 button:hover 上浮效果 */
+    background: rgba(139, 92, 246, 0.15);
+    color: #fff;
+}
+
+/* 选项文本 */
+.wk-select__option-label {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 选中态：文字高亮（不显示勾选标记） */
+.wk-select__option.is-selected {
+    color: #a78bfa;
+    font-weight: 600;
+}
+
+/* 键盘导航高亮 */
+.wk-select__option.is-highlighted {
+    background: rgba(139, 92, 246, 0.15);
+    color: #fff;
+}
+
+/* 分页控件 */
+.wk-select__pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.wk-select__pager-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.wk-select__pager-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.wk-select__pager-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.wk-select__pager-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.wk-select__pager-info {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    user-select: none;
+}
+
+/* 隐藏的原生 select：仅用于表单提交与事件桥接 */
+.wk-select__native {
+    display: none;
+}
+
 /* 开关 Toggle */
 .app-toggle {
     position: relative;

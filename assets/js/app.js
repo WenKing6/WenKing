@@ -515,8 +515,295 @@ window.closeLicenseModal = function() {
             }
         }
 
+        _initCustomSelects() {
+            var self = this;
+            var PAGE_SIZE = 10;
+
+            // 点击页面其他区域关闭所有已展开的下拉
+            if (!document._wkSelectClickBound) {
+                document._wkSelectClickBound = true;
+                document.addEventListener('click', function() {
+                    document.querySelectorAll('.wk-select.is-open').forEach(function(w) {
+                        self._closeCustomSelect(w);
+                    });
+                });
+            }
+
+            document.querySelectorAll('.wk-select').forEach(function(wrapper) {
+                if (wrapper.dataset.bound) return;
+                wrapper.dataset.bound = '1';
+
+                var select = wrapper.querySelector('.wk-select__native');
+                var trigger = wrapper.querySelector('.wk-select__trigger');
+                var menu = wrapper.querySelector('.wk-select__menu');
+                var optionsWrap = wrapper.querySelector('.wk-select__options');
+                var pager = wrapper.querySelector('.wk-select__pager');
+                var pagerInfo = wrapper.querySelector('.wk-select__pager-info');
+                var pagerPrev = wrapper.querySelector('.wk-select__pager-prev');
+                var pagerNext = wrapper.querySelector('.wk-select__pager-next');
+
+                if (!select || !trigger || !menu || !optionsWrap) return;
+
+                var currentPage = 1;
+                var totalPages = 1;
+
+                // 同步当前选中项到触发器显示
+                var syncValue = function() {
+                    var valueEl = wrapper.querySelector('.wk-select__value');
+                    var selectedOption = select.options[select.selectedIndex];
+                    if (valueEl && selectedOption) {
+                        valueEl.textContent = selectedOption.textContent;
+                    }
+                };
+                syncValue();
+
+                // 分页渲染：仅显示当前页的选项
+                var renderPage = function() {
+                    var allOptions = Array.prototype.slice.call(optionsWrap.querySelectorAll('.wk-select__option'));
+                    var total = allOptions.length;
+                    totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                    if (currentPage > totalPages) currentPage = totalPages;
+                    if (currentPage < 1) currentPage = 1;
+
+                    allOptions.forEach(function(o, i) {
+                        var pageIndex = Math.floor(i / PAGE_SIZE);
+                        o.style.display = (pageIndex === currentPage - 1) ? '' : 'none';
+                    });
+
+                    // 分页控件仅在选项超过一页时显示
+                    if (pager) {
+                        var needsPager = total > PAGE_SIZE;
+                        pager.style.display = needsPager ? '' : 'none';
+                        if (pagerInfo) {
+                            pagerInfo.textContent = currentPage + ' / ' + totalPages;
+                        }
+                        if (pagerPrev) pagerPrev.disabled = currentPage <= 1;
+                        if (pagerNext) pagerNext.disabled = currentPage >= totalPages;
+                    }
+                };
+
+                // 分页按钮事件
+                if (pagerPrev) {
+                    pagerPrev.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (currentPage > 1) {
+                            currentPage--;
+                            renderPage();
+                        }
+                    });
+                }
+                if (pagerNext) {
+                    pagerNext.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            renderPage();
+                        }
+                    });
+                }
+
+                // 设置选中项并同步原生 select、触发 change 事件
+                var selectOption = function(optionBtn) {
+                    var value = optionBtn.getAttribute('data-value');
+                    var label = optionBtn.querySelector('.wk-select__option-label').textContent;
+
+                    // 更新选中态样式
+                    optionsWrap.querySelectorAll('.wk-select__option').forEach(function(o) {
+                        o.classList.remove('is-selected');
+                        o.setAttribute('aria-selected', 'false');
+                    });
+                    optionBtn.classList.add('is-selected');
+                    optionBtn.setAttribute('aria-selected', 'true');
+
+                    // 同步原生 select 并触发 change
+                    select.value = value;
+                    var valueEl = wrapper.querySelector('.wk-select__value');
+                    if (valueEl) valueEl.textContent = label;
+                    select.dispatchEvent(new Event('change'));
+
+                    self._closeCustomSelect(wrapper);
+                };
+
+                // 触发器：点击展开/收起
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var isOpen = wrapper.classList.contains('is-open');
+
+                    // 关闭其他下拉
+                    document.querySelectorAll('.wk-select.is-open').forEach(function(w) {
+                        if (w !== wrapper) self._closeCustomSelect(w);
+                    });
+
+                    if (isOpen) {
+                        self._closeCustomSelect(wrapper);
+                    } else {
+                        self._openCustomSelect(wrapper);
+                    }
+                });
+
+                // 选项点击（事件委托，兼容分页与动态重建）
+                optionsWrap.addEventListener('click', function(e) {
+                    var optionBtn = e.target.closest('.wk-select__option');
+                    if (!optionBtn) return;
+                    e.stopPropagation();
+                    selectOption(optionBtn);
+                });
+
+                // 键盘导航
+                trigger.addEventListener('keydown', function(e) {
+                    var isOpen = wrapper.classList.contains('is-open');
+                    var visibleOptions = Array.prototype.slice.call(optionsWrap.querySelectorAll('.wk-select__option')).filter(function(o) {
+                        return o.style.display !== 'none';
+                    });
+
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                    }
+
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        if (!isOpen) {
+                            self._openCustomSelect(wrapper);
+                            return;
+                        }
+                        var currentIdx = visibleOptions.indexOf(optionsWrap.querySelector('.wk-select__option.is-selected'));
+                        var nextIdx;
+                        if (e.key === 'ArrowDown') {
+                            nextIdx = currentIdx < visibleOptions.length - 1 ? currentIdx + 1 : 0;
+                        } else {
+                            nextIdx = currentIdx > 0 ? currentIdx - 1 : visibleOptions.length - 1;
+                        }
+                        // 高亮当前项，同步原生 select
+                        visibleOptions.forEach(function(o) { o.classList.remove('is-highlighted'); });
+                        if (visibleOptions[nextIdx]) {
+                            visibleOptions[nextIdx].classList.add('is-highlighted');
+                            select.value = visibleOptions[nextIdx].getAttribute('data-value');
+                            syncValue();
+                        }
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                        if (isOpen) {
+                            var highlighted = optionsWrap.querySelector('.wk-select__option.is-highlighted');
+                            if (highlighted) {
+                                selectOption(highlighted);
+                            } else {
+                                self._closeCustomSelect(wrapper);
+                            }
+                        } else {
+                            self._openCustomSelect(wrapper);
+                        }
+                    } else if (e.key === 'Escape') {
+                        if (isOpen) self._closeCustomSelect(wrapper);
+                    }
+                });
+
+                // 保存渲染函数供展开时使用
+                wrapper._wkRenderPage = renderPage;
+                wrapper._wkCurrentPage = function() { return currentPage; };
+                wrapper._wkSetCurrentPage = function(p) { currentPage = p; };
+            });
+        }
+
+        _openCustomSelect(wrapper) {
+            wrapper.classList.add('is-open');
+            var trigger = wrapper.querySelector('.wk-select__trigger');
+            var menu = wrapper.querySelector('.wk-select__menu');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+            if (menu) menu.setAttribute('aria-hidden', 'false');
+
+            // 底部空间不足时向上展开，避免菜单被滚动容器（弹窗）底部裁剪
+            if (menu) {
+                var dialog = wrapper.closest('.glass-card');
+                if (dialog) {
+                    var dRect = dialog.getBoundingClientRect();
+                    var wRect = wrapper.getBoundingClientRect();
+                    var menuHeight = menu.offsetHeight || 0;
+                    var spaceBelow = dRect.bottom - wRect.bottom;
+                    var spaceAbove = wRect.top - dRect.top;
+                    var flipUp = spaceBelow < menuHeight + 8 && spaceAbove > spaceBelow;
+                    menu.classList.toggle('wk-select__menu--up', flipUp);
+                }
+            }
+
+            // 展开时按分页渲染，并高亮当前选中项所在页
+            if (wrapper._wkRenderPage) wrapper._wkRenderPage();
+            var selected = wrapper.querySelector('.wk-select__option.is-selected');
+            if (selected) {
+                wrapper.querySelectorAll('.wk-select__option').forEach(function(o) {
+                    o.classList.remove('is-highlighted');
+                });
+                selected.classList.add('is-highlighted');
+                // 若选中项不在当前页，跳转到其所在页
+                if (selected.style.display === 'none' && wrapper._wkSetCurrentPage) {
+                    var allOptions = Array.prototype.slice.call(wrapper.querySelectorAll('.wk-select__option'));
+                    var idx = allOptions.indexOf(selected);
+                    if (idx >= 0) {
+                        wrapper._wkSetCurrentPage(Math.floor(idx / 10) + 1);
+                    }
+                    if (wrapper._wkRenderPage) wrapper._wkRenderPage();
+                    selected.classList.add('is-highlighted');
+                }
+            }
+        }
+
+        _closeCustomSelect(wrapper) {
+            wrapper.classList.remove('is-open');
+            var trigger = wrapper.querySelector('.wk-select__trigger');
+            var menu = wrapper.querySelector('.wk-select__menu');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+            if (menu) {
+                menu.setAttribute('aria-hidden', 'true');
+                menu.classList.remove('wk-select__menu--up');
+            }
+            wrapper.querySelectorAll('.wk-select__option').forEach(function(o) {
+                o.classList.remove('is-highlighted');
+            });
+        }
+
+        _refreshCustomSelect(selectId) {
+            var select = document.getElementById(selectId);
+            if (!select) return;
+            var wrapper = select.closest('.wk-select');
+            if (!wrapper) return;
+            var optionsWrap = wrapper.querySelector('.wk-select__options');
+            var valueEl = wrapper.querySelector('.wk-select__value');
+            if (!optionsWrap || !valueEl) return;
+
+            // 重建选项按钮
+            optionsWrap.innerHTML = '';
+            Array.from(select.options).forEach(function(option) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'wk-select__option';
+                btn.setAttribute('role', 'option');
+                btn.setAttribute('aria-selected', 'false');
+                btn.setAttribute('data-value', option.value);
+
+                var label = document.createElement('span');
+                label.className = 'wk-select__option-label';
+                label.textContent = option.textContent;
+                btn.appendChild(label);
+
+                if (option.selected) {
+                    btn.classList.add('is-selected');
+                    btn.setAttribute('aria-selected', 'true');
+                }
+                optionsWrap.appendChild(btn);
+            });
+
+            // 重置分页到第一页并重渲染
+            if (wrapper._wkSetCurrentPage) wrapper._wkSetCurrentPage(1);
+            if (wrapper._wkRenderPage) wrapper._wkRenderPage();
+
+            // 同步 value 显示
+            var selectedOption = select.options[select.selectedIndex];
+            valueEl.textContent = selectedOption ? selectedOption.textContent : '';
+        }
+
         _initAdminPage() {
             var self = this;
+
+            // 初始化自定义选择器（button 风格下拉）
+            this._initCustomSelects();
+
             var form = document.getElementById('product-form');
 
             // 绑定模态框关闭按钮事件（防止重复绑定）
@@ -594,6 +881,7 @@ window.closeLicenseModal = function() {
                     if (role === 'admin') {
                         userContainer.style.display = 'none';
                         userSelect.removeAttribute('required');
+                        self._refreshCustomSelect('lf-user');
                         return;
                     }
 
@@ -601,7 +889,10 @@ window.closeLicenseModal = function() {
                     userContainer.style.display = 'block';
                     userSelect.setAttribute('required', 'required');
 
-                    if (!role) return;
+                    if (!role) {
+                        self._refreshCustomSelect('lf-user');
+                        return;
+                    }
 
                     var users = usersByRole[role] || [];
                     if (users.length > 0) {
@@ -612,6 +903,7 @@ window.closeLicenseModal = function() {
                             userSelect.appendChild(option);
                         });
                     }
+                    self._refreshCustomSelect('lf-user');
                 }
 
                 // 监听角色选择变化
@@ -1199,6 +1491,9 @@ window.closeLicenseModal = function() {
             document.getElementById('ue-password').value = '';
             document.getElementById('user-edit-title').textContent = 'Edit User: ' + user.username;
 
+            this._refreshCustomSelect('ue-status');
+            this._refreshCustomSelect('ue-role');
+
             var overlay = document.getElementById('user-edit-overlay');
             var dialog = document.getElementById('user-edit-dialog');
             overlay.classList.remove('hidden');
@@ -1397,6 +1692,7 @@ window.closeLicenseModal = function() {
             // 根据默认 status 设置 button text
             this._updateDefaultButtonText(statusSelect ? statusSelect.value : 'online');
             this._bindStatusChange();
+            this._refreshCustomSelect('f-status');
         }
 
         _updateDefaultButtonText(status) {
@@ -1441,6 +1737,7 @@ window.closeLicenseModal = function() {
                 modalTitle.textContent = 'Edit Product: ' + p.name;
             }
             document.getElementById('submit-btn').innerHTML = '<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Save Changes';
+            this._refreshCustomSelect('f-status');
             // 打开模态框，传递 false 表示不重置表单
             window.openProductModal(false);
         }

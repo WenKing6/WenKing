@@ -26,6 +26,54 @@ foreach ($users as $u) {
         'email' => $u['email']
     ];
 }
+
+/**
+ * Render a custom select dropdown (wk-select component)
+ * 视觉与 .app-input 保持一致，结构支持键盘导航与选中态指示
+ */
+function renderCustomSelect(string $id, array $options, string $selected = '', string $widthClass = 'w-full', bool $required = false): void {
+    $requiredAttr = $required ? ' required' : '';
+    $currentLabel = $options[$selected] ?? (count($options) > 0 ? array_values($options)[0] : '');
+    $currentValue = $selected;
+
+    // 当未指定选中值或选中值不存在时，默认选中第一个选项
+    if (!array_key_exists($selected, $options) && count($options) > 0) {
+        $currentValue = array_key_first($options);
+        $currentLabel = $options[$currentValue];
+    }
+
+    echo '<div class="wk-select ' . $widthClass . '" data-wk-select>';
+    echo '    <select id="' . $id . '" class="wk-select__native"' . $requiredAttr . ' aria-hidden="true" tabindex="-1">';
+    foreach ($options as $value => $label) {
+        $sel = (string)$value === (string)$currentValue ? ' selected' : '';
+        echo '        <option value="' . htmlspecialchars((string)$value) . '"' . $sel . '>' . htmlspecialchars($label) . '</option>';
+    }
+    echo '    </select>';
+    echo '    <button type="button" class="wk-select__trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="' . $id . '-label">';
+    echo '        <span class="wk-select__value" id="' . $id . '-label">' . htmlspecialchars($currentLabel) . '</span>';
+    echo '        <svg class="wk-select__chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
+    echo '    </button>';
+    echo '    <div class="wk-select__menu" role="listbox" aria-hidden="true">';
+    echo '        <div class="wk-select__options">';
+    foreach ($options as $value => $label) {
+        $isSelected = (string)$value === (string)$currentValue;
+        echo '        <button type="button" class="wk-select__option' . ($isSelected ? ' is-selected' : '') . '" role="option" aria-selected="' . ($isSelected ? 'true' : 'false') . '" data-value="' . htmlspecialchars((string)$value) . '">';
+        echo '            <span class="wk-select__option-label">' . htmlspecialchars($label) . '</span>';
+        echo '        </button>';
+    }
+    echo '        </div>';
+    echo '        <div class="wk-select__pager">';
+    echo '            <button type="button" class="wk-select__pager-btn wk-select__pager-prev" aria-label="Previous page">';
+    echo '                <svg class="wk-select__pager-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>';
+    echo '            </button>';
+    echo '            <span class="wk-select__pager-info"></span>';
+    echo '            <button type="button" class="wk-select__pager-btn wk-select__pager-next" aria-label="Next page">';
+    echo '                <svg class="wk-select__pager-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+    echo '            </button>';
+    echo '        </div>';
+    echo '    </div>';
+    echo '</div>';
+}
 ?>
 <div class="app-page-header mb-8" data-users-by-role='<?php echo htmlspecialchars(json_encode($usersByRole), ENT_QUOTES); ?>'>
     <h1 class="text-3xl font-display font-bold mb-2">
@@ -260,12 +308,13 @@ foreach ($users as $u) {
                         </span>
                         <input type="text" id="user-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by username...">
                     </div>
-                    <select id="user-role-filter" class="app-select w-full sm:w-36">
-                        <option value="">All Roles</option>
-                        <?php foreach ($userModel->getAvailableRoles() as $key => $label): ?>
-                        <option value="<?php echo $key; ?>"><?php echo $label; ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?php
+                    $roleOptions = ['' => 'All Roles'];
+                    foreach ($userModel->getAvailableRoles() as $key => $label) {
+                        $roleOptions[$key] = $label;
+                    }
+                    renderCustomSelect('user-role-filter', $roleOptions, '', 'w-full sm:w-36');
+                    ?>
                 </div>
             </div>
 
@@ -451,25 +500,20 @@ foreach ($users as $u) {
                         </span>
                         <input type="text" id="license-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by key...">
                     </div>
-                    <select id="license-product-filter" class="app-select w-full sm:w-40">
-                        <option value="">All Products</option>
-                        <?php foreach ($products as $p): ?>
-                        <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="license-status-filter" class="app-select w-full sm:w-36">
-                        <option value="">All Status</option>
-                        <option value="unused">Unused</option>
-                        <option value="active">Active</option>
-                        <option value="expired">Expired</option>
-                        <option value="disabled">Disabled</option>
-                    </select>
-                    <select id="license-per-page" class="app-select w-full sm:w-28">
-                        <option value="10">10 / page</option>
-                        <option value="20">20 / page</option>
-                        <option value="50">50 / page</option>
-                        <option value="100">100 / page</option>
-                    </select>
+                    <?php
+                    $licenseProductOptions = ['' => 'All Products'];
+                    foreach ($products as $p) {
+                        $licenseProductOptions[$p['id']] = $p['name'];
+                    }
+                    renderCustomSelect('license-product-filter', $licenseProductOptions, '', 'w-full sm:w-40');
+                    renderCustomSelect('license-status-filter', [
+                        '' => 'All Status',
+                        'unused' => 'Unused',
+                        'active' => 'Active',
+                        'expired' => 'Expired',
+                        'disabled' => 'Disabled'
+                    ], '', 'w-full sm:w-36');
+                    ?>
                     <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -614,18 +658,29 @@ foreach ($users as $u) {
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
-                <div class="text-sm text-white/40">
-                    Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-white/40">
+                        Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-white/40">Per page</span>
+                        <?php renderCustomSelect('license-per-page', [
+                            '10' => '10',
+                            '20' => '20',
+                            '50' => '50',
+                            '100' => '100'
+                        ], '10', 'w-16'); ?>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
                     </button>
-                    <span class="text-sm text-white/60">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
-                    <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
+                    <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
@@ -650,38 +705,37 @@ foreach ($users as $u) {
         <form id="license-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
-                <select id="lf-product" class="app-select w-full" required>
-                    <option value="">-- Select Product --</option>
-                    <?php foreach ($products as $p): ?>
-                    <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <?php
+                $lfProductOptions = ['' => '-- Select Product --'];
+                foreach ($products as $p) {
+                    $lfProductOptions[$p['id']] = $p['name'];
+                }
+                renderCustomSelect('lf-product', $lfProductOptions, '', 'w-full', true);
+                ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
-                <select id="lf-duration" class="app-select w-full" required>
-                    <option value="">-- Select Time --</option>
-                    <option value="1">1 Day</option>
-                    <option value="7">7 Days</option>
-                    <option value="30">30 Days</option>
-                    <option value="90">90 Days</option>
-                    <option value="365">1 Year</option>
-                    <option value="9999">Lifetime</option>
-                </select>
+                <?php renderCustomSelect('lf-duration', [
+                    '' => '-- Select Time --',
+                    '1' => '1 Day',
+                    '7' => '7 Days',
+                    '30' => '30 Days',
+                    '90' => '90 Days',
+                    '365' => '1 Year',
+                    '9999' => 'Lifetime'
+                ], '', 'w-full', true); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
-                <select id="lf-role" class="app-select w-full" required>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="reseller">Reseller</option>
-                </select>
+                <?php renderCustomSelect('lf-role', [
+                    'admin' => 'Admin',
+                    'manager' => 'Manager',
+                    'reseller' => 'Reseller'
+                ], 'admin', 'w-full', true); ?>
             </div>
             <div id="lf-user-container" style="display: none;">
                 <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
-                <select id="lf-user" class="app-select w-full">
-                    <option value="">-- Select User --</option>
-                </select>
+                <?php renderCustomSelect('lf-user', ['' => '-- Select User --'], '', 'w-full'); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">License Keys *</label>
@@ -726,20 +780,20 @@ foreach ($users as $u) {
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Status</label>
-                <select id="ue-status" class="app-select w-full">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="banned">Banned</option>
-                </select>
+                <?php renderCustomSelect('ue-status', [
+                    'active' => 'Active',
+                    'inactive' => 'Inactive',
+                    'banned' => 'Banned'
+                ], 'active', 'w-full'); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Role</label>
-                <select id="ue-role" class="app-select w-full">
-                    <option value="user">User</option>
-                    <option value="reseller">Reseller</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
-                </select>
+                <?php renderCustomSelect('ue-role', [
+                    'user' => 'User',
+                    'reseller' => 'Reseller',
+                    'manager' => 'Manager',
+                    'admin' => 'Admin'
+                ], 'user', 'w-full'); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">New Password <span class="text-white/40">(leave blank to keep current)</span></label>
@@ -780,11 +834,11 @@ foreach ($users as $u) {
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Status</label>
-                <select id="f-status" class="app-select w-full">
-                    <option value="online">Online</option>
-                    <option value="updating">Updating</option>
-                    <option value="development">Development</option>
-                </select>
+                <?php renderCustomSelect('f-status', [
+                    'online' => 'Online',
+                    'updating' => 'Updating',
+                    'development' => 'Development'
+                ], 'online', 'w-full'); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Image Path</label>
