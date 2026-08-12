@@ -1153,6 +1153,9 @@ window.closeLicenseModal = function() {
             // 初始化产品分页
             self._initProductPagination();
 
+            // 初始化产品状态筛选
+            self._initProductFilters();
+
             // 初始化许可证搜索/筛选/分页
             self._initLicenseFilters();
         }
@@ -1444,7 +1447,7 @@ window.closeLicenseModal = function() {
 
         _deleteUser(id, triggerBtn) {
             var self = this;
-            this._showConfirmDialog('是否要删除这个用户？', function() {
+            this._showConfirmDialog('Are you sure you want to delete this user?', function() {
                 if (triggerBtn) {
                     triggerBtn.classList.add('is-loading');
                 }
@@ -1532,7 +1535,7 @@ window.closeLicenseModal = function() {
 
                 // 如果角色发生变化，需要二次确认
                 if (newRole !== currentRole) {
-                    self._showConfirmDialog('确定要将角色从 ' + currentRole + ' 更改为 ' + newRole + ' 吗？', function() {
+                    self._showConfirmDialog('Are you sure you want to change the role from ' + currentRole + ' to ' + newRole + '?', function() {
                         self._submitUserUpdate(id);
                     });
                 } else {
@@ -1806,17 +1809,35 @@ window.closeLicenseModal = function() {
 
         _getProductCount() {
             var tbody = document.getElementById('product-list');
-            return tbody ? tbody.querySelectorAll('tr[data-id]').length : 0;
+            if (!tbody) return 0;
+            var statusFilter = document.getElementById('product-status-filter');
+            var status = statusFilter ? statusFilter.value : '';
+            return Array.prototype.filter.call(tbody.querySelectorAll('tr[data-id]'), function(row) {
+                return !status || row.getAttribute('data-status') === status;
+            }).length;
         }
 
         _filterProducts() {
             var tbody = document.getElementById('product-list');
             if (!tbody) return;
 
+            var statusFilter = document.getElementById('product-status-filter');
+            var status = statusFilter ? statusFilter.value : '';
+
             var cardsContainer = document.getElementById('product-list-mobile');
             var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-id]'));
             var cards = cardsContainer ? Array.prototype.slice.call(cardsContainer.querySelectorAll('.product-card')) : [];
-            var total = rows.length;
+
+            // 筛选出符合条件的行与卡片
+            var visibleRows = [];
+            var visibleCards = [];
+            rows.forEach(function(row) {
+                if (!status || row.getAttribute('data-status') === status) visibleRows.push(row);
+            });
+            cards.forEach(function(card) {
+                if (!status || card.getAttribute('data-status') === status) visibleCards.push(card);
+            });
+            var total = visibleRows.length;
 
             // 分页
             var currentPage = this._productCurrentPage ? this._productCurrentPage() : 1;
@@ -1830,13 +1851,17 @@ window.closeLicenseModal = function() {
             var startIndex = (currentPage - 1) * perPage;
             var endIndex = Math.min(startIndex + perPage, total);
 
-            // 仅显示当前页的行/卡片，其余隐藏
-            rows.forEach(function(row, i) {
-                row.style.display = (i >= startIndex && i < endIndex) ? '' : 'none';
-            });
-            cards.forEach(function(card, i) {
-                card.style.display = (i >= startIndex && i < endIndex) ? '' : 'none';
-            });
+            // 隐藏所有行/卡片
+            rows.forEach(function(row) { row.style.display = 'none'; });
+            cards.forEach(function(card) { card.style.display = 'none'; });
+
+            // 仅显示当前页的行/卡片
+            visibleRows.slice(startIndex, endIndex).forEach(function(row) { row.style.display = ''; });
+            visibleCards.slice(startIndex, endIndex).forEach(function(card) { card.style.display = ''; });
+
+            // 更新计数
+            var countEl = document.getElementById('product-count');
+            if (countEl) countEl.textContent = total;
 
             // 更新分页信息
             this._updateProductPagination(total, currentPage, perPage);
@@ -1863,6 +1888,17 @@ window.closeLicenseModal = function() {
             if (totalPagesEl) totalPagesEl.textContent = totalPages || 1;
             if (prevBtn) prevBtn.disabled = currentPage <= 1;
             if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        _initProductFilters() {
+            var statusFilter = document.getElementById('product-status-filter');
+            if (!statusFilter) return;
+            var self = this;
+            statusFilter.addEventListener('change', function() {
+                // 筛选变化时回到第一页
+                if (self._productSetCurrentPage) self._productSetCurrentPage(1);
+                self._filterProducts();
+            });
         }
 
         _resetAdminForm() {
@@ -1934,7 +1970,7 @@ window.closeLicenseModal = function() {
         _deleteAdminProduct(id, triggerBtn) {
             var self = this;
             // 显示自定义确认对话框
-            this._showConfirmDialog('是否要删除这个产品？', function() {
+            this._showConfirmDialog('Are you sure you want to delete this product?', function() {
                 // 用户点击确定，开始删除
                 if (triggerBtn) {
                     triggerBtn.classList.add('is-loading');
@@ -1992,11 +2028,11 @@ window.closeLicenseModal = function() {
                         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>' +
                     '</svg>' +
                 '</div>' +
-                '<div class="confirm-dialog-title">确认删除</div>' +
+                '<div class="confirm-dialog-title">Confirm</div>' +
                 '<div class="confirm-dialog-message">' + message + '</div>' +
                 '<div class="confirm-dialog-actions">' +
-                    '<button class="confirm-btn-cancel">取消</button>' +
-                    '<button class="confirm-btn-confirm">确定</button>' +
+                    '<button class="confirm-btn-cancel">Cancel</button>' +
+                    '<button class="confirm-btn-confirm">Confirm</button>' +
                 '</div>' +
             '</div>';
 
@@ -2022,7 +2058,7 @@ window.closeLicenseModal = function() {
 
             confirmBtn.addEventListener('click', function() {
                 confirmBtn.disabled = true;
-                confirmBtn.textContent = '删除中...';
+                confirmBtn.textContent = 'Processing...';
                 onConfirm();
                 // 注意：不在这里关闭对话框，等 API 返回后再关闭
             });

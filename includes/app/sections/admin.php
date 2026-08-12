@@ -161,14 +161,22 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
         <!-- Product List -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-white">Product List (<?php echo count($products); ?>)</h3>
-                <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm" onclick="openProductModal()">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Add Product
-                </button>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <h3 class="text-lg font-semibold text-white">Product List (<span id="product-count"><?php echo count($products); ?></span>)</h3>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <?php renderCustomSelect('product-status-filter', [
+                        '' => 'All Statuses',
+                        'online' => 'Online',
+                        'updating' => 'Updating',
+                        'development' => 'Development'
+                    ], '', 'w-full sm:w-40'); ?>
+                    <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openProductModal()">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Product
+                    </button>
+                </div>
             </div>
 
             <!-- Desktop Table Layout -->
@@ -177,7 +185,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
                             <th class="text-left py-3 px-4">Name</th>
-                            <th class="text-left py-3 px-4">Tagline</th>
                             <th class="text-left py-3 px-4">Status</th>
                             <th class="text-left py-3 px-4">Sort</th>
                             <th class="text-left py-3 px-4">Visible</th>
@@ -186,9 +193,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     </thead>
                     <tbody id="product-list">
                         <?php foreach ($products as $p): ?>
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $p['id']; ?>">
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $p['id']; ?>" data-status="<?php echo $p['status']; ?>">
                             <td class="py-3 px-4 font-medium text-white"><?php echo htmlspecialchars($p['name']); ?></td>
-                            <td class="py-3 px-4 text-white/60 max-w-xs truncate"><?php echo htmlspecialchars($p['tagline']); ?></td>
                             <td class="py-3 px-4">
                                 <span class="status-badge status-<?php echo $p['status']; ?> text-xs"><?php echo ucfirst($p['status']); ?></span>
                             </td>
@@ -215,11 +221,10 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             <!-- Mobile Card Layout -->
             <div id="product-list-mobile" class="md:hidden space-y-3">
                 <?php foreach ($products as $p): ?>
-                <div class="product-card relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>">
+                <div class="product-card relative p-4 rounded-lg bg-white/5 hover:bg-white/10 transition" data-id="<?php echo $p['id']; ?>" data-status="<?php echo $p['status']; ?>">
                     <div class="flex items-start justify-between gap-3 mb-3">
                         <div class="min-w-0 flex-1">
                             <div class="text-sm font-medium text-white truncate"><?php echo htmlspecialchars($p['name']); ?></div>
-                            <div class="text-xs text-white/60 truncate"><?php echo htmlspecialchars($p['tagline']); ?></div>
                         </div>
                         <span class="status-badge status-<?php echo $p['status']; ?> text-xs shrink-0"><?php echo ucfirst($p['status']); ?></span>
                     </div>
