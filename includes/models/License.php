@@ -258,6 +258,39 @@ class License {
     }
 
     /**
+     * Batch delete licenses
+     */
+    public function deleteBatch(array $ids): array {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        $ids = array_filter($ids, fn($id) => $id > 0);
+
+        if (empty($ids)) {
+            return [
+                'success' => false,
+                'message' => 'No valid license IDs provided'
+            ];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $this->db->prepare("DELETE FROM licenses WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $deleted = $stmt->rowCount();
+
+            return [
+                'success' => true,
+                'deleted' => $deleted,
+                'message' => $deleted . ' license(s) deleted successfully'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'Delete failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * Get statistics
      */
     public function getStats(): array {

@@ -1240,6 +1240,95 @@ window.closeLicenseModal = function() {
                 });
             }
 
+            // ===== 勾选与批量删除 =====
+            var selectedIds = new Set();
+            var selectAllEl = document.getElementById('license-select-all');
+            var deleteSelectedBtn = document.getElementById('license-delete-selected');
+
+            // 更新已选数量与批量删除按钮显示状态
+            function updateSelectedUI() {
+                var count = selectedIds.size;
+                var countEl = document.getElementById('license-selected-count');
+                if (countEl) countEl.textContent = count;
+                if (deleteSelectedBtn) {
+                    if (count > 0) {
+                        deleteSelectedBtn.classList.remove('hidden');
+                        deleteSelectedBtn.classList.add('flex');
+                    } else {
+                        deleteSelectedBtn.classList.add('hidden');
+                        deleteSelectedBtn.classList.remove('flex');
+                    }
+                }
+            }
+
+            // 同步表头全选框状态（仅针对当前页可见行）
+            function syncSelectAllState() {
+                if (!selectAllEl) return;
+                var visibleChecks = self._getVisibleLicenseChecks();
+                var checkedCount = visibleChecks.filter(function(cb) { return cb.checked; }).length;
+                selectAllEl.checked = visibleChecks.length > 0 && checkedCount === visibleChecks.length;
+                selectAllEl.indeterminate = checkedCount > 0 && checkedCount < visibleChecks.length;
+            }
+
+            // 获取当前页可见的行勾选框（桌面表格）
+            self._getVisibleLicenseChecks = function() {
+                var tbody = document.getElementById('license-list');
+                if (!tbody) return [];
+                return Array.from(tbody.querySelectorAll('.license-row-check')).filter(function(cb) {
+                    var tr = cb.closest('tr');
+                    return tr && tr.style.display !== 'none';
+                });
+            };
+
+            // 勾选/取消单行（同时更新选中集合与行高亮）
+            self._toggleLicenseRowSelection = function(cb) {
+                var id = cb.getAttribute('data-id');
+                // 从父元素开始查找行容器（桌面 tr / 移动卡片 div），避免命中勾选框自身
+                var row = cb.parentElement ? cb.parentElement.closest('[data-id]') : null;
+                if (cb.checked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+                if (row) {
+                    row.classList.toggle('license-row-selected', cb.checked);
+                }
+            };
+
+            // 表头全选框（作用于当前页可见行）
+            if (selectAllEl) {
+                selectAllEl.addEventListener('change', function() {
+                    var visibleChecks = self._getVisibleLicenseChecks();
+                    visibleChecks.forEach(function(cb) {
+                        cb.checked = selectAllEl.checked;
+                        self._toggleLicenseRowSelection(cb);
+                    });
+                    updateSelectedUI();
+                    syncSelectAllState();
+                });
+            }
+
+            // 行勾选（事件委托，覆盖桌面表格与移动卡片）
+            if (!window._licenseRowChangeBound) {
+                window._licenseRowChangeBound = true;
+                document.addEventListener('change', function(e) {
+                    var cb = e.target.closest('.license-row-check');
+                    if (!cb) return;
+                    self._toggleLicenseRowSelection(cb);
+                    updateSelectedUI();
+                    syncSelectAllState();
+                });
+            }
+
+            // 批量删除已选
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', function() {
+                    var ids = Array.from(selectedIds);
+                    if (ids.length === 0) return;
+                    self._deleteLicenses(ids);
+                });
+            }
+
             // 初始筛选
             self._filterLicenses();
 
@@ -1247,6 +1336,8 @@ window.closeLicenseModal = function() {
             this._licenseCurrentPage = function() { return currentPage; };
             this._licenseSetCurrentPage = function(page) { currentPage = page; };
             this._licensePerPage = function() { return perPage; };
+            this._syncLicenseSelectAll = syncSelectAllState;
+            updateSelectedUI();
         }
 
         _filterLicenses() {
@@ -1302,6 +1393,11 @@ window.closeLicenseModal = function() {
 
             // 更新分页信息
             this._updateLicensePagination(visibleRows.length, currentPage, perPage);
+
+            // 同步表头全选框状态
+            if (this._syncLicenseSelectAll) {
+                this._syncLicenseSelectAll();
+            }
         }
 
         _getFilteredLicenseCount() {
@@ -1403,6 +1499,40 @@ window.closeLicenseModal = function() {
             if (activeEl) activeEl.textContent = active;
             if (unusedEl) unusedEl.textContent = unused;
             if (expiredEl) expiredEl.textContent = expired;
+        }
+
+        _deleteLicenses(ids) {
+            var self = this;
+            var count = ids.length;
+            this._showConfirmDialog('Are you sure you want to delete ' + count + ' selected license(s)? This action cannot be undone.', function() {
+                fetch(window.SITE_URL + '/api/licenses.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=batch_delete&ids=' + encodeURIComponent(JSON.stringify(ids))
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast(data.message || 'Licenses deleted successfully', 'success');
+                        }
+                        setTimeout(function() { location.reload(); }, 800);
+                    } else {
+                        if (typeof showToast !== 'undefined') {
+                            showToast(data.message || 'Delete failed', 'error');
+                        } else {
+                            alert(data.message || 'Delete failed');
+                        }
+                    }
+                })
+                .catch(function() {
+                    if (typeof showToast !== 'undefined') {
+                        showToast('Network error', 'error');
+                    } else {
+                        alert('Network error');
+                    }
+                });
+            });
         }
 
         _toggleUserStatus(id, newStatus, triggerBtn) {
@@ -1937,10 +2067,8 @@ window.closeLicenseModal = function() {
             statusSelect.dataset.changeBound = '1';
             var self = this;
             statusSelect.addEventListener('change', function() {
-                // 只在新增模式下自动更新 button text
-                if (!document.getElementById('edit-id').value) {
-                    self._updateDefaultButtonText(this.value);
-                }
+                // 新增与编辑模式保持一致：切换状态时同步 Button Text
+                self._updateDefaultButtonText(this.value);
             });
         }
 

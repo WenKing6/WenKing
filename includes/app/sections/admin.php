@@ -573,6 +573,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         </svg>
                         Add License
                     </button>
+                    <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete Selected (<span id="license-selected-count">0</span>)
+                    </button>
                 </div>
             </div>
 
@@ -581,6 +587,9 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
+                            <th class="py-3 px-4 w-10">
+                                <input type="checkbox" id="license-select-all" class="license-checkbox" title="Select all on this page" aria-label="Select all licenses on this page">
+                            </th>
                             <th class="text-left py-3 px-4">License Key</th>
                             <th class="text-left py-3 px-4">Product</th>
                             <th class="text-left py-3 px-4">Duration</th>
@@ -594,7 +603,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     <tbody id="license-list">
                         <?php if (empty($licenses)): ?>
                         <tr>
-                            <td colspan="8" class="text-center py-12 text-white/40">
+                            <td colspan="9" class="text-center py-12 text-white/40">
                                 <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
                                 </svg>
@@ -604,6 +613,9 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         <?php else: ?>
                             <?php foreach ($licenses as $lic): ?>
                             <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                                <td class="py-3 px-4">
+                                    <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
+                                </td>
                                 <td class="py-3 px-4 font-mono text-sm text-white/80"><?php echo htmlspecialchars($lic['license_key']); ?></td>
                                 <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></td>
                                 <td class="py-3 px-4 text-white/60">
@@ -670,9 +682,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     <?php foreach ($licenses as $lic): ?>
                     <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
                         <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1 min-w-0">
-                                <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
-                                <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
+                            <div class="flex items-start gap-3 flex-1 min-w-0">
+                                <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
+                                    <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
+                                </div>
                             </div>
                             <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs shrink-0">
                                 <?php echo ucfirst($lic['status']); ?>

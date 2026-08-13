@@ -456,6 +456,68 @@
     transform: translateX(20px);
 }
 
+/* 复选框（License 列表勾选） */
+.license-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+}
+
+.license-checkbox:hover {
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.license-checkbox:checked {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+.license-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.license-checkbox:indeterminate {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+.license-checkbox:indeterminate::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 7px;
+    width: 8px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+}
+
+.license-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+tr.license-row-selected,
+.license-row-selected {
+    background: rgba(139, 92, 246, 0.08) !important;
+}
+
 /* 表单组 */
 .app-form-group {
     margin-bottom: 1.5rem;

@@ -117,6 +117,17 @@ switch ($action) {
         echo json_encode($result);
         break;
 
+    case 'batch_delete':
+        $ids = json_decode($_POST['ids'] ?? '[]', true);
+        if (!is_array($ids) || empty($ids)) {
+            echo json_encode(['success' => false, 'message' => 'No license IDs provided']);
+            exit;
+        }
+
+        $result = $license->deleteBatch($ids);
+        echo json_encode($result);
+        break;
+
     case 'get_by_product_user':
         $productId = (int)($_GET['product_id'] ?? 0);
         $userId = (int)($_GET['user_id'] ?? 0);
