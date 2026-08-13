@@ -7,6 +7,11 @@
 // 引入配置
 require_once __DIR__ . '/../config/config.php';
 
+// 启动会话（AJAX 加载页面片段时需要读取登录态与角色）
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // 白名单验证
 $allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager', 'admin'];
 $page = $_GET['page'] ?? 'dashboard';

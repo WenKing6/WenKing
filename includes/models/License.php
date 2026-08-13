@@ -8,9 +8,36 @@ require_once __DIR__ . '/../Database.php';
 
 class License {
     private PDO $db;
+    private static bool $allocationTableChecked = false;
 
     public function __construct() {
         $this->db = Database::getInstance()->getPdo();
+        if (!self::$allocationTableChecked) {
+            $this->ensureAllocationTable();
+            self::$allocationTableChecked = true;
+        }
+    }
+
+    /**
+     * 确保 license_allocations 配额表存在（幂等自愈迁移）
+     * 配额 = Admin 给经理分配的「某产品 + 某时长」可领取的钥匙数量
+     * quantity   = 总量
+     * used_count = 经理已领取的数量
+     */
+    private function ensureAllocationTable(): void {
+        $this->db->exec("CREATE TABLE IF NOT EXISTS `license_allocations` (
+            `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `user_id` INT UNSIGNED NOT NULL,
+            `product_id` INT UNSIGNED NOT NULL,
+            `duration_days` INT NOT NULL DEFAULT 30,
+            `quantity` INT NOT NULL DEFAULT 0,
+            `used_count` INT NOT NULL DEFAULT 0,
+            `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uk_user_product_duration` (`user_id`, `product_id`, `duration_days`),
+            KEY `idx_alloc_user` (`user_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     }
 
     /**
@@ -322,5 +349,204 @@ class License {
             ':user_id' => $userId
         ]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Get licenses assigned to a specific user (经理只看自己的钥匙)
+     */
+    public function getByUser(int $userId): array {
+        $stmt = $this->db->prepare('
+            SELECT l.*, p.name as product_name, u.username as user_name
+            FROM licenses l
+            LEFT JOIN products p ON l.product_id = p.id
+            LEFT JOIN users u ON l.user_id = u.id
+            WHERE l.user_id = :user_id
+            ORDER BY l.created_at DESC
+        ');
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get all allocations (管理员) or allocations of one user (经理)
+     */
+    public function getAllocations(?int $userId = null): array {
+        $sql = '
+            SELECT a.*, p.name as product_name, u.username as manager_name
+            FROM license_allocations a
+            LEFT JOIN products p ON a.product_id = p.id
+            LEFT JOIN users u ON a.user_id = u.id
+        ';
+        $params = [];
+        if ($userId !== null) {
+            $sql .= ' WHERE a.user_id = :user_id';
+            $params[':user_id'] = $userId;
+        }
+        $sql .= ' ORDER BY a.updated_at DESC';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Create / increase a quota for a manager (某产品 + 某时长 可领 X 把钥匙)
+     */
+    public function createAllocation(int $userId, int $productId, int $durationDays, int $quantity): array {
+        try {
+            $stmt = $this->db->prepare('
+                INSERT INTO license_allocations (user_id, product_id, duration_days, quantity)
+                VALUES (:user_id, :product_id, :duration_days, :quantity)
+                ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+            ');
+            $stmt->execute([
+                ':user_id' => $userId,
+                ':product_id' => $productId,
+                ':duration_days' => $durationDays,
+                ':quantity' => $quantity,
+            ]);
+            return ['success' => true, 'message' => 'Quota granted successfully'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete an allocation (管理员撤销配额)
+     */
+    public function deleteAllocation(int $id): array {
+        try {
+            $stmt = $this->db->prepare('DELETE FROM license_allocations WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            return ['success' => true, 'message' => 'Quota deleted successfully'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Delete failed: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * 统计某产品 + 某时长的库存可用钥匙数量（unused 且未分配给任何人）
+     */
+    public function getInventoryCount(int $productId, int $durationDays): int {
+        $stmt = $this->db->prepare('
+            SELECT COUNT(*) FROM licenses
+            WHERE product_id = :product_id AND duration_days = :duration_days
+              AND status = "unused" AND user_id IS NULL
+        ');
+        $stmt->execute([':product_id' => $productId, ':duration_days' => $durationDays]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
+     * 经理从库存领取钥匙（事务：校验配额剩余 + 库存数量，分配钥匙并同步 used_count）
+     */
+    public function claimKeys(int $userId, int $productId, int $durationDays, int $quantity): array {
+        if ($quantity <= 0) {
+            return ['success' => false, 'message' => 'Invalid quantity'];
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            // 锁定配额行，防止并发超领
+            $stmt = $this->db->prepare('
+                SELECT id, quantity, used_count FROM license_allocations
+                WHERE user_id = :user_id AND product_id = :product_id AND duration_days = :duration_days
+                FOR UPDATE
+            ');
+            $stmt->execute([
+                ':user_id' => $userId,
+                ':product_id' => $productId,
+                ':duration_days' => $durationDays,
+            ]);
+            $alloc = $stmt->fetch();
+            if (!$alloc) {
+                $this->db->rollBack();
+                return ['success' => false, 'message' => 'No quota allocated for this product & duration'];
+            }
+
+            $remaining = (int)$alloc['quantity'] - (int)$alloc['used_count'];
+            if ($remaining < $quantity) {
+                $this->db->rollBack();
+                return ['success' => false, 'message' => 'Insufficient quota, only ' . $remaining . ' key(s) remaining'];
+            }
+
+            // 锁定库存中可分配的钥匙（unused 且未分配）
+            $limit = (int)$quantity; // 已校验为正整数，直接内联避免 LIMIT 参数化问题
+            $stmt = $this->db->prepare('
+                SELECT id FROM licenses
+                WHERE product_id = :product_id AND duration_days = :duration_days
+                  AND status = "unused" AND user_id IS NULL
+                LIMIT ' . $limit . '
+                FOR UPDATE
+            ');
+            $stmt->execute([':product_id' => $productId, ':duration_days' => $durationDays]);
+            $keys = $stmt->fetchAll();
+
+            if (count($keys) < $quantity) {
+                $this->db->rollBack();
+                return ['success' => false, 'message' => 'Not enough keys in inventory (available: ' . count($keys) . ')'];
+            }
+
+            // 把钥匙挂到经理名下
+            $ids = array_column($keys, 'id');
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $upd = $this->db->prepare("UPDATE licenses SET user_id = ? WHERE id IN ($placeholders)");
+            $upd->execute(array_merge([$userId], $ids));
+
+            // 同步配额已领取数量
+            $upd2 = $this->db->prepare('UPDATE license_allocations SET used_count = used_count + ? WHERE id = ?');
+            $upd2->execute([$quantity, $alloc['id']]);
+
+            $this->db->commit();
+            return ['success' => true, 'claimed' => count($ids), 'message' => count($ids) . ' key(s) claimed successfully'];
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            return ['success' => false, 'message' => 'Claim failed: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * 管理员回收经理已领取但未激活的钥匙（回库存，配额 used_count 减一）
+     */
+    public function recycle(int $licenseId): array {
+        try {
+            $license = $this->getById($licenseId);
+            if (!$license) {
+                return ['success' => false, 'message' => 'License not found'];
+            }
+            if (!$license['user_id']) {
+                return ['success' => false, 'message' => 'License is not assigned to any user'];
+            }
+            if ($license['status'] !== 'unused') {
+                return ['success' => false, 'message' => 'Only unactivated keys can be recycled'];
+            }
+
+            $this->db->beginTransaction();
+
+            // 收回钥匙回库存
+            $stmt = $this->db->prepare('UPDATE licenses SET user_id = NULL WHERE id = :id');
+            $stmt->execute([':id' => $licenseId]);
+
+            // 对应配额 used_count 减一（不低于 0）
+            $stmt = $this->db->prepare('
+                UPDATE license_allocations SET used_count = GREATEST(used_count - 1, 0)
+                WHERE user_id = :user_id AND product_id = :product_id AND duration_days = :duration_days
+            ');
+            $stmt->execute([
+                ':user_id' => $license['user_id'],
+                ':product_id' => $license['product_id'],
+                ':duration_days' => $license['duration_days'],
+            ]);
+
+            $this->db->commit();
+            return ['success' => true, 'message' => 'License recycled back to inventory'];
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            return ['success' => false, 'message' => 'Recycle failed: ' . $e->getMessage()];
+        }
     }
 }

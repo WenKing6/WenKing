@@ -21,6 +21,30 @@ $siteIcon = (new SiteSetting())->get('site_icon');
 $faqItems = (new FaqItem())->getAll();
 $currentIcon = $siteIcon ? SITE_URL . $siteIcon : SITE_URL . '/assets/images/gta-v-logo-transparent-free-png.webp';
 
+// 当前用户识别：Session + 数据库角色校验（防篡改）
+$sessionUserId = (int)($_SESSION['user_id'] ?? 0);
+$currentUser = $sessionUserId > 0 ? $userModel->findById($sessionUserId) : null;
+$isAdmin = $currentUser && $currentUser['role'] === 'admin';
+
+// 配额数据（仅管理员展示配额管理）
+$allocations = $isAdmin ? $licenseModel->getAllocations() : [];
+
+// 经理用户列表（Grant Quota 弹窗用）
+$managerUsers = array_filter($users, fn($u) => $u['role'] === 'manager');
+
+/**
+ * 时长显示标签
+ */
+function licenseDurationLabel(int $days): string {
+    if ($days === 1) return '1 Day';
+    if ($days === 7) return '7 Days';
+    if ($days === 30) return '30 Days';
+    if ($days === 90) return '90 Days';
+    if ($days === 365) return '1 Year';
+    if ($days >= 9999) return 'Lifetime';
+    return $days . ' Days';
+}
+
 // Group users by role for license assignment
 $usersByRole = [];
 foreach ($users as $u) {
@@ -88,6 +112,9 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">Admin Panel</span>
     </h1>
     <p class="text-white/60">Manage products, users, and system settings</p>
+    <?php if ($currentUser): ?>
+    <p class="text-xs text-white/40 mt-2">Signed in as <span class="text-accent-cyan"><?php echo htmlspecialchars($currentUser['username']); ?></span> (<?php echo ucfirst($currentUser['role']); ?>)</p>
+    <?php endif; ?>
 </div>
 
 <!-- Tab Navigation -->
@@ -569,6 +596,96 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
         </div>
 
+        <?php if ($isAdmin): ?>
+        <!-- Quota Management -->
+        <div class="glass-card p-6 rounded-xl mb-6" id="quota-management">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Quota Management</h3>
+                    <p class="text-xs text-white/40 mt-1">Grant managers the right to claim keys of a specific product & duration from inventory.</p>
+                </div>
+                <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" id="grant-quota-btn">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Grant Quota
+                </button>
+            </div>
+
+            <?php if (empty($allocations)): ?>
+            <div class="text-center py-8 text-white/40">
+                No quotas granted yet. Click "Grant Quota" to give a manager access to inventory keys.
+            </div>
+            <?php else: ?>
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-white/50 border-b border-white/10">
+                            <th class="text-left py-3 px-4">Manager</th>
+                            <th class="text-left py-3 px-4">Product</th>
+                            <th class="text-left py-3 px-4">Duration</th>
+                            <th class="text-left py-3 px-4">Total</th>
+                            <th class="text-left py-3 px-4">Claimed</th>
+                            <th class="text-left py-3 px-4">Remaining</th>
+                            <th class="text-left py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allocation-list">
+                        <?php foreach ($allocations as $alloc):
+                            $total = (int)$alloc['quantity'];
+                            $used = (int)$alloc['used_count'];
+                            $remaining = $total - $used;
+                        ?>
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo (int)$alloc['id']; ?>">
+                            <td class="py-3 px-4 font-medium text-white"><?php echo htmlspecialchars($alloc['manager_name'] ?? 'Unknown'); ?></td>
+                            <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($alloc['product_name'] ?? 'N/A'); ?></td>
+                            <td class="py-3 px-4 text-accent-cyan"><?php echo licenseDurationLabel((int)$alloc['duration_days']); ?></td>
+                            <td class="py-3 px-4 text-white/80"><?php echo $total; ?></td>
+                            <td class="py-3 px-4 text-white/60"><?php echo $used; ?></td>
+                            <td class="py-3 px-4 <?php echo $remaining > 0 ? 'text-status-online' : 'text-white/40'; ?>"><?php echo $remaining; ?></td>
+                            <td class="py-3 px-4">
+                                <button class="btn-allocation-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete Quota" data-id="<?php echo (int)$alloc['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden space-y-3">
+                <?php foreach ($allocations as $alloc):
+                    $total = (int)$alloc['quantity'];
+                    $used = (int)$alloc['used_count'];
+                    $remaining = $total - $used;
+                ?>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo (int)$alloc['id']; ?>">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="min-w-0">
+                            <div class="font-semibold text-white"><?php echo htmlspecialchars($alloc['manager_name'] ?? 'Unknown'); ?></div>
+                            <div class="text-sm text-white/60 mt-1"><?php echo htmlspecialchars($alloc['product_name'] ?? 'N/A'); ?> · <span class="text-accent-cyan"><?php echo licenseDurationLabel((int)$alloc['duration_days']); ?></span></div>
+                        </div>
+                        <button class="btn-allocation-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5 shrink-0" title="Delete Quota" data-id="<?php echo (int)$alloc['id']; ?>">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="text-xs text-white/40">
+                        Total <span class="text-white/80"><?php echo $total; ?></span> &middot; Claimed <span class="text-white/80"><?php echo $used; ?></span> &middot; Remaining <span class="<?php echo $remaining > 0 ? 'text-status-online' : 'text-white/40'; ?>"><?php echo $remaining; ?></span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
         <!-- License List -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -601,12 +718,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                         Add License
-                    </button>
-                    <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" onclick="openAssignModal()">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        Assign License
                     </button>
                     <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -647,7 +758,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         </tr>
                         <?php else: ?>
                             <?php foreach ($licenses as $lic): ?>
-                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>" data-user-id="<?php echo (int)$lic['user_id']; ?>" data-role="<?php echo htmlspecialchars($lic['user_role'] ?? ''); ?>">
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
                                 <td class="py-3 px-4">
                                     <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 </td>
@@ -691,10 +802,10 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     ?>
                                 </td>
                                 <td class="py-3 px-4 flex gap-2">
-                                    <?php if ($lic['status'] === 'unused' && !empty($lic['user_id'])): ?>
-                                    <button class="btn-license-recycle text-white/40 hover:text-status-updating transition p-2 rounded-lg hover:bg-white/5" title="Recycle (unassign)" data-id="<?php echo $lic['id']; ?>">
+                                    <?php if ($lic['user_id'] && $lic['status'] === 'unused'): ?>
+                                    <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                     </button>
                                     <?php endif; ?>
@@ -722,7 +833,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 </div>
                 <?php else: ?>
                     <?php foreach ($licenses as $lic): ?>
-                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>" data-user-id="<?php echo (int)$lic['user_id']; ?>" data-role="<?php echo htmlspecialchars($lic['user_role'] ?? ''); ?>">
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-start gap-3 flex-1 min-w-0">
                                 <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
@@ -756,11 +867,11 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     <?php endif; ?>
                                 </span>
                             </div>
-                            <div class="flex gap-1 items-center">
-                                <?php if ($lic['status'] === 'unused' && !empty($lic['user_id'])): ?>
-                                <button class="btn-license-recycle text-white/40 hover:text-status-updating transition p-2 rounded-lg hover:bg-white/5" title="Recycle (unassign)" data-id="<?php echo $lic['id']; ?>">
+                            <div class="flex items-center shrink-0">
+                                <?php if ($lic['user_id'] && $lic['status'] === 'unused'): ?>
+                                <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
                                 </button>
                                 <?php endif; ?>
@@ -778,28 +889,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
             <!-- Pagination -->
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="flex flex-wrap items-center gap-4">
-                    <?php
-                    // 筛选：角色权限（唯一角色列表）
-                    $licenseRoleOptions = ['' => 'All Roles'];
-                    $roleSeen = [];
-                    foreach ($users as $u) {
-                        $role = (string)($u['role'] ?? '');
-                        if ($role !== '' && !isset($roleSeen[$role])) {
-                            $roleSeen[$role] = true;
-                            $licenseRoleOptions[$role] = ucfirst($role);
-                        }
-                    }
-                    // 筛选：用户
-                    $licenseUserOptions = ['' => 'All Users'];
-                    foreach ($users as $u) {
-                        $label = $u['username'];
-                        if (!empty($u['email'])) $label .= ' (' . $u['email'] . ')';
-                        $licenseUserOptions[$u['id']] = $label;
-                    }
-                    renderCustomSelect('license-role-filter', $licenseRoleOptions, '', 'w-full sm:w-36');
-                    renderCustomSelect('license-user-filter', $licenseUserOptions, '', 'w-full sm:w-48');
-                    ?>
+                <div class="flex items-center gap-4">
                     <div class="text-sm text-white/40">
                         Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
                     </div>
@@ -1041,45 +1131,41 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     </div>
 </div>
 
-<!-- License Edit Modal -->
-<!-- Assign License Modal (配额分配：给用户分配可生成钥匙的数量额度) -->
-<div id="allocation-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="allocation-edit-dialog">
+<!-- Grant Quota Modal -->
+<div id="grant-quota-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="grant-quota-dialog">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-white">Assign License</h3>
-            <button class="text-white/40 hover:text-white transition p-1" id="allocation-edit-close">
+            <h3 class="text-lg font-semibold text-white">Grant Quota</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="grant-quota-close">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
-        <p class="text-sm text-white/40 mb-5">Grant a key generation quota to a user. The user can then generate keys within this quota from their panel.</p>
-        <form id="allocation-form" class="space-y-4">
+        <form id="grant-quota-form" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
-                <?php renderCustomSelect('af-role', [
-                    'manager' => 'Manager',
-                    'reseller' => 'Reseller',
-                    'admin' => 'Admin'
-                ], 'manager', 'w-full', true); ?>
-            </div>
-            <div id="af-user-container">
-                <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
-                <?php renderCustomSelect('af-user', ['' => '-- Select User --'], '', 'w-full', true); ?>
+                <label class="block text-sm font-medium text-white/70 mb-2">Manager *</label>
+                <?php
+                $gqManagerOptions = ['' => '-- Select Manager --'];
+                foreach ($managerUsers as $mu) {
+                    $gqManagerOptions[$mu['id']] = $mu['username'];
+                }
+                renderCustomSelect('gq-manager', $gqManagerOptions, '', 'w-full', true);
+                ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
                 <?php
-                $afProductOptions = ['' => '-- Select Product --'];
+                $gqProductOptions = ['' => '-- Select Product --'];
                 foreach ($products as $p) {
-                    $afProductOptions[$p['id']] = $p['name'];
+                    $gqProductOptions[$p['id']] = $p['name'];
                 }
-                renderCustomSelect('af-product', $afProductOptions, '', 'w-full', true);
+                renderCustomSelect('gq-product', $gqProductOptions, '', 'w-full', true);
                 ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
-                <?php renderCustomSelect('af-duration', [
+                <?php renderCustomSelect('gq-duration', [
                     '' => '-- Select Time --',
                     '1' => '1 Day',
                     '7' => '7 Days',
@@ -1091,17 +1177,17 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
-                <input type="number" id="af-quantity" class="app-input w-full px-4 py-2" min="1" max="100000" placeholder="Number of keys to allocate" required>
-                <p class="text-xs text-white/40 mt-1">The user can generate up to this many keys for the selected product and duration.</p>
+                <input type="number" id="gq-quantity" class="app-input w-full px-4 py-2" min="1" placeholder="How many keys can this manager claim?" required>
+                <p class="text-xs text-white/40 mt-1" id="gq-inventory-hint"></p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Assign License
+                    Grant Quota
                 </button>
-                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="allocation-cancel-btn">
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="grant-quota-cancel">
                     Cancel
                 </button>
             </div>
@@ -1109,6 +1195,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     </div>
 </div>
 
+<!-- License Edit Modal -->
 <div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="license-edit-dialog">
         <div class="flex items-center justify-between mb-6">

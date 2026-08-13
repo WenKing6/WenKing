@@ -2,12 +2,24 @@
 /**
  * 仪表盘页面内容
  */
+
+// 确保会话已启动（AJAX 路由中需要重新读取登录用户）
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 获取当前登录用户
+require_once __DIR__ . '/../../models/User.php';
+$userModel = new User();
+$sessionUserId = (int)($_SESSION['user_id'] ?? 0);
+$currentUser = $sessionUserId > 0 ? $userModel->findById($sessionUserId) : null;
+$currentUsername = $currentUser ? htmlspecialchars($currentUser['username']) : 'User';
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('dashboard.title'); ?></span>
     </h1>
-    <p class="text-white/60"><?php _e('dashboard.subtitle'); ?></p>
+    <p class="text-white/60">Welcome back! <?php echo $currentUsername; ?></p>
 </div>
 
 <!-- 统计卡片 -->

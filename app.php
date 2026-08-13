@@ -6,6 +6,11 @@
  */
 require_once __DIR__ . '/config/config.php';
 
+// 启动会话（登录后 session 中记录 user_id/role，供页面做角色校验）
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // PHP 端 SSR 路由（避免首屏闪烁）
 $allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager', 'admin'];
 $current_page = $_GET['page'] ?? 'dashboard';

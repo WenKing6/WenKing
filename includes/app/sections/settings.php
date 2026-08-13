@@ -157,8 +157,11 @@
 </div>
 
 <!-- Save Button -->
-<div class="flex justify-center mt-6">
+<div class="flex justify-center mt-6 gap-3">
     <button class="btn-primary px-6 py-3 rounded-lg font-semibold">
         <?php _e('settings.save_changes'); ?>
+    </button>
+    <button type="button" id="logout-btn" class="px-6 py-3 rounded-lg font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 transition">
+        退出登录
     </button>
 </div>
