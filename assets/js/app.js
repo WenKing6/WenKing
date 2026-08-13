@@ -1799,6 +1799,32 @@ window.showToast = function(message, type) {
                 gqRole.addEventListener('change', handleRoleChange);
             }
 
+            // InputNumber 加减按钮
+            var gqQuantityInput = document.getElementById('gq-quantity');
+            var gqMinusBtn = document.querySelector('.wk-input-number__btn--minus');
+            var gqPlusBtn = document.querySelector('.wk-input-number__btn--plus');
+
+            if (gqMinusBtn && !gqMinusBtn.dataset.bound) {
+                gqMinusBtn.dataset.bound = '1';
+                gqMinusBtn.addEventListener('click', function() {
+                    if (!gqQuantityInput) return;
+                    var val = parseInt(gqQuantityInput.value, 10) || 1;
+                    var min = parseInt(gqQuantityInput.getAttribute('min'), 10) || 1;
+                    if (val > min) {
+                        gqQuantityInput.value = val - 1;
+                    }
+                });
+            }
+
+            if (gqPlusBtn && !gqPlusBtn.dataset.bound) {
+                gqPlusBtn.dataset.bound = '1';
+                gqPlusBtn.addEventListener('click', function() {
+                    if (!gqQuantityInput) return;
+                    var val = parseInt(gqQuantityInput.value, 10) || 1;
+                    gqQuantityInput.value = val + 1;
+                });
+            }
+
             // 库存可用数量联动提示
             var gqProduct = document.getElementById('gq-product');
             var gqDuration = document.getElementById('gq-duration');

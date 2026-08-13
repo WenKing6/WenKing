@@ -1160,7 +1160,19 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
-                <input type="number" id="gq-quantity" class="app-input w-full px-4 py-2" min="1" placeholder="How many keys can this manager claim?" required>
+                <div class="wk-input-number w-full">
+                    <button type="button" class="wk-input-number__btn wk-input-number__btn--minus" aria-label="Decrease">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                        </svg>
+                    </button>
+                    <input type="number" id="gq-quantity" class="wk-input-number__input" min="1" placeholder="How many keys can this manager claim?" required>
+                    <button type="button" class="wk-input-number__btn wk-input-number__btn--plus" aria-label="Increase">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
+                </div>
                 <p class="text-xs text-white/40 mt-1" id="gq-inventory-hint"></p>
             </div>
             <div class="flex gap-3 pt-2">
