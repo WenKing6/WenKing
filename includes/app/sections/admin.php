@@ -829,12 +829,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Pagination -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="flex items-center gap-4">
+            <div class="flex flex-col items-stretch sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div class="text-sm text-white/40">
                         Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <span class="text-sm text-white/40">Per page</span>
                         <?php renderCustomSelect('license-per-page', [
                             '10' => '10',
@@ -848,27 +848,23 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         foreach ($managerUsers as $mu) {
                             $licenseManagerOptions[$mu['id']] = $mu['username'];
                         }
-                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
+                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-36 sm:w-40');
                         // Reseller 筛选
                         $licenseResellerOptions = ['' => 'All Resellers'];
                         foreach ($resellerUsers as $ru) {
                             $licenseResellerOptions[$ru['id']] = $ru['username'];
                         }
-                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
+                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-36 sm:w-40');
                         ?>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="flex items-center justify-center sm:justify-end gap-2 flex-shrink-0">
                     <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
+                        Prev
                     </button>
                     <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
                     <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
+                        Next
                     </button>
                 </div>
             </div>
@@ -1088,7 +1084,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
 <!-- Grant Quota Modal -->
 <div id="grant-quota-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="grant-quota-dialog">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200" id="grant-quota-dialog">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-semibold text-white">Grant Quota</h3>
             <button class="text-white/40 hover:text-white transition p-1" id="grant-quota-close">
