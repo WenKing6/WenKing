@@ -602,6 +602,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         </svg>
                         Add License
                     </button>
+                    <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" onclick="openAssignModal()">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        Assign License
+                    </button>
                     <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -641,7 +647,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         </tr>
                         <?php else: ?>
                             <?php foreach ($licenses as $lic): ?>
-                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>" data-user-id="<?php echo (int)$lic['user_id']; ?>" data-role="<?php echo htmlspecialchars($lic['user_role'] ?? ''); ?>">
                                 <td class="py-3 px-4">
                                     <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 </td>
@@ -685,6 +691,13 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     ?>
                                 </td>
                                 <td class="py-3 px-4 flex gap-2">
+                                    <?php if ($lic['status'] === 'unused' && !empty($lic['user_id'])): ?>
+                                    <button class="btn-license-recycle text-white/40 hover:text-status-updating transition p-2 rounded-lg hover:bg-white/5" title="Recycle (unassign)" data-id="<?php echo $lic['id']; ?>">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+                                        </svg>
+                                    </button>
+                                    <?php endif; ?>
                                     <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -709,7 +722,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 </div>
                 <?php else: ?>
                     <?php foreach ($licenses as $lic): ?>
-                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>" data-user-id="<?php echo (int)$lic['user_id']; ?>" data-role="<?php echo htmlspecialchars($lic['user_role'] ?? ''); ?>">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-start gap-3 flex-1 min-w-0">
                                 <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
@@ -743,11 +756,20 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     <?php endif; ?>
                                 </span>
                             </div>
-                            <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
+                            <div class="flex gap-1 items-center">
+                                <?php if ($lic['status'] === 'unused' && !empty($lic['user_id'])): ?>
+                                <button class="btn-license-recycle text-white/40 hover:text-status-updating transition p-2 rounded-lg hover:bg-white/5" title="Recycle (unassign)" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+                                    </svg>
+                                </button>
+                                <?php endif; ?>
+                                <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -756,7 +778,28 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
             <!-- Pagination -->
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <?php
+                    // 筛选：角色权限（唯一角色列表）
+                    $licenseRoleOptions = ['' => 'All Roles'];
+                    $roleSeen = [];
+                    foreach ($users as $u) {
+                        $role = (string)($u['role'] ?? '');
+                        if ($role !== '' && !isset($roleSeen[$role])) {
+                            $roleSeen[$role] = true;
+                            $licenseRoleOptions[$role] = ucfirst($role);
+                        }
+                    }
+                    // 筛选：用户
+                    $licenseUserOptions = ['' => 'All Users'];
+                    foreach ($users as $u) {
+                        $label = $u['username'];
+                        if (!empty($u['email'])) $label .= ' (' . $u['email'] . ')';
+                        $licenseUserOptions[$u['id']] = $label;
+                    }
+                    renderCustomSelect('license-role-filter', $licenseRoleOptions, '', 'w-full sm:w-36');
+                    renderCustomSelect('license-user-filter', $licenseUserOptions, '', 'w-full sm:w-48');
+                    ?>
                     <div class="text-sm text-white/40">
                         Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
                     </div>
@@ -786,6 +829,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- Settings Tab -->
@@ -998,6 +1042,73 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 </div>
 
 <!-- License Edit Modal -->
+<!-- Assign License Modal (配额分配：给用户分配可生成钥匙的数量额度) -->
+<div id="allocation-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="allocation-edit-dialog">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white">Assign License</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="allocation-edit-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-sm text-white/40 mb-5">Grant a key generation quota to a user. The user can then generate keys within this quota from their panel.</p>
+        <form id="allocation-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
+                <?php renderCustomSelect('af-role', [
+                    'manager' => 'Manager',
+                    'reseller' => 'Reseller',
+                    'admin' => 'Admin'
+                ], 'manager', 'w-full', true); ?>
+            </div>
+            <div id="af-user-container">
+                <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
+                <?php renderCustomSelect('af-user', ['' => '-- Select User --'], '', 'w-full', true); ?>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
+                <?php
+                $afProductOptions = ['' => '-- Select Product --'];
+                foreach ($products as $p) {
+                    $afProductOptions[$p['id']] = $p['name'];
+                }
+                renderCustomSelect('af-product', $afProductOptions, '', 'w-full', true);
+                ?>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
+                <?php renderCustomSelect('af-duration', [
+                    '' => '-- Select Time --',
+                    '1' => '1 Day',
+                    '7' => '7 Days',
+                    '30' => '30 Days',
+                    '90' => '90 Days',
+                    '365' => '1 Year',
+                    '9999' => 'Lifetime'
+                ], '', 'w-full', true); ?>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
+                <input type="number" id="af-quantity" class="app-input w-full px-4 py-2" min="1" max="100000" placeholder="Number of keys to allocate" required>
+                <p class="text-xs text-white/40 mt-1">The user can generate up to this many keys for the selected product and duration.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Assign License
+                </button>
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="allocation-cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="license-edit-dialog">
         <div class="flex items-center justify-between mb-6">

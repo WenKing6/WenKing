@@ -11,7 +11,42 @@ $userModel = new User();
 $licenseModel = new License();
 $products = $productModel->getAll();
 $users = $userModel->getAll();
-$licenses = $licenseModel->getAll();
+
+// 当前经理账户：优先 URL ?user_id=，否则取第一个 manager 角色用户
+$managerUsers = array_values(array_filter($users, fn($u) => $u['role'] === 'manager'));
+$requestedUserId = (int)($_GET['user_id'] ?? 0);
+$currentManager = null;
+foreach ($managerUsers as $mu) {
+    if ((int)$mu['id'] === $requestedUserId) {
+        $currentManager = $mu;
+        break;
+    }
+}
+if (!$currentManager && $managerUsers) {
+    $currentManager = $managerUsers[0];
+}
+$currentUserId = $currentManager ? (int)$currentManager['id'] : 0;
+
+// 当前经理的配额与钥匙（只展示属于该经理的数据）
+$allocations = $currentUserId ? $licenseModel->getQuotaForUser($currentUserId) : [];
+$licenses = array_values(array_filter($licenseModel->getAll(), fn($l) => (int)$l['user_id'] === $currentUserId));
+
+// 生成钥匙可选项：配额中仍有剩余的组合
+$gfQuotaOptions = ['' => '-- Select Quota --'];
+foreach ($allocations as $a) {
+    $remaining = (int)$a['quantity'] - (int)$a['used_count'];
+    if ($remaining > 0) {
+        $days = (int)$a['duration_days'];
+        if ($days === 1) $durText = '1 Day';
+        elseif ($days === 7) $durText = '7 Days';
+        elseif ($days === 30) $durText = '30 Days';
+        elseif ($days === 90) $durText = '90 Days';
+        elseif ($days === 365) $durText = '1 Year';
+        elseif ($days >= 9999) $durText = 'Lifetime';
+        else $durText = $days . ' Days';
+        $gfQuotaOptions[$a['product_id'] . '_' . $a['duration_days']] = ($a['product_name'] ?? 'Product') . ' · ' . $durText . ' (Remaining: ' . $remaining . ')';
+    }
+}
 
 // Group users by role for license assignment
 $usersByRole = [];
@@ -75,11 +110,25 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     echo '</div>';
 }
 ?>
-<div class="app-page-header mb-8" data-users-by-role='<?php echo htmlspecialchars(json_encode($usersByRole), ENT_QUOTES); ?>'>
-    <h1 class="text-3xl font-display font-bold mb-2">
-        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('manager.title'); ?></span>
-    </h1>
-    <p class="text-white/60"><?php _e('manager.subtitle'); ?></p>
+<div class="app-page-header mb-8" data-users-by-role='<?php echo htmlspecialchars(json_encode($usersByRole), ENT_QUOTES); ?>' data-current-manager='<?php echo $currentUserId; ?>'>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-display font-bold mb-2">
+                <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('manager.title'); ?></span>
+            </h1>
+            <p class="text-white/60"><?php _e('manager.subtitle'); ?></p>
+        </div>
+        <div class="w-full sm:w-72">
+            <label class="block text-sm text-white/60 mb-2">Current Account</label>
+            <?php
+            $managerSelectOptions = [];
+            foreach ($managerUsers as $mu) {
+                $managerSelectOptions[$mu['id']] = $mu['username'] . ' (' . $mu['email'] . ')';
+            }
+            renderCustomSelect('manager-account-select', $managerSelectOptions, (string)$currentUserId, 'w-full');
+            ?>
+        </div>
+    </div>
 </div>
 
 <!-- Tab 导航 -->
@@ -356,6 +405,100 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
         </div>
 
+        <!-- My Quota (我的可生成配额) -->
+        <div class="glass-card p-6 rounded-xl mb-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-accent-cyan/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">My Quota (<span id="quota-count"><?php echo count($allocations); ?></span>)</h3>
+                        <p class="text-sm text-white/40">Keys you can generate per product and duration</p>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (empty($allocations)): ?>
+            <div class="text-center py-8 text-white/40">
+                No quota assigned yet. Contact the administrator to receive a key quota.
+            </div>
+            <?php else: ?>
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-white/50 border-b border-white/10">
+                            <th class="text-left py-3 px-4">Product</th>
+                            <th class="text-left py-3 px-4">Duration</th>
+                            <th class="text-left py-3 px-4">Allocated</th>
+                            <th class="text-left py-3 px-4">Generated</th>
+                            <th class="text-left py-3 px-4">Remaining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($allocations as $a): ?>
+                        <?php
+                        $days = (int)$a['duration_days'];
+                        if ($days === 1) $durText = '1 Day';
+                        elseif ($days === 7) $durText = '7 Days';
+                        elseif ($days === 30) $durText = '30 Days';
+                        elseif ($days === 90) $durText = '90 Days';
+                        elseif ($days === 365) $durText = '1 Year';
+                        elseif ($days >= 9999) $durText = 'Lifetime';
+                        else $durText = $days . ' Days';
+                        $used = (int)$a['used_count'];
+                        $remaining = (int)$a['quantity'] - $used;
+                        ?>
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                            <td class="py-3 px-4 text-white/80"><?php echo htmlspecialchars($a['product_name'] ?? 'N/A'); ?></td>
+                            <td class="py-3 px-4 text-white/60"><?php echo $durText; ?></td>
+                            <td class="py-3 px-4 text-white/80"><?php echo (int)$a['quantity']; ?></td>
+                            <td class="py-3 px-4 text-white/60"><?php echo $used; ?></td>
+                            <td class="py-3 px-4">
+                                <span class="status-badge <?php echo $remaining > 0 ? 'status-online' : 'bg-white/10 text-white/40 border-white/10'; ?> text-xs">
+                                    <?php echo $remaining; ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden space-y-3">
+                <?php foreach ($allocations as $a): ?>
+                <?php
+                $days = (int)$a['duration_days'];
+                if ($days === 1) $durText = '1 Day';
+                elseif ($days === 7) $durText = '7 Days';
+                elseif ($days === 30) $durText = '30 Days';
+                elseif ($days === 90) $durText = '90 Days';
+                elseif ($days === 365) $durText = '1 Year';
+                elseif ($days >= 9999) $durText = 'Lifetime';
+                else $durText = $days . ' Days';
+                $used = (int)$a['used_count'];
+                $remaining = (int)$a['quantity'] - $used;
+                ?>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-white"><?php echo htmlspecialchars($a['product_name'] ?? 'N/A'); ?></span>
+                        <span class="text-xs text-white/40"><?php echo $durText; ?></span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-white/40">
+                        <span>Allocated: <?php echo (int)$a['quantity']; ?></span>
+                        <span>Generated: <?php echo $used; ?></span>
+                        <span class="status-badge <?php echo $remaining > 0 ? 'status-online' : 'bg-white/10 text-white/40 border-white/10'; ?> text-xs"><?php echo $remaining; ?> left</span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+
         <!-- License List -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -383,11 +526,11 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         'disabled' => 'Disabled'
                     ], '', 'w-full sm:w-36');
                     ?>
-                    <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
+                    <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openGenerateKeysModal()">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
-                        Add License
+                        Generate Keys
                     </button>
                     <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,7 +566,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                 <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
                                 </svg>
-                                No licenses yet. Click "Add License" to create one.
+                                No licenses yet. Click "Generate Keys" to create one.
                             </td>
                         </tr>
                         <?php else: ?>
@@ -575,65 +718,39 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     </div>
 </div>
 
-<!-- License Edit Modal (outside tab-panel to avoid display:none) -->
-<div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="license-edit-dialog">
+<!-- Generate Keys Modal (outside tab-panel to avoid display:none) -->
+<div id="generate-keys-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="generate-keys-dialog">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-white" id="license-edit-title">Add License</h3>
-            <button class="text-white/40 hover:text-white transition p-1" id="license-edit-close">
+            <h3 class="text-lg font-semibold text-white">Generate Keys</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="generate-keys-close">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
-        <form id="license-form" class="space-y-4">
+        <p class="text-sm text-white/40 mb-5">Generate keys within your assigned quota. Generated keys are bound to your account and remain unused until they are redeemed.</p>
+        <form id="generate-keys-form" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
-                <?php
-                $lfProductOptions = ['' => '-- Select Product --'];
-                foreach ($products as $p) {
-                    $lfProductOptions[$p['id']] = $p['name'];
-                }
-                renderCustomSelect('lf-product', $lfProductOptions, '', 'w-full', true);
-                ?>
+                <label class="block text-sm font-medium text-white/70 mb-2">Quota *</label>
+                <?php renderCustomSelect('gf-quota', $gfQuotaOptions, '', 'w-full', true); ?>
+                <?php if (empty($gfQuotaOptions) || (count($gfQuotaOptions) === 1 && array_key_exists('', $gfQuotaOptions))): ?>
+                <p class="text-xs text-white/40 mt-1">You have no remaining quota. Contact the administrator to get more keys.</p>
+                <?php endif; ?>
             </div>
             <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
-                <?php renderCustomSelect('lf-duration', [
-                    '' => '-- Select Time --',
-                    '1' => '1 Day',
-                    '7' => '7 Days',
-                    '30' => '30 Days',
-                    '90' => '90 Days',
-                    '365' => '1 Year',
-                    '9999' => 'Lifetime'
-                ], '', 'w-full', true); ?>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
-                <?php renderCustomSelect('lf-role', [
-                    'admin' => 'Admin',
-                    'manager' => 'Manager',
-                    'reseller' => 'Reseller'
-                ], 'admin', 'w-full', true); ?>
-            </div>
-            <div id="lf-user-container" style="display: none;">
-                <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
-                <?php renderCustomSelect('lf-user', ['' => '-- Select User --'], '', 'w-full'); ?>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">License Keys *</label>
-                <textarea id="lf-license-keys" class="app-input w-full px-4 py-2 font-mono text-sm" rows="6" placeholder="Enter one key per line, e.g.&#10;ABCD-1234-EFGH-5678&#10;IJKL-9012-MNOP-3456&#10;QRST-7890-UVWX-1234" required></textarea>
-                <p class="text-xs text-white/40 mt-1">One key per line. You can paste multiple keys at once.</p>
+                <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
+                <input type="number" id="gf-quantity" class="app-input w-full px-4 py-2" min="1" max="100000" placeholder="Number of keys to generate" required>
+                <p class="text-xs text-white/40 mt-1" id="gf-available-hint">Select a quota to see how many keys you can generate.</p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                    Add License
+                    Generate Keys
                 </button>
-                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="license-cancel-btn">
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="generate-keys-cancel">
                     Cancel
                 </button>
             </div>

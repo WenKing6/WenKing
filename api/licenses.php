@@ -141,6 +141,74 @@ switch ($action) {
         echo json_encode(['success' => true, 'data' => $items]);
         break;
 
+    case 'create_allocation':
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $productId = (int)($_POST['product_id'] ?? 0);
+        $durationDays = (int)($_POST['duration_days'] ?? 0);
+        $quantity = (int)($_POST['quantity'] ?? 0);
+
+        if ($userId <= 0 || $productId <= 0 || $durationDays <= 0 || $quantity <= 0) {
+            echo json_encode(['success' => false, 'message' => 'User, product, duration and quantity are required']);
+            exit;
+        }
+
+        $result = $license->createAllocation($userId, $productId, $durationDays, $quantity);
+        echo json_encode($result);
+        break;
+
+    case 'list_allocations':
+        $items = $license->getAllocations();
+        echo json_encode(['success' => true, 'data' => $items]);
+        break;
+
+    case 'delete_allocation':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid allocation ID']);
+            exit;
+        }
+
+        $result = $license->deleteAllocation($id);
+        echo json_encode($result);
+        break;
+
+    case 'get_quota':
+        $userId = (int)($_GET['user_id'] ?? 0);
+        if ($userId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'User ID is required']);
+            exit;
+        }
+
+        $items = $license->getQuotaForUser($userId);
+        echo json_encode(['success' => true, 'data' => $items]);
+        break;
+
+    case 'generate_keys':
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $productId = (int)($_POST['product_id'] ?? 0);
+        $durationDays = (int)($_POST['duration_days'] ?? 0);
+        $quantity = (int)($_POST['quantity'] ?? 0);
+
+        if ($userId <= 0 || $productId <= 0 || $durationDays <= 0 || $quantity <= 0) {
+            echo json_encode(['success' => false, 'message' => 'User, product, duration and quantity are required']);
+            exit;
+        }
+
+        $result = $license->generateKeys($userId, $productId, $durationDays, $quantity);
+        echo json_encode($result);
+        break;
+
+    case 'recycle':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid license ID']);
+            exit;
+        }
+
+        $result = $license->recycle($id);
+        echo json_encode($result);
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
         break;

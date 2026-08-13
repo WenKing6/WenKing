@@ -67,6 +67,77 @@ window.closeLicenseModal = function() {
     }
 };
 
+// Assign License (配额分配) modal functions
+window.openAssignModal = function() {
+    var overlay = document.getElementById('allocation-edit-overlay');
+    var dialog = document.getElementById('allocation-edit-dialog');
+    var form = document.getElementById('allocation-form');
+
+    if (overlay && dialog) {
+        if (form) form.reset();
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        setTimeout(function() {
+            dialog.classList.remove('scale-95', 'opacity-0');
+            dialog.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+};
+
+window.closeAssignModal = function() {
+    var overlay = document.getElementById('allocation-edit-overlay');
+    var dialog = document.getElementById('allocation-edit-dialog');
+
+    if (overlay && dialog) {
+        dialog.classList.remove('scale-100', 'opacity-100');
+        dialog.classList.add('scale-95', 'opacity-0');
+        setTimeout(function() {
+            overlay.classList.remove('flex');
+            overlay.classList.add('hidden');
+        }, 200);
+    }
+};
+
+// Generate Keys modal functions (Manager panel)
+window.openGenerateKeysModal = function() {
+    var overlay = document.getElementById('generate-keys-overlay');
+    var dialog = document.getElementById('generate-keys-dialog');
+    var form = document.getElementById('generate-keys-form');
+
+    if (overlay && dialog) {
+        if (form) form.reset();
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        setTimeout(function() {
+            dialog.classList.remove('scale-95', 'opacity-0');
+            dialog.classList.add('scale-100', 'opacity-100');
+        }, 10);
+
+        // 更新配额剩余提示
+        var quotaSelect = document.getElementById('gf-quota');
+        var hint = document.getElementById('gf-available-hint');
+        if (quotaSelect && hint) {
+            var text = quotaSelect.options[quotaSelect.selectedIndex] ? quotaSelect.options[quotaSelect.selectedIndex].text : '';
+            var m = text.match(/\(Remaining: (\d+)\)/);
+            hint.textContent = m ? ('Available: ' + m[1] + ' keys') : 'Select a quota to see how many keys you can generate.';
+        }
+    }
+};
+
+window.closeGenerateKeysModal = function() {
+    var overlay = document.getElementById('generate-keys-overlay');
+    var dialog = document.getElementById('generate-keys-dialog');
+
+    if (overlay && dialog) {
+        dialog.classList.remove('scale-100', 'opacity-100');
+        dialog.classList.add('scale-95', 'opacity-0');
+        setTimeout(function() {
+            overlay.classList.remove('flex');
+            overlay.classList.add('hidden');
+        }, 200);
+    }
+};
+
 // FAQ modal functions
 window.openFaqModal = function(data) {
     var overlay = document.getElementById('faq-edit-overlay');
@@ -941,6 +1012,120 @@ window.showToast = function(message, type) {
                 });
             }
 
+            // Assign License（配额分配）模态框事件绑定
+            var allocCloseBtn = document.getElementById('allocation-edit-close');
+            if (allocCloseBtn && !allocCloseBtn.dataset.bound) {
+                allocCloseBtn.dataset.bound = '1';
+                allocCloseBtn.addEventListener('click', window.closeAssignModal);
+            }
+
+            var allocCancelBtn = document.getElementById('allocation-cancel-btn');
+            if (allocCancelBtn && !allocCancelBtn.dataset.bound) {
+                allocCancelBtn.dataset.bound = '1';
+                allocCancelBtn.addEventListener('click', window.closeAssignModal);
+            }
+
+            var allocOverlay = document.getElementById('allocation-edit-overlay');
+            if (allocOverlay && !allocOverlay.dataset.bound) {
+                allocOverlay.dataset.bound = '1';
+                allocOverlay.addEventListener('click', function(e) {
+                    if (e.target === allocOverlay) {
+                        window.closeAssignModal();
+                    }
+                });
+            }
+
+            // af-role → af-user 角色联动（配额必须绑定具体用户，始终显示用户选择器）
+            var afRole = document.getElementById('af-role');
+            var afUser = document.getElementById('af-user');
+            if (afRole && afUser && !afRole.dataset.bound) {
+                afRole.dataset.bound = '1';
+
+                var assignHeader = document.querySelector('.app-page-header[data-users-by-role]');
+                var assignUsersByRole = {};
+                if (assignHeader && assignHeader.dataset.usersByRole) {
+                    try {
+                        assignUsersByRole = JSON.parse(assignHeader.dataset.usersByRole);
+                    } catch (e) {
+                        console.error('Failed to parse usersByRole for assign modal:', e);
+                    }
+                }
+
+                function loadAssignUsers(role) {
+                    afUser.innerHTML = '<option value="">-- Select User --</option>';
+                    var users = assignUsersByRole[role] || [];
+                    users.forEach(function(user) {
+                        var option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = user.username + ' (' + user.email + ')';
+                        afUser.appendChild(option);
+                    });
+                    self._refreshCustomSelect('af-user');
+                }
+
+                afRole.addEventListener('change', function() {
+                    loadAssignUsers(this.value);
+                });
+
+                // 初始加载默认角色（manager）的用户
+                if (afRole.value) {
+                    loadAssignUsers(afRole.value);
+                }
+            }
+
+            // 分配表单提交
+            var allocForm = document.getElementById('allocation-form');
+            if (allocForm && !allocForm.dataset.bound) {
+                allocForm.dataset.bound = '1';
+                allocForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var userId = document.getElementById('af-user').value;
+                    var productId = document.getElementById('af-product').value;
+                    var duration = document.getElementById('af-duration').value;
+                    var quantity = document.getElementById('af-quantity').value;
+
+                    if (!userId || !productId || !duration || !quantity) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please fill in all required fields', 'error');
+                        }
+                        return;
+                    }
+
+                    var body = new URLSearchParams({
+                        action: 'create_allocation',
+                        user_id: userId,
+                        product_id: productId,
+                        duration_days: duration,
+                        quantity: quantity
+                    });
+
+                    fetch(window.SITE_URL + '/api/licenses.php', {
+                        method: 'POST',
+                        body: body
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            if (typeof showToast !== 'undefined') {
+                                showToast('License quota assigned successfully', 'success');
+                            }
+                            setTimeout(function() { location.reload(); }, 800);
+                        } else {
+                            if (typeof showToast !== 'undefined') {
+                                showToast(data.message || 'Assign failed', 'error');
+                            } else {
+                                alert(data.message || 'Assign failed');
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Network error', 'error');
+                        }
+                    });
+                });
+            }
+
             // 角色选择动态加载用户列表
             var roleSelect = document.getElementById('lf-role');
             var userSelect = document.getElementById('lf-user');
@@ -1228,6 +1413,16 @@ window.showToast = function(message, type) {
                             appLoader._closeUserEditModal();
                         }
                     }
+
+                    // 回收钥匙（取消分配回库存）
+                    var recycleBtn = e.target.closest('.btn-license-recycle');
+                    if (recycleBtn) {
+                        e.preventDefault();
+                        var recycleId = recycleBtn.getAttribute('data-id');
+                        if (appLoader && appLoader._recycleLicense) {
+                            appLoader._recycleLicense(recycleId, recycleBtn);
+                        }
+                    }
                 });
             }
 
@@ -1251,6 +1446,184 @@ window.showToast = function(message, type) {
 
             // 初始化许可证搜索/筛选/分页
             self._initLicenseFilters();
+
+            // 初始化 Manager 面板专属工具（账户切换 / 生成钥匙）
+            self._initManagerTools();
+        }
+
+        // Manager 面板专属工具：当前账户切换 + 生成钥匙模态框
+        _initManagerTools() {
+            var self = this;
+
+            // 当前账户切换（?user_id= 跳转刷新）
+            var accountSelect = document.getElementById('manager-account-select');
+            if (accountSelect && !accountSelect.dataset.bound) {
+                accountSelect.dataset.bound = '1';
+                var header = document.querySelector('.app-page-header[data-current-manager]');
+                var curId = header ? header.dataset.currentManager : '';
+                accountSelect.addEventListener('change', function() {
+                    var newId = this.value;
+                    if (newId && newId !== curId) {
+                        var url = new URL(window.location.href);
+                        url.searchParams.set('user_id', newId);
+                        window.location.href = url.toString();
+                    }
+                });
+            }
+
+            // 生成钥匙模态框关闭/取消/遮罩
+            var gkClose = document.getElementById('generate-keys-close');
+            if (gkClose && !gkClose.dataset.bound) {
+                gkClose.dataset.bound = '1';
+                gkClose.addEventListener('click', window.closeGenerateKeysModal);
+            }
+            var gkCancel = document.getElementById('generate-keys-cancel');
+            if (gkCancel && !gkCancel.dataset.bound) {
+                gkCancel.dataset.bound = '1';
+                gkCancel.addEventListener('click', window.closeGenerateKeysModal);
+            }
+            var gkOverlay = document.getElementById('generate-keys-overlay');
+            if (gkOverlay && !gkOverlay.dataset.bound) {
+                gkOverlay.dataset.bound = '1';
+                gkOverlay.addEventListener('click', function(e) {
+                    if (e.target === gkOverlay) {
+                        window.closeGenerateKeysModal();
+                    }
+                });
+            }
+
+            // 配额选择 → 更新剩余数量提示
+            var gfQuota = document.getElementById('gf-quota');
+            var gfHint = document.getElementById('gf-available-hint');
+            var gfQuantity = document.getElementById('gf-quantity');
+            if (gfQuota && gfHint && !gfQuota.dataset.bound) {
+                gfQuota.dataset.bound = '1';
+                gfQuota.addEventListener('change', function() {
+                    var text = this.options[this.selectedIndex] ? this.options[this.selectedIndex].text : '';
+                    var m = text.match(/\(Remaining: (\d+)\)/);
+                    if (m) {
+                        var rem = parseInt(m[1], 10);
+                        gfHint.textContent = 'Available: ' + rem + ' keys';
+                        if (gfQuantity) {
+                            gfQuantity.max = rem;
+                        }
+                    } else {
+                        gfHint.textContent = 'Select a quota to see how many keys you can generate.';
+                    }
+                });
+            }
+
+            // 生成钥匙表单提交
+            var gkForm = document.getElementById('generate-keys-form');
+            if (gkForm && !gkForm.dataset.bound) {
+                gkForm.dataset.bound = '1';
+                gkForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var quotaVal = document.getElementById('gf-quota').value;
+                    var quantity = document.getElementById('gf-quantity').value;
+                    var mngHeader = document.querySelector('.app-page-header[data-current-manager]');
+                    var currentManagerId = mngHeader ? mngHeader.dataset.currentManager : '';
+
+                    if (!quotaVal || !quantity || !currentManagerId) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Please select a quota and enter a quantity', 'error');
+                        }
+                        return;
+                    }
+
+                    var parts = quotaVal.split('_');
+                    if (parts.length !== 2) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Invalid quota selection', 'error');
+                        }
+                        return;
+                    }
+
+                    var submitBtn = gkForm.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+
+                    var body = new URLSearchParams({
+                        action: 'generate_keys',
+                        user_id: currentManagerId,
+                        product_id: parts[0],
+                        duration_days: parts[1],
+                        quantity: quantity
+                    });
+
+                    fetch(window.SITE_URL + '/api/licenses.php', {
+                        method: 'POST',
+                        body: body
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var msg = data.created ? data.created + ' key(s) generated successfully' : 'Keys generated successfully';
+                            if (typeof showToast !== 'undefined') {
+                                showToast(msg, 'success');
+                            }
+                            setTimeout(function() { location.reload(); }, 1000);
+                        } else {
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            }
+                            if (typeof showToast !== 'undefined') {
+                                showToast(data.message || 'Generation failed', 'error');
+                            } else {
+                                alert(data.message || 'Generation failed');
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }
+                        if (typeof showToast !== 'undefined') {
+                            showToast('Network error', 'error');
+                        }
+                    });
+                });
+            }
+        }
+
+        // Admin：回收未激活钥匙（取消分配重新入库）
+        _recycleLicense(id, btn) {
+            var self = this;
+            if (!self._showConfirmDialog) return;
+
+            self._showConfirmDialog('Recycle this license? It will be unassigned and return to the inventory.', function() {
+                var body = new URLSearchParams({
+                    action: 'recycle',
+                    id: id
+                });
+
+                fetch(window.SITE_URL + '/api/licenses.php', {
+                    method: 'POST',
+                    body: body
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        if (typeof showToast !== 'undefined') {
+                            showToast('License recycled back to inventory', 'success');
+                        }
+                        setTimeout(function() { location.reload(); }, 800);
+                    } else {
+                        if (typeof showToast !== 'undefined') {
+                            showToast(data.message || 'Recycle failed', 'error');
+                        }
+                    }
+                })
+                .catch(function() {
+                    if (typeof showToast !== 'undefined') {
+                        showToast('Network error', 'error');
+                    }
+                });
+            });
         }
 
         _initLicenseFilters() {
@@ -1261,6 +1634,8 @@ window.showToast = function(message, type) {
             var self = this;
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
+            var roleFilter = document.getElementById('license-role-filter');
+            var userFilter = document.getElementById('license-user-filter');
             var perPageSelect = document.getElementById('license-per-page');
             var prevBtn = document.getElementById('license-prev-page');
             var nextBtn = document.getElementById('license-next-page');
@@ -1298,6 +1673,22 @@ window.showToast = function(message, type) {
             // 状态筛选
             if (statusFilter) {
                 statusFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 角色权限筛选
+            if (roleFilter) {
+                roleFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // 用户筛选
+            if (userFilter) {
+                userFilter.addEventListener('change', function() {
                     currentPage = 1;
                     self._filterLicenses();
                 });
@@ -1439,6 +1830,8 @@ window.showToast = function(message, type) {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
+            var roleFilter = document.getElementById('license-role-filter');
+            var userFilter = document.getElementById('license-user-filter');
             var tbody = document.getElementById('license-list');
 
             if (!tbody) return;
@@ -1446,6 +1839,8 @@ window.showToast = function(message, type) {
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
+            var roleValue = roleFilter ? roleFilter.value : '';
+            var userValue = userFilter ? userFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var visibleRows = [];
@@ -1463,8 +1858,10 @@ window.showToast = function(message, type) {
                 var matchSearch = !searchTerm || keyText.includes(searchTerm);
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
+                var matchRole = !roleValue || row.getAttribute('data-role') === roleValue;
+                var matchUser = !userValue || row.getAttribute('data-user-id') === userValue;
 
-                if (matchSearch && matchProduct && matchStatus) {
+                if (matchSearch && matchProduct && matchStatus && matchRole && matchUser) {
                     visibleRows.push(row);
                 }
             });
@@ -1502,17 +1899,21 @@ window.showToast = function(message, type) {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
+            var roleFilter = document.getElementById('license-role-filter');
+            var userFilter = document.getElementById('license-user-filter');
 
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
+            var roleValue = roleFilter ? roleFilter.value : '';
+            var userValue = userFilter ? userFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var count = 0;
 
             allRows.forEach(function(row) {
-                var licenseKey = row.querySelector('td:nth-child(1)');
-                var statusCell = row.querySelector('td:nth-child(5)');
+                var licenseKey = row.querySelector('td:nth-child(2)');
+                var statusCell = row.querySelector('td:nth-child(6)');
 
                 var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
                 var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
@@ -1520,8 +1921,10 @@ window.showToast = function(message, type) {
                 var matchSearch = !searchTerm || keyText.includes(searchTerm);
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
+                var matchRole = !roleValue || row.getAttribute('data-role') === roleValue;
+                var matchUser = !userValue || row.getAttribute('data-user-id') === userValue;
 
-                if (matchSearch && matchProduct && matchStatus) {
+                if (matchSearch && matchProduct && matchStatus && matchRole && matchUser) {
                     count++;
                 }
             });
