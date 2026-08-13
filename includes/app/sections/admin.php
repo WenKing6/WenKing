@@ -848,13 +848,13 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         foreach ($managerUsers as $mu) {
                             $licenseManagerOptions[$mu['id']] = $mu['username'];
                         }
-                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-36 sm:w-40');
+                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
                         // Reseller 筛选
                         $licenseResellerOptions = ['' => 'All Resellers'];
                         foreach ($resellerUsers as $ru) {
                             $licenseResellerOptions[$ru['id']] = $ru['username'];
                         }
-                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-36 sm:w-40');
+                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
                         ?>
                     </div>
                 </div>
