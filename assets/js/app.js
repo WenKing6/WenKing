@@ -1309,16 +1309,18 @@ window.closeLicenseModal = function() {
             }
 
             // 行勾选（事件委托，覆盖桌面表格与移动卡片）
-            if (!window._licenseRowChangeBound) {
-                window._licenseRowChangeBound = true;
-                document.addEventListener('change', function(e) {
-                    var cb = e.target.closest('.license-row-check');
-                    if (!cb) return;
-                    self._toggleLicenseRowSelection(cb);
-                    updateSelectedUI();
-                    syncSelectAllState();
-                });
+            // 每次重新初始化时移除旧监听器再绑定新的，避免重复绑定或闭包捕获旧 self
+            if (self._licenseRowChangeHandler) {
+                document.removeEventListener('change', self._licenseRowChangeHandler);
             }
+            self._licenseRowChangeHandler = function(e) {
+                var cb = e.target.closest('.license-row-check');
+                if (!cb) return;
+                self._toggleLicenseRowSelection(cb);
+                updateSelectedUI();
+                syncSelectAllState();
+            };
+            document.addEventListener('change', self._licenseRowChangeHandler);
 
             // 批量删除已选
             if (deleteSelectedBtn) {
