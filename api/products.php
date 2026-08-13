@@ -68,6 +68,21 @@ switch ($action) {
         echo json_encode(['success' => $success]);
         break;
 
+    case 'toggle_visibility':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => '无效的产品 ID']);
+            exit;
+        }
+
+        $isVisible = $product->toggleVisibility($id);
+        if ($isVisible === null) {
+            echo json_encode(['success' => false, 'message' => '产品不存在']);
+            exit;
+        }
+        echo json_encode(['success' => true, 'is_visible' => $isVisible]);
+        break;
+
     case 'delete':
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {

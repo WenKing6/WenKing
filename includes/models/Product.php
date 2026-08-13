@@ -95,6 +95,22 @@ class Product {
     }
 
     /**
+     * 切换产品可见性（is_visible 0/1 翻转）
+     * 返回切换后的可见状态
+     */
+    public function toggleVisibility(int $id): ?int {
+        $stmt = $this->db->prepare('UPDATE products SET is_visible = 1 - is_visible WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        if ($stmt->rowCount() === 0) {
+            return null;
+        }
+        $stmt = $this->db->prepare('SELECT is_visible FROM products WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+        return $row !== false ? (int)$row['is_visible'] : null;
+    }
+
+    /**
      * 解析 features 字段（用 | 分隔）
      */
     public static function parseFeatures(string $features): array {

@@ -1087,6 +1087,16 @@ window.closeLicenseModal = function() {
                         }
                     }
 
+                    // 产品可见性快速切换（眼睛按钮）
+                    var visibilityBtn = e.target.closest('.btn-admin-visibility');
+                    if (visibilityBtn) {
+                        e.preventDefault();
+                        var vid = visibilityBtn.getAttribute('data-id');
+                        if (appLoader && appLoader._toggleProductVisibility) {
+                            appLoader._toggleProductVisibility(vid, visibilityBtn);
+                        }
+                    }
+
                     var cancelBtnEl = e.target.closest('#cancel-btn');
                     if (cancelBtnEl) {
                         e.preventDefault();
@@ -2139,6 +2149,83 @@ window.closeLicenseModal = function() {
                         alert('Network error');
                     }
                 });
+            });
+        }
+
+        _toggleProductVisibility(id, triggerBtn) {
+            var self = this;
+            if (triggerBtn) {
+                triggerBtn.classList.add('is-loading');
+            }
+
+            fetch(window.SITE_URL + '/api/products.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=toggle_visibility&id=' + id
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (triggerBtn) {
+                    triggerBtn.classList.remove('is-loading');
+                }
+                if (data.success) {
+                    var visible = data.is_visible == 1;
+                    // 保持移动端 (w-4) 与桌面端 (w-5) 的图标尺寸一致
+                    var svgSize = 'w-5 h-5';
+                    var curSvg = triggerBtn ? triggerBtn.querySelector('svg') : null;
+                    if (curSvg && curSvg.classList.contains('w-4')) {
+                        svgSize = 'w-4 h-4';
+                    }
+                    var openIcon = '<svg class="' + svgSize + '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
+                    var closedIcon = '<svg class="' + svgSize + '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>';
+
+                    // 更新按钮状态与图标
+                    if (triggerBtn) {
+                        triggerBtn.setAttribute('data-visible', visible ? '1' : '0');
+                        triggerBtn.title = visible ? 'Hide from frontend' : 'Show on frontend';
+                        triggerBtn.classList.toggle('opacity-40', !visible);
+                        triggerBtn.innerHTML = visible ? openIcon : closedIcon;
+                    }
+
+                    // 同步同行/同卡片的可见状态指示
+                    // 从父元素开始查找行容器，避免命中带 data-id 的按钮自身
+                    var row = triggerBtn
+                        ? (triggerBtn.closest('tr') || (triggerBtn.parentElement ? triggerBtn.parentElement.closest('[data-id]') : null))
+                        : null;
+                    if (row) {
+                        var iconEl = row.querySelector('.pv-icon');
+                        if (iconEl) {
+                            iconEl.textContent = visible ? '✅' : '❌';
+                            iconEl.classList.toggle('text-status-online', visible);
+                            iconEl.classList.toggle('text-white/30', !visible);
+                        }
+                        // 移动卡片上的 Visible/Hidden 文字
+                        var labelEl = row.querySelector('.pv-label');
+                        if (labelEl) {
+                            labelEl.textContent = visible ? 'Visible' : 'Hidden';
+                        }
+                    }
+
+                    if (typeof showToast !== 'undefined') {
+                        showToast(visible ? 'Product is now visible' : 'Product is now hidden', 'success');
+                    }
+                } else {
+                    if (typeof showToast !== 'undefined') {
+                        showToast(data.message || 'Toggle failed', 'error');
+                    } else {
+                        alert(data.message || 'Toggle failed');
+                    }
+                }
+            })
+            .catch(function() {
+                if (triggerBtn) {
+                    triggerBtn.classList.remove('is-loading');
+                }
+                if (typeof showToast !== 'undefined') {
+                    showToast('Network error', 'error');
+                } else {
+                    alert('Network error');
+                }
             });
         }
 
