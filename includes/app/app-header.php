@@ -16,6 +16,19 @@ if (!defined('SITE_NAME')) {
     <title><?php echo defined('PAGE_TITLE') ? PAGE_TITLE : SITE_NAME . ' - Dashboard'; ?></title>
     <meta name="description" content="<?php echo META_DESCRIPTION; ?>">
 
+    <?php
+    // 读取网站图标设置作为 favicon（失败时回退到默认 logo）
+    $favicon = SITE_URL . '/assets/images/gta-v-logo-transparent-free-png.webp';
+    try {
+        require_once __DIR__ . '/../models/SiteSetting.php';
+        $siteIconPath = (string)(new SiteSetting())->get('site_icon');
+        if ($siteIconPath !== '') {
+            $favicon = SITE_URL . $siteIconPath;
+        }
+    } catch (Throwable $e) {}
+    ?>
+    <link rel="icon" href="<?php echo $favicon; ?>">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 

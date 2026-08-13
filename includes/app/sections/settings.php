@@ -26,7 +26,7 @@
             <div>
                 <label class="block text-sm text-white/60 mb-2"><?php _e('settings.subscription'); ?></label>
                 <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 bg-accent-purple/20 text-accent-purple rounded-full text-sm font-medium"><?php _e('settings.pro_plan'); ?></span>
+                    <span class="px-3 py-1 bg-accent-purple/20 text-accent-purple rounded-full text-sm font-medium"><?php _e('settings.pro_plan'); ?></span>    
                     <span class="text-sm text-white/40"><?php _e('settings.expires'); ?> 2026-08-25</span>
                 </div>
             </div>

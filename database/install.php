@@ -74,6 +74,34 @@ try {
         echo "ℹ products 表已有数据，跳过插入\n";
     }
 
+    // 创建 site_settings 表（Settings 页网站配置）
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS `site_settings` (
+            `setting_key` VARCHAR(100) NOT NULL,
+            `setting_value` TEXT NULL,
+            `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`setting_key`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "✓ 数据表 'site_settings' 创建成功\n";
+
+    // 创建 faq_items 表（Settings 页 FAQ Manager 管理的前台问答项）
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS `faq_items` (
+            `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `question` VARCHAR(255) NOT NULL,
+            `answer` TEXT NOT NULL,
+            `sort_order` INT NOT NULL DEFAULT 0,
+            `is_visible` TINYINT(1) NOT NULL DEFAULT 1,
+            `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_faq_sort` (`sort_order`),
+            KEY `idx_faq_visible` (`is_visible`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "✓ 数据表 'faq_items' 创建成功\n";
+
     echo "\n安装完成！请删除此文件 (database/install.php) 以确保安全。\n";
 } catch (PDOException $e) {
     echo "✗ 安装失败: " . $e->getMessage() . "\n";

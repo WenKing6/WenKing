@@ -579,3 +579,134 @@ tr.license-row-selected,
         transform: rotate(360deg);
     }
 }
+
+/* ============================================
+   6. Settings 页面 - 网站图标上传
+   ============================================ */
+
+.icon-upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    background: rgba(10, 10, 15, 0.5);
+    transition: all 0.2s ease;
+}
+
+.icon-upload-zone.dragover {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.08);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.25);
+}
+
+.icon-upload-preview {
+    width: 96px;
+    height: 96px;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.icon-upload-preview img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.icon-upload-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon-upload-hint {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+/* ============================================
+   7. Settings 页面 - 网站名称行内编辑
+   ============================================ */
+
+#site-name-form {
+    display: none;
+}
+
+.name-edit-active #site-name-view {
+    display: none;
+}
+
+.name-edit-active #site-name-form {
+    display: block;
+}
+
+#site-name-input.is-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   8. 全局 Toast 提示
+   ============================================ */
+
+.global-toast {
+    position: fixed;
+    top: 1.25rem;
+    left: 50%;
+    transform: translate(-50%, -16px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: min(92vw, 420px);
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem;
+    background: #1a1a24;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    color: #fff;
+    font-size: 0.875rem;
+}
+
+.global-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.global-toast-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.global-toast-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.global-toast-success .global-toast-icon svg {
+    color: #10b981;
+}
+
+.global-toast-warning .global-toast-icon svg {
+    color: #f59e0b;
+}
+
+.global-toast-error .global-toast-icon svg {
+    color: #ef4444;
+}

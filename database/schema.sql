@@ -78,3 +78,25 @@ CREATE TABLE IF NOT EXISTS `licenses` (
     KEY `idx_status` (`status`),
     KEY `idx_expires_at` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 站点设置表（Settings 页网站名称/图标等配置，key-value）
+CREATE TABLE IF NOT EXISTS `site_settings` (
+    `setting_key` VARCHAR(100) NOT NULL,
+    `setting_value` TEXT NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- FAQ 条目表（Settings 页 FAQ Manager 管理的前台问答项）
+CREATE TABLE IF NOT EXISTS `faq_items` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `question` VARCHAR(255) NOT NULL,
+    `answer` TEXT NOT NULL,
+    `sort_order` INT NOT NULL DEFAULT 0,
+    `is_visible` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_faq_sort` (`sort_order`),
+    KEY `idx_faq_visible` (`is_visible`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

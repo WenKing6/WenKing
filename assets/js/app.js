@@ -67,6 +67,89 @@ window.closeLicenseModal = function() {
     }
 };
 
+// FAQ modal functions
+window.openFaqModal = function(data) {
+    var overlay = document.getElementById('faq-edit-overlay');
+    var dialog = document.getElementById('faq-edit-dialog');
+    var form = document.getElementById('faq-form');
+    if (!overlay || !dialog || !form) return;
+
+    var isEdit = !!(data && data.id);
+    var idEl = document.getElementById('fe-id');
+    var questionEl = document.getElementById('fe-question');
+    var answerEl = document.getElementById('fe-answer');
+    var sortEl = document.getElementById('fe-sort');
+    var visibleEl = document.getElementById('fe-visible');
+    var titleEl = document.getElementById('faq-edit-title');
+    var submitBtn = document.getElementById('faq-submit-btn');
+
+    form.reset();
+    if (idEl) idEl.value = isEdit ? data.id : '';
+    if (questionEl) questionEl.value = isEdit ? (data.question || '') : '';
+    if (answerEl) answerEl.value = isEdit ? (data.answer || '') : '';
+    if (sortEl) sortEl.value = isEdit ? (data.sort_order || 0) : 0;
+    if (visibleEl) visibleEl.checked = isEdit ? (data.is_visible != 0) : true;
+    if (titleEl) titleEl.textContent = isEdit ? 'Edit FAQ' : 'Add FAQ';
+    if (submitBtn) {
+        submitBtn.innerHTML = '<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>' +
+            (isEdit ? 'Save FAQ' : 'Add FAQ');
+    }
+
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    setTimeout(function() {
+        dialog.classList.remove('scale-95', 'opacity-0');
+        dialog.classList.add('scale-100', 'opacity-100');
+    }, 10);
+    if (questionEl) setTimeout(function() { questionEl.focus(); }, 120);
+};
+
+window.closeFaqModal = function() {
+    var overlay = document.getElementById('faq-edit-overlay');
+    var dialog = document.getElementById('faq-edit-dialog');
+
+    if (overlay && dialog) {
+        dialog.classList.remove('scale-100', 'opacity-100');
+        dialog.classList.add('scale-95', 'opacity-0');
+        setTimeout(function() {
+            overlay.classList.remove('flex');
+            overlay.classList.add('hidden');
+        }, 200);
+    }
+};
+
+// Global toast notification - available on all pages (5s display duration)
+window.showToast = function(message, type) {
+    type = type || 'success';
+
+    var toast = document.getElementById('global-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'global-toast';
+        toast.className = 'global-toast';
+        document.body.appendChild(toast);
+    }
+
+    var icons = {
+        success: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+        warning: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>',
+        error: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'
+    };
+
+    toast.innerHTML = '<div class="global-toast-icon">' + (icons[type] || icons.success) + '</div><span class="global-toast-msg"></span>';
+    toast.querySelector('.global-toast-msg').textContent = message;
+    toast.className = 'global-toast global-toast-' + type;
+
+    // 重置动画
+    void toast.offsetWidth;
+    toast.classList.add('show');
+
+    clearTimeout(window.__globalToastTimer);
+    window.__globalToastTimer = setTimeout(function() {
+        toast.classList.remove('show');
+    }, 5000);
+};
+
 (function () {
     'use strict';
 
@@ -192,6 +275,9 @@ window.closeLicenseModal = function() {
 
             // Initialize Admin page functionality
             this._initAdminPage();
+
+            // Initialize Settings page functionality
+            this._initSettingsPage();
         }
 
         _initTabs() {
@@ -2316,6 +2402,585 @@ window.closeLicenseModal = function() {
         _wait(ms) {
             return new Promise(function (resolve) {
                 setTimeout(resolve, ms);
+            });
+        }
+
+        // ============================================
+        // Settings 页面初始化
+        // 网站图标上传 / 网站名称修改 / 风琴式内容块
+        // ============================================
+        _initSettingsPage() {
+            var self = this;
+            var nameCard = document.getElementById('site-name-card');
+            if (!nameCard) return; // 非 Settings 页面
+
+            // ---------- 网站名称行内编辑 ----------
+            this._initSiteNameEditor();
+
+            // ---------- 网站图标上传 ----------
+            this._initSiteIconUpload();
+
+            // ---------- FAQ 管理（Product List 风格）----------
+            this._initFaqManager();
+        }
+
+        _initSiteNameEditor() {
+            var card = document.getElementById('site-name-card');
+            var view = document.getElementById('site-name-view');
+            var form = document.getElementById('site-name-form');
+            var input = document.getElementById('site-name-input');
+            var editBtn = document.getElementById('site-name-edit-btn');
+            var cancelBtn = document.getElementById('site-name-cancel-btn');
+            var valueEl = document.getElementById('site-name-value');
+            var initialEl = document.getElementById('site-name-initial');
+            var countEl = document.getElementById('site-name-count');
+            var errorEl = document.getElementById('site-name-error');
+            if (!card || !view || !form || !input || !editBtn || !cancelBtn || !valueEl) return;
+
+            // 过滤危险/非法特殊字符（与服务端保持一致）
+            var DISALLOWED = /[<>{}|`"\\\u0000-\u001F\u007F]/g;
+            var MAX_LENGTH = 50;
+
+            function updateCount() {
+                countEl.textContent = input.value.length + '/' + MAX_LENGTH;
+            }
+
+            function setError(msg) {
+                if (!msg) {
+                    errorEl.classList.add('hidden');
+                    input.classList.remove('is-invalid');
+                    return;
+                }
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+                input.classList.add('is-invalid');
+            }
+
+            function enterEdit() {
+                input.value = valueEl.textContent;
+                updateCount();
+                setError(null);
+                card.classList.add('name-edit-active');
+                setTimeout(function() { input.focus(); }, 50);
+            }
+
+            function exitEdit() {
+                card.classList.remove('name-edit-active');
+            }
+
+            function applyName(name) {
+                valueEl.textContent = name;
+                initialEl.textContent = name.charAt(0).toUpperCase();
+                // 同步侧边栏品牌名称
+                var brandEl = document.querySelector('.app-sidebar .sidebar-brand-name');
+                if (brandEl) brandEl.textContent = name;
+            }
+
+            editBtn.addEventListener('click', enterEdit);
+            cancelBtn.addEventListener('click', function() {
+                exitEdit();
+                setError(null);
+            });
+
+            // 输入时过滤特殊字符并更新计数
+            input.addEventListener('input', function() {
+                var filtered = this.value.replace(DISALLOWED, '');
+                if (filtered !== this.value) {
+                    this.value = filtered;
+                }
+                if (this.value.length > MAX_LENGTH) {
+                    this.value = this.value.slice(0, MAX_LENGTH);
+                }
+                updateCount();
+                setError(null);
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var name = input.value.trim().replace(DISALLOWED, '');
+                if (!name) {
+                    setError('Site name cannot be empty.');
+                    return;
+                }
+                if (name.length > MAX_LENGTH) {
+                    name = name.slice(0, MAX_LENGTH);
+                }
+
+                var submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+
+                fetch(window.SITE_URL + '/api/settings.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=save_name&site_name=' + encodeURIComponent(name)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    submitBtn.classList.remove('is-loading');
+                    submitBtn.disabled = false;
+                    if (data.success) {
+                        applyName(data.site_name);
+                        exitEdit();
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('Site name updated successfully', 'success');
+                        }
+                    } else {
+                        setError(data.message || 'Failed to save site name.');
+                    }
+                })
+                .catch(function() {
+                    submitBtn.classList.remove('is-loading');
+                    submitBtn.disabled = false;
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Network error', 'error');
+                    }
+                });
+            });
+        }
+
+        _initSiteIconUpload() {
+            var zone = document.getElementById('site-icon-zone');
+            var fileInput = document.getElementById('site-icon-file');
+            var pickBtn = document.getElementById('site-icon-pick');
+            var uploadBtn = document.getElementById('site-icon-upload');
+            var preview = document.getElementById('site-icon-preview');
+            var hint = document.getElementById('site-icon-hint');
+            if (!zone || !fileInput || !pickBtn || !uploadBtn || !preview) return;
+
+            var ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
+            var ALLOWED_EXTS = ['png', 'jpg', 'jpeg', 'svg'];
+            var MAX_SIZE = 2 * 1024 * 1024; // 2MB
+            var selectedFile = null;
+
+            function setHint(msg, isError) {
+                hint.textContent = msg;
+                hint.style.color = isError ? '#f87171' : '';
+            }
+
+            function validate(file) {
+                if (!file) return 'Please choose an image first.';
+                var ext = (file.name.split('.').pop() || '').toLowerCase();
+                if (ALLOWED_TYPES.indexOf(file.type) === -1 && ALLOWED_EXTS.indexOf(ext) === -1) {
+                    return 'Invalid file type. Allowed: PNG, JPG, SVG.';
+                }
+                if (file.size > MAX_SIZE) {
+                    return 'Image is too large. Maximum size is 2MB.';
+                }
+                return null;
+            }
+
+            function showPreview(file) {
+                if (file.type === 'image/svg+xml') {
+                    var url = URL.createObjectURL(file);
+                    preview.src = url;
+                } else {
+                    var reader = new FileReader();
+                    reader.onload = function(e) { preview.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                }
+                preview.style.opacity = '1';
+            }
+
+            function onFileSelected(file) {
+                var err = validate(file);
+                if (err) {
+                    setHint(err, true);
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                    return;
+                }
+                selectedFile = file;
+                showPreview(file);
+                setHint(file.name + ' selected - ready to upload', false);
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+
+            pickBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    onFileSelected(this.files[0]);
+                }
+            });
+
+            // 拖拽上传
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            zone.addEventListener('dragleave', function() {
+                zone.classList.remove('dragover');
+            });
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    onFileSelected(e.dataTransfer.files[0]);
+                }
+            });
+
+            uploadBtn.addEventListener('click', function() {
+                if (!selectedFile) return;
+
+                var btn = this;
+                btn.classList.add('is-loading');
+                btn.disabled = true;
+                setHint('Uploading...', false);
+
+                var formData = new FormData();
+                formData.append('action', 'upload_icon');
+                formData.append('icon', selectedFile);
+
+                fetch(window.SITE_URL + '/api/settings.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    btn.classList.remove('is-loading');
+                    btn.disabled = false;
+                    if (data.success) {
+                        // 缓存破除：追加时间戳避免浏览器缓存旧图标
+                        preview.src = window.SITE_URL + data.site_icon + '?v=' + Date.now();
+                        setHint('Icon uploaded successfully', false);
+                        selectedFile = null;
+                        fileInput.value = '';
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('Site icon updated successfully', 'success');
+                        }
+                    } else {
+                        setHint(data.message || 'Upload failed', true);
+                        if (typeof window.showToast === 'function') {
+                            window.showToast(data.message || 'Upload failed', 'error');
+                        }
+                    }
+                })
+                .catch(function() {
+                    btn.classList.remove('is-loading');
+                    btn.disabled = false;
+                    setHint('Network error', true);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Network error', 'error');
+                    }
+                });
+            });
+        }
+
+        // ===== FAQ Manager（Product List 风格：表格 + 增删改查）=====
+        _initFaqManager() {
+            var list = document.getElementById('faq-list');
+            var mobileList = document.getElementById('faq-list-mobile');
+            var addBtn = document.getElementById('faq-add');
+            var countEl = document.getElementById('faq-count');
+            if (!list || !mobileList || !addBtn) return;
+
+            var self = this;
+            this._faqBindList();
+
+            // 新增 FAQ
+            addBtn.addEventListener('click', function() {
+                openFaqModal();
+            });
+
+            // 模态框：关闭 / 取消 / 遮罩点击
+            var overlay = document.getElementById('faq-edit-overlay');
+            var closeBtn = document.getElementById('faq-edit-close');
+            var cancelBtn = document.getElementById('faq-cancel-btn');
+            if (overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) closeFaqModal();
+                });
+            }
+            if (closeBtn) closeBtn.addEventListener('click', closeFaqModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeFaqModal);
+
+            // 表单提交（防重复绑定）
+            var form = document.getElementById('faq-form');
+            if (form && !form.dataset.faqBound) {
+                form.dataset.faqBound = '1';
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    self._faqSubmit();
+                });
+            }
+            if (countEl) countEl.textContent = list.querySelectorAll('tr[data-id]').length;
+        }
+
+        // 绑定 FAQ 列表上的操作按钮（编辑/删除/可见性切换）
+        _faqBindList() {
+            var self = this;
+            var list = document.getElementById('faq-list');
+            var mobileList = document.getElementById('faq-list-mobile');
+            if (!list || !mobileList) return;
+
+            function bindEdit(btn) {
+                if (btn.dataset.faqBound) return;
+                btn.dataset.faqBound = '1';
+                btn.addEventListener('click', function() {
+                    var item = null;
+                    try { item = JSON.parse(btn.getAttribute('data-faq') || 'null'); } catch (e) {}
+                    openFaqModal(item);
+                });
+            }
+            function bindDelete(btn) {
+                if (btn.dataset.faqBound) return;
+                btn.dataset.faqBound = '1';
+                btn.addEventListener('click', function() {
+                    self._faqDeleteItem(btn);
+                });
+            }
+            function bindToggle(btn) {
+                if (btn.dataset.faqBound) return;
+                btn.dataset.faqBound = '1';
+                btn.addEventListener('click', function() {
+                    self._faqToggleItem(btn);
+                });
+            }
+
+            [list, mobileList].forEach(function(container) {
+                container.querySelectorAll('.btn-faq-edit').forEach(bindEdit);
+                container.querySelectorAll('.btn-faq-delete').forEach(bindDelete);
+                container.querySelectorAll('.btn-faq-toggle').forEach(bindToggle);
+            });
+        }
+
+        // 重新拉取列表并重建表格 / 移动端卡片（保持单一数据源）
+        _faqRefreshList() {
+            var self = this;
+            var list = document.getElementById('faq-list');
+            var mobileList = document.getElementById('faq-list-mobile');
+            var countEl = document.getElementById('faq-count');
+            if (!list || !mobileList) return;
+
+            fetch(window.SITE_URL + '/api/faq.php?action=list')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.success) return;
+                var items = data.data || [];
+                if (countEl) countEl.textContent = items.length;
+
+                var emptySvg = '<svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>';
+
+                if (items.length === 0) {
+                    list.innerHTML = '<tr><td colspan="4" class="text-center py-12 text-white/40">' + emptySvg + 'No FAQ items yet. Click "Add FAQ" to create one.</td></tr>';
+                    mobileList.innerHTML = '<div class="text-center py-12 text-white/40">' + emptySvg + 'No FAQ items yet. Click "Add FAQ" to create one.</div>';
+                } else {
+                    list.innerHTML = items.map(function(item) { return self._faqBuildRowHtml(item); }).join('');
+                    mobileList.innerHTML = items.map(function(item) { return self._faqBuildCardHtml(item); }).join('');
+                }
+                self._faqBindList();
+            })
+            .catch(function() {});
+        }
+
+        // 桌面端表格行 HTML（与 PHP 端结构保持一致）
+        _faqBuildRowHtml(item) {
+            var esc = function(s) {
+                return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            };
+            var visible = item.is_visible != 0;
+            var badgeClass = visible ? 'status-online' : 'bg-white/10 text-white/60 border-white/10';
+            var badgeText = visible ? 'Visible' : 'Hidden';
+            var faqJson = esc(JSON.stringify(item));
+            var eyeIcon = visible
+                ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>'
+                : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>';
+
+            return '<tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="' + item.id + '">' +
+                '<td class="py-3 px-4 font-medium text-white faq-cell-question">' + esc(item.question) + '</td>' +
+                '<td class="py-3 px-4 text-white/40 faq-cell-sort">' + (item.sort_order || 0) + '</td>' +
+                '<td class="py-3 px-4"><span class="status-badge ' + badgeClass + ' text-xs faq-cell-visible">' + badgeText + '</span></td>' +
+                '<td class="py-3 px-4 flex gap-2">' +
+                    '<button class="btn-faq-toggle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5 ' + (visible ? '' : 'opacity-40') + '" title="Toggle visibility" data-id="' + item.id + '" data-visible="' + (visible ? 1 : 0) + '">' + eyeIcon + '</button>' +
+                    '<button class="btn-faq-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-faq="' + faqJson + '"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>' +
+                    '<button class="btn-faq-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="' + item.id + '"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>' +
+                '</td>' +
+            '</tr>';
+        }
+
+        // 移动端卡片 HTML（与 PHP 端结构保持一致）
+        _faqBuildCardHtml(item) {
+            var esc = function(s) {
+                return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            };
+            var visible = item.is_visible != 0;
+            var badgeClass = visible ? 'status-online' : 'bg-white/10 text-white/60 border-white/10';
+            var badgeText = visible ? 'Visible' : 'Hidden';
+            var faqJson = esc(JSON.stringify(item));
+
+            return '<div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="' + item.id + '">' +
+                '<div class="flex items-start justify-between gap-3 mb-3">' +
+                    '<div class="min-w-0 flex-1">' +
+                        '<div class="text-sm font-medium text-white faq-cell-question">' + esc(item.question) + '</div>' +
+                        '<div class="text-xs text-white/40 mt-1">Sort: <span class="faq-cell-sort">' + (item.sort_order || 0) + '</span></div>' +
+                    '</div>' +
+                    '<span class="status-badge ' + badgeClass + ' text-xs faq-cell-visible shrink-0">' + badgeText + '</span>' +
+                '</div>' +
+                '<div class="flex items-center justify-end gap-1 border-t border-white/5 pt-3">' +
+                    '<button class="btn-faq-toggle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5 ' + (visible ? '' : 'opacity-40') + '" title="Toggle visibility" data-id="' + item.id + '" data-visible="' + (visible ? 1 : 0) + '"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>' +
+                    '<button class="btn-faq-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-faq="' + faqJson + '"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>' +
+                    '<button class="btn-faq-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="' + item.id + '"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>' +
+                '</div>' +
+            '</div>';
+        }
+
+        // 提交 FAQ 表单（新增 / 编辑）
+        _faqSubmit() {
+            var self = this;
+            var form = document.getElementById('faq-form');
+            var submitBtn = document.getElementById('faq-submit-btn');
+            if (!form || !submitBtn) return;
+
+            var idEl = document.getElementById('fe-id');
+            var questionEl = document.getElementById('fe-question');
+            var answerEl = document.getElementById('fe-answer');
+            var sortEl = document.getElementById('fe-sort');
+            var visibleEl = document.getElementById('fe-visible');
+
+            var id = idEl ? idEl.value : '';
+            var question = (questionEl ? questionEl.value : '').trim();
+            var answer = (answerEl ? answerEl.value : '').trim();
+            var sort = parseInt(sortEl ? sortEl.value : '0', 10) || 0;
+            var visible = visibleEl && visibleEl.checked ? 1 : 0;
+
+            if (!question) {
+                if (typeof window.showToast === 'function') window.showToast('Question cannot be empty.', 'warning');
+                if (questionEl) questionEl.focus();
+                return;
+            }
+            if (!answer) {
+                if (typeof window.showToast === 'function') window.showToast('Answer cannot be empty.', 'warning');
+                if (answerEl) answerEl.focus();
+                return;
+            }
+            if (question.length > 255) question = question.slice(0, 255);
+
+            submitBtn.classList.add('is-loading');
+            submitBtn.disabled = true;
+
+            var isEdit = id !== '';
+            var body = 'action=' + (isEdit ? 'update' : 'create') +
+                '&question=' + encodeURIComponent(question) +
+                '&answer=' + encodeURIComponent(answer) +
+                '&sort_order=' + encodeURIComponent(sort) +
+                '&is_visible=' + visible;
+            if (isEdit) body += '&id=' + encodeURIComponent(id);
+
+            fetch(window.SITE_URL + '/api/faq.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+                if (data.success) {
+                    closeFaqModal();
+                    self._faqRefreshList();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(isEdit ? 'FAQ updated successfully' : 'FAQ added successfully', 'success');
+                    }
+                } else {
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(data.message || 'Save failed', 'error');
+                    }
+                }
+            })
+            .catch(function() {
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Network error', 'error');
+                }
+            });
+        }
+
+        // 删除 FAQ（与 Product List 删除逻辑保持一致：确认对话框 -> 加载态 -> 提示）
+        _faqDeleteItem(btn) {
+            var self = this;
+            var id = btn.getAttribute('data-id');
+            if (!id) return;
+
+            self._showConfirmDialog('Are you sure you want to delete this FAQ item?', function() {
+                btn.classList.add('is-loading');
+                btn.disabled = true;
+
+                fetch(window.SITE_URL + '/api/faq.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=delete&id=' + encodeURIComponent(id)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    btn.classList.remove('is-loading');
+                    btn.disabled = false;
+                    var overlay = document.querySelector('.confirm-overlay');
+                    if (overlay) overlay.remove();
+
+                    if (data.success) {
+                        self._faqRefreshList();
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('FAQ deleted successfully', 'success');
+                        }
+                    } else {
+                        if (typeof window.showToast === 'function') {
+                            window.showToast(data.message || 'Delete failed', 'error');
+                        }
+                    }
+                })
+                .catch(function() {
+                    btn.classList.remove('is-loading');
+                    btn.disabled = false;
+                    var overlay = document.querySelector('.confirm-overlay');
+                    if (overlay) overlay.remove();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Network error', 'error');
+                    }
+                });
+            });
+        }
+
+        // 切换 FAQ 可见性
+        _faqToggleItem(btn) {
+            var self = this;
+            var id = btn.getAttribute('data-id');
+            if (!id) return;
+
+            btn.classList.add('is-loading');
+            btn.disabled = true;
+
+            fetch(window.SITE_URL + '/api/faq.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=toggle&id=' + encodeURIComponent(id)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                btn.classList.remove('is-loading');
+                btn.disabled = false;
+                if (data.success) {
+                    self._faqRefreshList();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(data.is_visible ? 'FAQ is now visible' : 'FAQ is now hidden', 'success');
+                    }
+                } else {
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(data.message || 'Toggle failed', 'error');
+                    }
+                }
+            })
+            .catch(function() {
+                btn.classList.remove('is-loading');
+                btn.disabled = false;
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Network error', 'error');
+                }
             });
         }
     }

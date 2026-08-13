@@ -15,15 +15,22 @@ if (!in_array($current_page, $allowed_pages)) {
     $current_page = 'dashboard';
 }
 
+// 站点名称（读取数据库设置，失败时回退到 SITE_NAME 常量）
+$siteName = SITE_NAME;
+try {
+    require_once __DIR__ . '/includes/models/SiteSetting.php';
+    $siteName = SiteSetting::getName();
+} catch (Throwable $e) {}
+
 // 页面标题映射
 $page_titles = [
-    'dashboard' => SITE_NAME . ' - Dashboard',
-    'settings'  => SITE_NAME . ' - Settings',
-    'downloads' => SITE_NAME . ' - Downloads',
-    'redeem'    => SITE_NAME . ' - Redeem Code',
-    'reseller'  => SITE_NAME . ' - Reseller',
-    'manager'   => SITE_NAME . ' - Manager',
-    'admin'     => SITE_NAME . ' - Admin',
+    'dashboard' => $siteName . ' - Dashboard',
+    'settings'  => $siteName . ' - Settings',
+    'downloads' => $siteName . ' - Downloads',
+    'redeem'    => $siteName . ' - Redeem Code',
+    'reseller'  => $siteName . ' - Reseller',
+    'manager'   => $siteName . ' - Manager',
+    'admin'     => $siteName . ' - Admin',
 ];
 
 define('PAGE_TITLE', $page_titles[$current_page]);

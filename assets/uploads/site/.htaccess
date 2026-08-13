@@ -1,0 +1,7 @@
+# 阻止 PHP 等脚本在上传目录内执行（防上传木马）
+<FilesMatch "\.(php|php\d|phtml|phar)$">
+    Require all denied
+</FilesMatch>
+
+# 禁用目录索引
+Options -Indexes

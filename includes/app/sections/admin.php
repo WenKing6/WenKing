@@ -13,6 +13,14 @@ $products = $productModel->getAll();
 $users = $userModel->getAll();
 $licenses = $licenseModel->getAll();
 
+// Settings tab 数据（站点身份 + FAQ 管理）
+require_once __DIR__ . '/../../models/SiteSetting.php';
+require_once __DIR__ . '/../../models/FaqItem.php';
+$siteName = SiteSetting::getName();
+$siteIcon = (new SiteSetting())->get('site_icon');
+$faqItems = (new FaqItem())->getAll();
+$currentIcon = $siteIcon ? SITE_URL . $siteIcon : SITE_URL . '/assets/images/gta-v-logo-transparent-free-png.webp';
+
 // Group users by role for license assignment
 $usersByRole = [];
 foreach ($users as $u) {
@@ -101,6 +109,13 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
         </svg>
         License
+    </button>
+    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="settings">
+        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        Settings
     </button>
 </div>
 
@@ -773,6 +788,215 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     </div>
 </div>
 
+<!-- Settings Tab -->
+<div id="settings-tab" class="tab-panel">
+    <!-- General Settings -->
+    <div class="glass-card p-6 rounded-xl mb-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white">General Settings</h3>
+                    <p class="text-sm text-white/40">Website identity shown across the entire site</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Site Icon Upload -->
+            <div class="rounded-xl bg-white/5 border border-white/5 p-6">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-lg bg-accent-cyan/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-white">Site Icon</h4>
+                        <p class="text-xs text-white/40">PNG, JPG or SVG &middot; Max 2MB</p>
+                    </div>
+                </div>
+
+                <div id="site-icon-zone" class="icon-upload-zone">
+                    <div class="icon-upload-preview">
+                        <img id="site-icon-preview" src="<?php echo $currentIcon; ?>" alt="Site Icon" onerror="this.style.opacity='0.15'">
+                    </div>
+                    <div class="icon-upload-controls">
+                        <input type="file" id="site-icon-file" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml" hidden>
+                        <button type="button" id="site-icon-pick" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 text-sm font-semibold transition">
+                            Choose Image
+                        </button>
+                        <button type="button" id="site-icon-upload" class="px-4 py-2 rounded-lg btn-primary text-sm font-semibold transition" disabled>
+                            Upload
+                        </button>
+                    </div>
+                    <p id="site-icon-hint" class="icon-upload-hint">Drag &amp; drop an image here, or click "Choose Image"</p>
+                </div>
+            </div>
+
+            <!-- Site Name Edit -->
+            <div class="rounded-xl bg-white/5 border border-white/5 p-6" id="site-name-card">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-white">Site Name</h4>
+                        <p class="text-xs text-white/40">Up to 50 characters &middot; special characters are filtered</p>
+                    </div>
+                </div>
+
+                <!-- 显示模式 -->
+                <div id="site-name-view" class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div id="site-name-initial" class="w-12 h-12 rounded-xl bg-accent-purple/20 flex items-center justify-center font-display font-bold text-xl text-accent-purple shrink-0"><?php echo htmlspecialchars(strtoupper(mb_substr($siteName, 0, 1))); ?></div>
+                        <div class="min-w-0">
+                            <div id="site-name-value" class="text-lg font-semibold text-white truncate"><?php echo htmlspecialchars($siteName); ?></div>
+                            <div class="text-xs text-white/40">Current site name</div>
+                        </div>
+                    </div>
+                    <button type="button" id="site-name-edit-btn" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 text-sm font-semibold transition whitespace-nowrap">
+                        Edit
+                    </button>
+                </div>
+
+                <!-- 编辑模式 -->
+                <form id="site-name-form" class="space-y-3" novalidate>
+                    <div>
+                        <label class="block text-sm font-medium text-white/70 mb-2">Site Name</label>
+                        <div class="relative">
+                            <input type="text" id="site-name-input" class="app-input w-full pr-14" value="<?php echo htmlspecialchars($siteName); ?>" maxlength="50" placeholder="Enter site name...">
+                            <span id="site-name-count" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/40"><?php echo mb_strlen($siteName); ?>/50</span>
+                        </div>
+                        <p id="site-name-error" class="text-xs text-red-400 mt-1 hidden"></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="submit" class="btn-primary px-5 py-2 rounded-lg font-semibold text-sm">Save</button>
+                        <button type="button" id="site-name-cancel-btn" class="px-5 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition text-sm">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Manager -->
+    <div class="glass-card p-6 rounded-xl">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div>
+                <h3 class="text-lg font-semibold text-white">FAQ Manager (<span id="faq-count"><?php echo count($faqItems); ?></span>)</h3>
+                <p class="text-sm text-white/40 mt-1">Manage the collapsible Q&amp;A items shown on the front page</p>
+            </div>
+            <button type="button" id="faq-add" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openFaqModal()">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add FAQ
+            </button>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-white/50 border-b border-white/10">
+                        <th class="text-left py-3 px-4">Question</th>
+                        <th class="text-left py-3 px-4 w-20">Sort</th>
+                        <th class="text-left py-3 px-4 w-28">Visible</th>
+                        <th class="text-left py-3 px-4 w-36">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="faq-list">
+                    <?php if (empty($faqItems)): ?>
+                    <tr>
+                        <td colspan="4" class="text-center py-12 text-white/40">
+                            <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            No FAQ items yet. Click "Add FAQ" to create one.
+                        </td>
+                    </tr>
+                    <?php else: ?>
+                        <?php foreach ($faqItems as $item): ?>
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo (int)$item['id']; ?>">
+                            <td class="py-3 px-4 font-medium text-white faq-cell-question"><?php echo htmlspecialchars($item['question']); ?></td>
+                            <td class="py-3 px-4 text-white/40 faq-cell-sort"><?php echo (int)$item['sort_order']; ?></td>
+                            <td class="py-3 px-4">
+                                <span class="status-badge <?php echo $item['is_visible'] ? 'status-online' : 'bg-white/10 text-white/60 border-white/10'; ?> text-xs faq-cell-visible"><?php echo $item['is_visible'] ? 'Visible' : 'Hidden'; ?></span>
+                            </td>
+                            <td class="py-3 px-4 flex gap-2">
+                                <button class="btn-faq-toggle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5 <?php echo $item['is_visible'] ? '' : 'opacity-40'; ?>" title="Toggle visibility" data-id="<?php echo (int)$item['id']; ?>" data-visible="<?php echo (int)$item['is_visible']; ?>">
+                                    <?php if ($item['is_visible']): ?>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <?php else: ?>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                                    <?php endif; ?>
+                                </button>
+                                <button class="btn-faq-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-faq='<?php echo htmlspecialchars(json_encode($item), ENT_QUOTES); ?>'>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-faq-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo (int)$item['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div id="faq-list-mobile" class="md:hidden space-y-3">
+            <?php if (empty($faqItems)): ?>
+            <div class="text-center py-12 text-white/40">
+                <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                </svg>
+                No FAQ items yet. Click "Add FAQ" to create one.
+            </div>
+            <?php else: ?>
+                <?php foreach ($faqItems as $item): ?>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo (int)$item['id']; ?>">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-white faq-cell-question"><?php echo htmlspecialchars($item['question']); ?></div>
+                            <div class="text-xs text-white/40 mt-1">Sort: <span class="faq-cell-sort"><?php echo (int)$item['sort_order']; ?></span></div>
+                        </div>
+                        <span class="status-badge <?php echo $item['is_visible'] ? 'status-online' : 'bg-white/10 text-white/60 border-white/10'; ?> text-xs faq-cell-visible shrink-0"><?php echo $item['is_visible'] ? 'Visible' : 'Hidden'; ?></span>
+                    </div>
+                    <div class="flex items-center justify-end gap-1 border-t border-white/5 pt-3">
+                        <button class="btn-faq-toggle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5 <?php echo $item['is_visible'] ? '' : 'opacity-40'; ?>" title="Toggle visibility" data-id="<?php echo (int)$item['id']; ?>" data-visible="<?php echo (int)$item['is_visible']; ?>">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                        <button class="btn-faq-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-faq='<?php echo htmlspecialchars(json_encode($item), ENT_QUOTES); ?>'>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-faq-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo (int)$item['id']; ?>">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
 <!-- License Edit Modal -->
 <div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="license-edit-dialog">
@@ -960,6 +1184,54 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     Add Product
                 </button>
                 <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- FAQ Edit Modal (outside tab-panel to avoid display:none) -->
+<div id="faq-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200 max-h-[90vh] overflow-y-auto" id="faq-edit-dialog">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white" id="faq-edit-title">Add FAQ</h3>
+            <button class="text-white/40 hover:text-white transition p-1" id="faq-edit-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="faq-form" class="space-y-4">
+            <input type="hidden" id="fe-id" value="">
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Question *</label>
+                <input type="text" id="fe-question" class="app-input w-full px-4 py-2" maxlength="255" placeholder="Enter the question..." required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Answer *</label>
+                <textarea id="fe-answer" class="app-input w-full px-4 py-2" rows="4" placeholder="Enter the answer..." required></textarea>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Sort Order</label>
+                    <input type="number" id="fe-sort" class="app-input w-full px-4 py-2 number-input" value="0">
+                </div>
+                <div class="flex items-end">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="fe-visible" checked class="w-4 h-4 rounded">
+                        <span class="text-sm text-white/60">Visible on frontend</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1" id="faq-submit-btn">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add FAQ
+                </button>
+                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="faq-cancel-btn">
                     Cancel
                 </button>
             </div>

@@ -4,6 +4,15 @@
  * 响应式设计：桌面端展开，移动端抽屉式
  */
 $current_page = $current_page ?? 'dashboard';
+
+// 读取站点设置（网站名称/图标），失败时回退到默认值
+$sidebarSiteName = defined('SITE_NAME') ? SITE_NAME : 'WenKing';
+$sidebarSiteIcon = '';
+try {
+    require_once __DIR__ . '/../models/SiteSetting.php';
+    $sidebarSiteName = SiteSetting::getName();
+    $sidebarSiteIcon = (string)(new SiteSetting())->get('site_icon');
+} catch (Throwable $e) {}
 ?>
 
 <!-- 移动端汉堡按钮 -->
@@ -21,9 +30,9 @@ $current_page = $current_page ?? 'dashboard';
     <!-- Logo 区域 -->
     <div class="p-6 border-b border-white/10">
         <a href="<?php echo SITE_URL; ?>/index.php" class="flex items-center gap-3 hover:opacity-80 transition">
-            <img src="<?php echo SITE_URL; ?>/assets/images/gta-v-logo-transparent-free-png.webp" alt="WenKing" class="h-10 w-auto">
-            <span class="text-xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">
-                WenKing
+            <img src="<?php echo SITE_URL . ($sidebarSiteIcon ?: '/assets/images/gta-v-logo-transparent-free-png.webp'); ?>" alt="<?php echo htmlspecialchars($sidebarSiteName); ?>" class="h-10 w-auto">
+            <span class="sidebar-brand-name text-xl font-display font-bold bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent">
+                <?php echo htmlspecialchars($sidebarSiteName); ?>
             </span>
         </a>
     </div>
