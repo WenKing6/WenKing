@@ -1096,11 +1096,8 @@ window.showToast = function(message, type) {
                 });
             }
 
-            // 如果没有 form，直接返回（但上面的模态框事件已经绑定）
-            if (!form) return;
-
-            // 表单提交（防止重复绑定）
-            if (!form.dataset.bound) {
+            // 产品表单提交（防止重复绑定）——Manager 页无产品表单时跳过，不影响后续用户/许可证初始化
+            if (form && !form.dataset.bound) {
                 form.dataset.bound = '1';
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -1453,11 +1450,11 @@ window.showToast = function(message, type) {
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var visibleRows = [];
 
-            // 筛选行
+            // 筛选行（第1列为勾选框，License Key/Product/Status 依次为第2/3/6列）
             allRows.forEach(function(row) {
-                var licenseKey = row.querySelector('td:nth-child(1)');
-                var productCell = row.querySelector('td:nth-child(2)');
-                var statusCell = row.querySelector('td:nth-child(5)');
+                var licenseKey = row.querySelector('td:nth-child(2)');
+                var productCell = row.querySelector('td:nth-child(3)');
+                var statusCell = row.querySelector('td:nth-child(6)');
 
                 var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
                 var productId = productFilter ? productFilter.options[productFilter.selectedIndex].value : '';
@@ -1578,7 +1575,7 @@ window.showToast = function(message, type) {
             var expired = 0;
 
             allRows.forEach(function(row) {
-                var statusCell = row.querySelector('td:nth-child(5)');
+                var statusCell = row.querySelector('td:nth-child(6)');
                 if (statusCell) {
                     var statusText = statusCell.textContent.toLowerCase();
                     if (statusText.includes('active')) active++;
