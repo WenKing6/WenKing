@@ -624,37 +624,16 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         'expired' => 'Expired',
                         'disabled' => 'Disabled'
                     ], '', 'w-full sm:w-36');
-                    // Manager 筛选
-                    $licenseManagerOptions = ['' => 'All Managers'];
-                    foreach ($managerUsers as $mu) {
-                        $licenseManagerOptions[$mu['id']] = $mu['username'];
-                    }
-                    renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
-                    // Reseller 筛选
-                    $licenseResellerOptions = ['' => 'All Resellers'];
-                    foreach ($resellerUsers as $ru) {
-                        $licenseResellerOptions[$ru['id']] = $ru['username'];
-                    }
-                    renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
                     ?>
                     <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
                         Add License
                     </button>
                     <?php if ($isAdmin): ?>
                     <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" id="grant-quota-btn">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
                         Grant Quota
                     </button>
                     <?php endif; ?>
                     <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
                 </div>
@@ -863,6 +842,20 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             '50' => '50',
                             '100' => '100'
                         ], '10', 'wk-select--fit'); ?>
+                        <?php
+                        // Manager 筛选
+                        $licenseManagerOptions = ['' => 'All Managers'];
+                        foreach ($managerUsers as $mu) {
+                            $licenseManagerOptions[$mu['id']] = $mu['username'];
+                        }
+                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
+                        // Reseller 筛选
+                        $licenseResellerOptions = ['' => 'All Resellers'];
+                        foreach ($resellerUsers as $ru) {
+                            $licenseResellerOptions[$ru['id']] = $ru['username'];
+                        }
+                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
+                        ?>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
