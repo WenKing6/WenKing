@@ -1335,6 +1335,24 @@ window.showToast = function(message, type) {
                 });
             }
 
+            // Manager 筛选
+            var managerFilter = document.getElementById('license-manager-filter');
+            if (managerFilter) {
+                managerFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
+            // Reseller 筛选
+            var resellerFilter = document.getElementById('license-reseller-filter');
+            if (resellerFilter) {
+                resellerFilter.addEventListener('change', function() {
+                    currentPage = 1;
+                    self._filterLicenses();
+                });
+            }
+
             // 每页显示数量
             if (perPageSelect) {
                 perPageSelect.addEventListener('change', function() {
@@ -1471,6 +1489,8 @@ window.showToast = function(message, type) {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
+            var managerFilter = document.getElementById('license-manager-filter');
+            var resellerFilter = document.getElementById('license-reseller-filter');
             var tbody = document.getElementById('license-list');
 
             if (!tbody) return;
@@ -1478,6 +1498,8 @@ window.showToast = function(message, type) {
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
+            var managerValue = managerFilter ? managerFilter.value : '';
+            var resellerValue = resellerFilter ? resellerFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var visibleRows = [];
@@ -1496,7 +1518,21 @@ window.showToast = function(message, type) {
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
 
-                if (matchSearch && matchProduct && matchStatus) {
+                // Manager 筛选
+                var matchManager = true;
+                if (managerValue) {
+                    var rowManagerId = row.getAttribute('data-manager-id');
+                    matchManager = rowManagerId === managerValue;
+                }
+
+                // Reseller 筛选
+                var matchReseller = true;
+                if (resellerValue) {
+                    var rowResellerId = row.getAttribute('data-reseller-id');
+                    matchReseller = rowResellerId === resellerValue;
+                }
+
+                if (matchSearch && matchProduct && matchStatus && matchManager && matchReseller) {
                     visibleRows.push(row);
                 }
             });
@@ -1534,10 +1570,14 @@ window.showToast = function(message, type) {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
+            var managerFilter = document.getElementById('license-manager-filter');
+            var resellerFilter = document.getElementById('license-reseller-filter');
 
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
+            var managerValue = managerFilter ? managerFilter.value : '';
+            var resellerValue = resellerFilter ? resellerFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var count = 0;
@@ -1553,7 +1593,21 @@ window.showToast = function(message, type) {
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
 
-                if (matchSearch && matchProduct && matchStatus) {
+                // Manager 筛选
+                var matchManager = true;
+                if (managerValue) {
+                    var rowManagerId = row.getAttribute('data-manager-id');
+                    matchManager = rowManagerId === managerValue;
+                }
+
+                // Reseller 筛选
+                var matchReseller = true;
+                if (resellerValue) {
+                    var rowResellerId = row.getAttribute('data-reseller-id');
+                    matchReseller = rowResellerId === resellerValue;
+                }
+
+                if (matchSearch && matchProduct && matchStatus && matchManager && matchReseller) {
                     count++;
                 }
             });
@@ -1714,6 +1768,37 @@ window.showToast = function(message, type) {
                 });
             }
 
+            // 角色选择联动用户选择
+            var gqRole = document.getElementById('gq-role');
+            var gqUserContainer = document.getElementById('gq-user-container');
+            var gqManagerWrapper = document.getElementById('gq-user-manager-wrapper');
+            var gqResellerWrapper = document.getElementById('gq-user-reseller-wrapper');
+
+            function handleRoleChange() {
+                if (!gqRole || !gqUserContainer) return;
+                var role = gqRole.value;
+
+                if (!role) {
+                    gqUserContainer.classList.add('hidden');
+                    return;
+                }
+
+                gqUserContainer.classList.remove('hidden');
+
+                if (role === 'manager') {
+                    gqManagerWrapper.classList.remove('hidden');
+                    gqResellerWrapper.classList.add('hidden');
+                } else if (role === 'reseller') {
+                    gqManagerWrapper.classList.add('hidden');
+                    gqResellerWrapper.classList.remove('hidden');
+                }
+            }
+
+            if (gqRole && !gqRole.dataset.rbound) {
+                gqRole.dataset.rbound = '1';
+                gqRole.addEventListener('change', handleRoleChange);
+            }
+
             // 库存可用数量联动提示
             var gqProduct = document.getElementById('gq-product');
             var gqDuration = document.getElementById('gq-duration');
@@ -1750,12 +1835,21 @@ window.showToast = function(message, type) {
                 grantForm.dataset.bound = '1';
                 grantForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    var managerId = document.getElementById('gq-manager').value;
+                    var role = document.getElementById('gq-role').value;
+                    var userId;
+
+                    // 根据角色获取对应的用户ID
+                    if (role === 'manager') {
+                        userId = document.getElementById('gq-manager').value;
+                    } else if (role === 'reseller') {
+                        userId = document.getElementById('gq-reseller').value;
+                    }
+
                     var productId = document.getElementById('gq-product').value;
                     var duration = document.getElementById('gq-duration').value;
                     var quantity = document.getElementById('gq-quantity').value;
 
-                    if (!managerId || !productId || !duration || !quantity || parseInt(quantity, 10) <= 0) {
+                    if (!role || !userId || !productId || !duration || !quantity || parseInt(quantity, 10) <= 0) {
                         if (typeof window.showToast === 'function') {
                             window.showToast('Please fill in all fields', 'error');
                         }
@@ -1763,7 +1857,7 @@ window.showToast = function(message, type) {
                     }
 
                     var body = 'action=create_allocation' +
-                        '&user_id=' + encodeURIComponent(managerId) +
+                        '&user_id=' + encodeURIComponent(userId) +
                         '&product_id=' + encodeURIComponent(productId) +
                         '&duration_days=' + encodeURIComponent(duration) +
                         '&quantity=' + encodeURIComponent(quantity);

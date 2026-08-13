@@ -96,7 +96,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('manager.title'); ?></span>
-        <?php if ($canViewLicenses): ?><span id="role-auth-test" class="text-sm font-normal text-accent-cyan ml-3">小文跑得快</span><?php endif; ?>
     </h1>
     <p class="text-white/60"><?php _e('manager.subtitle'); ?></p>
     <?php if ($currentUser): ?>

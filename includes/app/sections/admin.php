@@ -31,6 +31,8 @@ $allocations = $isAdmin ? $licenseModel->getAllocations() : [];
 
 // 经理用户列表（Grant Quota 弹窗用）
 $managerUsers = array_filter($users, fn($u) => $u['role'] === 'manager');
+// Reseller 用户列表（Grant Quota 弹窗用）
+$resellerUsers = array_filter($users, fn($u) => $u['role'] === 'reseller');
 
 /**
  * 时长显示标签
@@ -596,96 +598,6 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
         </div>
 
-        <?php if ($isAdmin): ?>
-        <!-- Quota Management -->
-        <div class="glass-card p-6 rounded-xl mb-6" id="quota-management">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-white">Quota Management</h3>
-                    <p class="text-xs text-white/40 mt-1">Grant managers the right to claim keys of a specific product & duration from inventory.</p>
-                </div>
-                <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" id="grant-quota-btn">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Grant Quota
-                </button>
-            </div>
-
-            <?php if (empty($allocations)): ?>
-            <div class="text-center py-8 text-white/40">
-                No quotas granted yet. Click "Grant Quota" to give a manager access to inventory keys.
-            </div>
-            <?php else: ?>
-            <!-- Desktop Table -->
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="text-white/50 border-b border-white/10">
-                            <th class="text-left py-3 px-4">Manager</th>
-                            <th class="text-left py-3 px-4">Product</th>
-                            <th class="text-left py-3 px-4">Duration</th>
-                            <th class="text-left py-3 px-4">Total</th>
-                            <th class="text-left py-3 px-4">Claimed</th>
-                            <th class="text-left py-3 px-4">Remaining</th>
-                            <th class="text-left py-3 px-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allocation-list">
-                        <?php foreach ($allocations as $alloc):
-                            $total = (int)$alloc['quantity'];
-                            $used = (int)$alloc['used_count'];
-                            $remaining = $total - $used;
-                        ?>
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo (int)$alloc['id']; ?>">
-                            <td class="py-3 px-4 font-medium text-white"><?php echo htmlspecialchars($alloc['manager_name'] ?? 'Unknown'); ?></td>
-                            <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($alloc['product_name'] ?? 'N/A'); ?></td>
-                            <td class="py-3 px-4 text-accent-cyan"><?php echo licenseDurationLabel((int)$alloc['duration_days']); ?></td>
-                            <td class="py-3 px-4 text-white/80"><?php echo $total; ?></td>
-                            <td class="py-3 px-4 text-white/60"><?php echo $used; ?></td>
-                            <td class="py-3 px-4 <?php echo $remaining > 0 ? 'text-status-online' : 'text-white/40'; ?>"><?php echo $remaining; ?></td>
-                            <td class="py-3 px-4">
-                                <button class="btn-allocation-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete Quota" data-id="<?php echo (int)$alloc['id']; ?>">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Mobile Cards -->
-            <div class="md:hidden space-y-3">
-                <?php foreach ($allocations as $alloc):
-                    $total = (int)$alloc['quantity'];
-                    $used = (int)$alloc['used_count'];
-                    $remaining = $total - $used;
-                ?>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo (int)$alloc['id']; ?>">
-                    <div class="flex items-start justify-between mb-2">
-                        <div class="min-w-0">
-                            <div class="font-semibold text-white"><?php echo htmlspecialchars($alloc['manager_name'] ?? 'Unknown'); ?></div>
-                            <div class="text-sm text-white/60 mt-1"><?php echo htmlspecialchars($alloc['product_name'] ?? 'N/A'); ?> · <span class="text-accent-cyan"><?php echo licenseDurationLabel((int)$alloc['duration_days']); ?></span></div>
-                        </div>
-                        <button class="btn-allocation-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5 shrink-0" title="Delete Quota" data-id="<?php echo (int)$alloc['id']; ?>">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="text-xs text-white/40">
-                        Total <span class="text-white/80"><?php echo $total; ?></span> &middot; Claimed <span class="text-white/80"><?php echo $used; ?></span> &middot; Remaining <span class="<?php echo $remaining > 0 ? 'text-status-online' : 'text-white/40'; ?>"><?php echo $remaining; ?></span>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
-        </div>
-        <?php endif; ?>
-
         <!-- License List -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -712,6 +624,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         'expired' => 'Expired',
                         'disabled' => 'Disabled'
                     ], '', 'w-full sm:w-36');
+                    // Manager 筛选
+                    $licenseManagerOptions = ['' => 'All Managers'];
+                    foreach ($managerUsers as $mu) {
+                        $licenseManagerOptions[$mu['id']] = $mu['username'];
+                    }
+                    renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
+                    // Reseller 筛选
+                    $licenseResellerOptions = ['' => 'All Resellers'];
+                    foreach ($resellerUsers as $ru) {
+                        $licenseResellerOptions[$ru['id']] = $ru['username'];
+                    }
+                    renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
                     ?>
                     <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -719,6 +643,14 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         </svg>
                         Add License
                     </button>
+                    <?php if ($isAdmin): ?>
+                    <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" id="grant-quota-btn">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Grant Quota
+                    </button>
+                    <?php endif; ?>
                     <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -757,8 +689,23 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             </td>
                         </tr>
                         <?php else: ?>
+                            <?php
+                            // 预先构建用户角色映射表
+                            $userRoleMap = [];
+                            foreach ($users as $u) {
+                                $userRoleMap[$u['id']] = $u['role'];
+                            }
+                            ?>
                             <?php foreach ($licenses as $lic): ?>
-                            <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                            <?php $userRole = !empty($lic['user_id']) ? ($userRoleMap[$lic['user_id']] ?? null) : null; ?>
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition"
+                                data-id="<?php echo $lic['id']; ?>"
+                                data-product-id="<?php echo $lic['product_id']; ?>"
+                                <?php if ($userRole === 'manager'): ?>
+                                data-manager-id="<?php echo $lic['user_id']; ?>"
+                                <?php elseif ($userRole === 'reseller'): ?>
+                                data-reseller-id="<?php echo $lic['user_id']; ?>"
+                                <?php endif; ?>>
                                 <td class="py-3 px-4">
                                     <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 </td>
@@ -832,8 +779,23 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     No licenses yet. Click "Add License" to create one.
                 </div>
                 <?php else: ?>
+                    <?php
+                    // 预先构建用户角色映射表
+                    $userRoleMap = [];
+                    foreach ($users as $u) {
+                        $userRoleMap[$u['id']] = $u['role'];
+                    }
+                    ?>
                     <?php foreach ($licenses as $lic): ?>
-                    <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
+                    <?php $userRole = !empty($lic['user_id']) ? ($userRoleMap[$lic['user_id']] ?? null) : null; ?>
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5"
+                         data-id="<?php echo $lic['id']; ?>"
+                         data-product-id="<?php echo $lic['product_id']; ?>"
+                         <?php if ($userRole === 'manager'): ?>
+                         data-manager-id="<?php echo $lic['user_id']; ?>"
+                         <?php elseif ($userRole === 'reseller'): ?>
+                         data-reseller-id="<?php echo $lic['user_id']; ?>"
+                         <?php endif; ?>>
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-start gap-3 flex-1 min-w-0">
                                 <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
@@ -1144,14 +1106,35 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
         </div>
         <form id="grant-quota-form" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Manager *</label>
+                <label class="block text-sm font-medium text-white/70 mb-2">Role *</label>
                 <?php
-                $gqManagerOptions = ['' => '-- Select Manager --'];
-                foreach ($managerUsers as $mu) {
-                    $gqManagerOptions[$mu['id']] = $mu['username'];
-                }
-                renderCustomSelect('gq-manager', $gqManagerOptions, '', 'w-full', true);
+                renderCustomSelect('gq-role', [
+                    '' => '-- Select Role --',
+                    'manager' => 'Manager',
+                    'reseller' => 'Reseller'
+                ], '', 'w-full', true);
                 ?>
+            </div>
+            <div id="gq-user-container" class="hidden">
+                <label class="block text-sm font-medium text-white/70 mb-2">User *</label>
+                <div id="gq-user-manager-wrapper">
+                    <?php
+                    $gqManagerOptions = ['' => '-- Select Manager --'];
+                    foreach ($managerUsers as $mu) {
+                        $gqManagerOptions[$mu['id']] = $mu['username'];
+                    }
+                    renderCustomSelect('gq-manager', $gqManagerOptions, '', 'w-full', true);
+                    ?>
+                </div>
+                <div id="gq-user-reseller-wrapper" class="hidden">
+                    <?php
+                    $gqResellerOptions = ['' => '-- Select Reseller --'];
+                    foreach ($resellerUsers as $ru) {
+                        $gqResellerOptions[$ru['id']] = $ru['username'];
+                    }
+                    renderCustomSelect('gq-reseller', $gqResellerOptions, '', 'w-full', true);
+                    ?>
+                </div>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
