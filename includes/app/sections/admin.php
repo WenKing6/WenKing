@@ -676,8 +676,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                 <td class="py-3 px-4">
                                     <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 </td>
-                                <td class="py-3 px-4"><span class="block font-mono text-sm text-white/80 truncate" title="<?php echo htmlspecialchars($lic['license_key']); ?>"><?php echo htmlspecialchars($lic['license_key']); ?></span></td>
-                                <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></td>
+                                <td class="py-3 px-4"><span class="block font-mono text-sm text-white/80 truncate"><?php echo htmlspecialchars($lic['license_key']); ?></span></td>
+                                <td class="py-3 px-4 text-white/60"><span class="block truncate"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></span></td>
                                 <td class="py-3 px-4 text-white/60">
                                     <?php
                                     $days = (int)$lic['duration_days'];
