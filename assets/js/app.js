@@ -1285,6 +1285,60 @@ window.showToast = function(message, type) {
             self._initLicenseFilters();
         }
 
+        /**
+         * 通用分页绑定（Prev / Next / 每页数量）
+         * HTML 由 PHP renderPagination(prefix) 渲染，id 约定：{prefix}-prev-page 等
+         * @param {string} prefix 元素 id 前缀（如 'license'、'user'、'product'）
+         * @param {Object} opts { getCount: Function, apply: Function }
+         * @returns {{getCurrent: Function, setCurrent: Function, getPerPage: Function}}
+         */
+        _bindPagination(prefix, opts) {
+            var perPageSelect = document.getElementById(prefix + '-per-page');
+            var prevBtn = document.getElementById(prefix + '-prev-page');
+            var nextBtn = document.getElementById(prefix + '-next-page');
+
+            var state = {
+                currentPage: 1,
+                perPage: perPageSelect ? (parseInt(perPageSelect.value) || 10) : 10
+            };
+
+            // 每页显示数量
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    state.perPage = parseInt(this.value) || 10;
+                    state.currentPage = 1;
+                    opts.apply();
+                });
+            }
+
+            // 上一页
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (state.currentPage > 1) {
+                        state.currentPage--;
+                        opts.apply();
+                    }
+                });
+            }
+
+            // 下一页
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    var totalPages = Math.ceil(opts.getCount() / state.perPage);
+                    if (state.currentPage < totalPages) {
+                        state.currentPage++;
+                        opts.apply();
+                    }
+                });
+            }
+
+            return {
+                getCurrent: function() { return state.currentPage; },
+                setCurrent: function(p) { state.currentPage = p; },
+                getPerPage: function() { return state.perPage; }
+            };
+        }
+
         _initLicenseFilters() {
             // 检查是否在 License 页面
             var searchInput = document.getElementById('license-search');
@@ -1293,95 +1347,55 @@ window.showToast = function(message, type) {
             var self = this;
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
-            var perPageSelect = document.getElementById('license-per-page');
-            var prevBtn = document.getElementById('license-prev-page');
-            var nextBtn = document.getElementById('license-next-page');
-
-            // 当前页码
-            var currentPage = 1;
-            var perPage = perPageSelect ? parseInt(perPageSelect.value) : 10;
-
-            // 获取所有许可证行
-            var allRows = [];
-            var tbody = document.getElementById('license-list');
-            if (tbody) {
-                allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
-            }
 
             // 更新统计数字
             self._updateLicenseStats();
 
-            // 搜索功能
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    currentPage = 1;
-                    self._filterLicenses();
-                });
+            // 通用分页绑定（Prev / Next / 每页数量）
+            var pager = self._bindPagination('license', {
+                getCount: function() { return self._getFilteredLicenseCount(); },
+                apply: function() { self._filterLicenses(); }
+            });
+            this._licenseCurrentPage = pager.getCurrent;
+            this._licenseSetCurrentPage = pager.setCurrent;
+            this._licensePerPage = pager.getPerPage;
+
+            // 重置页码并重新过滤
+            function resetAndFilter() {
+                pager.setCurrent(1);
+                self._filterLicenses();
             }
+
+            // 搜索功能
+            searchInput.addEventListener('input', resetAndFilter);
 
             // 产品筛选
             if (productFilter) {
-                productFilter.addEventListener('change', function() {
-                    currentPage = 1;
-                    self._filterLicenses();
-                });
+                productFilter.addEventListener('change', resetAndFilter);
             }
 
             // 状态筛选
             if (statusFilter) {
-                statusFilter.addEventListener('change', function() {
-                    currentPage = 1;
-                    self._filterLicenses();
+                statusFilter.addEventListener('change', resetAndFilter);
+            }
+
+            // 角色筛选（联动用户筛选）
+            var roleFilter = document.getElementById('license-role-filter');
+            if (roleFilter) {
+                roleFilter.addEventListener('change', function() {
+                    self._rebuildLicenseUserOptions(roleFilter.value);
+                    resetAndFilter();
                 });
             }
 
-            // Manager 筛选
-            var managerFilter = document.getElementById('license-manager-filter');
-            if (managerFilter) {
-                managerFilter.addEventListener('change', function() {
-                    currentPage = 1;
-                    self._filterLicenses();
-                });
+            // 用户筛选
+            var userFilter = document.getElementById('license-user-filter');
+            if (userFilter) {
+                userFilter.addEventListener('change', resetAndFilter);
             }
 
-            // Reseller 筛选
-            var resellerFilter = document.getElementById('license-reseller-filter');
-            if (resellerFilter) {
-                resellerFilter.addEventListener('change', function() {
-                    currentPage = 1;
-                    self._filterLicenses();
-                });
-            }
-
-            // 每页显示数量
-            if (perPageSelect) {
-                perPageSelect.addEventListener('change', function() {
-                    perPage = parseInt(this.value);
-                    currentPage = 1;
-                    self._filterLicenses();
-                });
-            }
-
-            // 上一页
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        self._filterLicenses();
-                    }
-                });
-            }
-
-            // 下一页
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    var totalPages = Math.ceil(self._getFilteredLicenseCount() / perPage);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        self._filterLicenses();
-                    }
-                });
-            }
+            // 初始化用户筛选选项（默认显示全部 manager + reseller）
+            self._rebuildLicenseUserOptions('');
 
             // ===== 勾选与批量删除 =====
             var selectedIds = new Set();
@@ -1477,20 +1491,51 @@ window.showToast = function(message, type) {
             // 初始筛选
             self._filterLicenses();
 
-            // 保存引用供后续使用
-            this._licenseCurrentPage = function() { return currentPage; };
-            this._licenseSetCurrentPage = function(page) { currentPage = page; };
-            this._licensePerPage = function() { return perPage; };
             this._syncLicenseSelectAll = syncSelectAllState;
             updateSelectedUI();
+        }
+
+        /**
+         * 根据所选角色重建用户筛选选项（数据来自 .app-page-header 的 data-users-by-role）
+         * @param {string} role '' = 显示全部 manager + reseller
+         */
+        _rebuildLicenseUserOptions(role) {
+            var select = document.getElementById('license-user-filter');
+            if (!select) return;
+
+            var header = document.querySelector('.app-page-header');
+            var raw = header ? header.getAttribute('data-users-by-role') : null;
+            var usersByRole = {};
+            try { usersByRole = raw ? JSON.parse(raw) : {}; } catch (e) { usersByRole = {}; }
+
+            // 重建 native select 选项
+            select.innerHTML = '';
+            var allOpt = document.createElement('option');
+            allOpt.value = '';
+            allOpt.textContent = 'All Users';
+            select.appendChild(allOpt);
+
+            var roles = role ? [role] : ['manager', 'reseller'];
+            roles.forEach(function(r) {
+                (usersByRole[r] || []).forEach(function(u) {
+                    var opt = document.createElement('option');
+                    opt.value = String(u.id);
+                    opt.textContent = u.username;
+                    select.appendChild(opt);
+                });
+            });
+
+            // 重置为 All Users 并同步自定义下拉
+            select.value = '';
+            this._refreshCustomSelect('license-user-filter');
         }
 
         _filterLicenses() {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
-            var managerFilter = document.getElementById('license-manager-filter');
-            var resellerFilter = document.getElementById('license-reseller-filter');
+            var roleFilter = document.getElementById('license-role-filter');
+            var userFilter = document.getElementById('license-user-filter');
             var tbody = document.getElementById('license-list');
 
             if (!tbody) return;
@@ -1498,8 +1543,8 @@ window.showToast = function(message, type) {
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
-            var managerValue = managerFilter ? managerFilter.value : '';
-            var resellerValue = resellerFilter ? resellerFilter.value : '';
+            var roleValue = roleFilter ? roleFilter.value : '';
+            var userValue = userFilter ? userFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var visibleRows = [];
@@ -1507,32 +1552,25 @@ window.showToast = function(message, type) {
             // 筛选行（第1列为勾选框，License Key/Product/Status 依次为第2/3/6列）
             allRows.forEach(function(row) {
                 var licenseKey = row.querySelector('td:nth-child(2)');
-                var productCell = row.querySelector('td:nth-child(3)');
                 var statusCell = row.querySelector('td:nth-child(6)');
 
                 var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
-                var productId = productFilter ? productFilter.options[productFilter.selectedIndex].value : '';
                 var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
 
                 var matchSearch = !searchTerm || keyText.includes(searchTerm);
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
 
-                // Manager 筛选
-                var matchManager = true;
-                if (managerValue) {
-                    var rowManagerId = row.getAttribute('data-manager-id');
-                    matchManager = rowManagerId === managerValue;
-                }
+                // 角色筛选（行上按归属角色打 data-manager-id / data-reseller-id）
+                var rowRole = row.hasAttribute('data-manager-id') ? 'manager'
+                    : (row.hasAttribute('data-reseller-id') ? 'reseller' : '');
+                var matchRole = !roleValue || rowRole === roleValue;
 
-                // Reseller 筛选
-                var matchReseller = true;
-                if (resellerValue) {
-                    var rowResellerId = row.getAttribute('data-reseller-id');
-                    matchReseller = rowResellerId === resellerValue;
-                }
+                // 用户筛选
+                var rowUserId = row.getAttribute('data-manager-id') || row.getAttribute('data-reseller-id') || '';
+                var matchUser = !userValue || rowUserId === userValue;
 
-                if (matchSearch && matchProduct && matchStatus && matchManager && matchReseller) {
+                if (matchSearch && matchProduct && matchStatus && matchRole && matchUser) {
                     visibleRows.push(row);
                 }
             });
@@ -1570,14 +1608,14 @@ window.showToast = function(message, type) {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
             var statusFilter = document.getElementById('license-status-filter');
-            var managerFilter = document.getElementById('license-manager-filter');
-            var resellerFilter = document.getElementById('license-reseller-filter');
+            var roleFilter = document.getElementById('license-role-filter');
+            var userFilter = document.getElementById('license-user-filter');
 
             var searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             var productValue = productFilter ? productFilter.value : '';
             var statusValue = statusFilter ? statusFilter.value : '';
-            var managerValue = managerFilter ? managerFilter.value : '';
-            var resellerValue = resellerFilter ? resellerFilter.value : '';
+            var roleValue = roleFilter ? roleFilter.value : '';
+            var userValue = userFilter ? userFilter.value : '';
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var count = 0;
@@ -1593,21 +1631,16 @@ window.showToast = function(message, type) {
                 var matchProduct = !productValue || row.getAttribute('data-product-id') === productValue;
                 var matchStatus = !statusValue || statusText.includes(statusValue);
 
-                // Manager 筛选
-                var matchManager = true;
-                if (managerValue) {
-                    var rowManagerId = row.getAttribute('data-manager-id');
-                    matchManager = rowManagerId === managerValue;
-                }
+                // 角色筛选
+                var rowRole = row.hasAttribute('data-manager-id') ? 'manager'
+                    : (row.hasAttribute('data-reseller-id') ? 'reseller' : '');
+                var matchRole = !roleValue || rowRole === roleValue;
 
-                // Reseller 筛选
-                var matchReseller = true;
-                if (resellerValue) {
-                    var rowResellerId = row.getAttribute('data-reseller-id');
-                    matchReseller = rowResellerId === resellerValue;
-                }
+                // 用户筛选
+                var rowUserId = row.getAttribute('data-manager-id') || row.getAttribute('data-reseller-id') || '';
+                var matchUser = !userValue || rowUserId === userValue;
 
-                if (matchSearch && matchProduct && matchStatus && matchManager && matchReseller) {
+                if (matchSearch && matchProduct && matchStatus && matchRole && matchUser) {
                     count++;
                 }
             });
@@ -2306,45 +2339,16 @@ window.showToast = function(message, type) {
             var perPageSelect = document.getElementById('user-per-page');
             if (!perPageSelect) return;
 
-            var currentPage = 1;
-            var perPage = parseInt(perPageSelect.value) || 10;
-            var prevBtn = document.getElementById('user-prev-page');
-            var nextBtn = document.getElementById('user-next-page');
-
-            // 每页显示数量
-            if (perPageSelect) {
-                perPageSelect.addEventListener('change', function() {
-                    perPage = parseInt(this.value) || 10;
-                    currentPage = 1;
-                    self._filterUsers();
-                });
-            }
-
-            // 上一页
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        self._filterUsers();
-                    }
-                });
-            }
-
-            // 下一页
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    var totalPages = Math.ceil(self._getFilteredUserCount() / perPage);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        self._filterUsers();
-                    }
-                });
-            }
+            // 通用分页绑定（Prev / Next / 每页数量）
+            var pager = self._bindPagination('user', {
+                getCount: function() { return self._getFilteredUserCount(); },
+                apply: function() { self._filterUsers(); }
+            });
 
             // 保存状态供其他方法读取
-            this._userCurrentPage = function() { return currentPage; };
-            this._userSetCurrentPage = function(p) { currentPage = p; };
-            this._userPerPage = function() { return perPage; };
+            this._userCurrentPage = pager.getCurrent;
+            this._userSetCurrentPage = pager.setCurrent;
+            this._userPerPage = pager.getPerPage;
 
             // 初始筛选
             self._filterUsers();
@@ -2459,45 +2463,16 @@ window.showToast = function(message, type) {
             var perPageSelect = document.getElementById('product-per-page');
             if (!perPageSelect) return;
 
-            var currentPage = 1;
-            var perPage = parseInt(perPageSelect.value) || 10;
-            var prevBtn = document.getElementById('product-prev-page');
-            var nextBtn = document.getElementById('product-next-page');
-
-            // 每页显示数量
-            if (perPageSelect) {
-                perPageSelect.addEventListener('change', function() {
-                    perPage = parseInt(this.value) || 10;
-                    currentPage = 1;
-                    self._filterProducts();
-                });
-            }
-
-            // 上一页
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        self._filterProducts();
-                    }
-                });
-            }
-
-            // 下一页
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    var totalPages = Math.ceil(self._getProductCount() / perPage);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        self._filterProducts();
-                    }
-                });
-            }
+            // 通用分页绑定（Prev / Next / 每页数量）
+            var pager = self._bindPagination('product', {
+                getCount: function() { return self._getProductCount(); },
+                apply: function() { self._filterProducts(); }
+            });
 
             // 保存状态供其他方法读取
-            this._productCurrentPage = function() { return currentPage; };
-            this._productSetCurrentPage = function(p) { currentPage = p; };
-            this._productPerPage = function() { return perPage; };
+            this._productCurrentPage = pager.getCurrent;
+            this._productSetCurrentPage = pager.setCurrent;
+            this._productPerPage = pager.getPerPage;
 
             // 初始分页
             self._filterProducts();

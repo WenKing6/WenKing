@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../../models/Product.php';
 require_once __DIR__ . '/../../models/User.php';
 require_once __DIR__ . '/../../models/License.php';
+require_once __DIR__ . '/../section-helpers.php';
 $productModel = new Product();
 $userModel = new User();
 $licenseModel = new License();
@@ -307,19 +308,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button type="button" id="user-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="user-current-page">1</span> of <span id="user-total-pages">1</span></span>
-                    <button type="button" id="user-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
+                <?php renderPagination('user'); ?>
             </div>
         </div>
     </div>
@@ -614,19 +603,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
-                    <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
+                <?php renderPagination('license'); ?>
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../../models/Product.php';
 require_once __DIR__ . '/../../models/User.php';
 require_once __DIR__ . '/../../models/License.php';
+require_once __DIR__ . '/../section-helpers.php';
 $productModel = new Product();
 $userModel = new User();
 $licenseModel = new License();
@@ -324,19 +325,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button type="button" id="product-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="product-current-page">1</span> of <span id="product-total-pages">1</span></span>
-                    <button type="button" id="product-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
+                <?php renderPagination('product'); ?>
             </div>
         </div>
     </div>
@@ -527,19 +516,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         ], '10', 'wk-select--fit'); ?>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button type="button" id="user-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="user-current-page">1</span> of <span id="user-total-pages">1</span></span>
-                    <button type="button" id="user-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
+                <?php renderPagination('user'); ?>
             </div>
         </div>
 
@@ -829,8 +806,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Pagination -->
-            <div class="flex flex-col items-stretch sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 min-w-0">
                     <div class="text-sm text-white/40">
                         Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count">0</span>
                     </div>
@@ -843,30 +820,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             '100' => '100'
                         ], '10', 'wk-select--fit'); ?>
                         <?php
-                        // Manager 筛选
-                        $licenseManagerOptions = ['' => 'All Managers'];
-                        foreach ($managerUsers as $mu) {
-                            $licenseManagerOptions[$mu['id']] = $mu['username'];
-                        }
-                        renderCustomSelect('license-manager-filter', $licenseManagerOptions, '', 'w-full sm:w-40');
-                        // Reseller 筛选
-                        $licenseResellerOptions = ['' => 'All Resellers'];
-                        foreach ($resellerUsers as $ru) {
-                            $licenseResellerOptions[$ru['id']] = $ru['username'];
-                        }
-                        renderCustomSelect('license-reseller-filter', $licenseResellerOptions, '', 'w-full sm:w-40');
+                        // 角色筛选（联动下方用户筛选）
+                        renderCustomSelect('license-role-filter', [
+                            '' => 'All Roles',
+                            'manager' => 'Manager',
+                            'reseller' => 'Reseller'
+                        ], '', 'w-full sm:w-36');
+                        // 用户筛选（选项由 JS 根据 data-users-by-role 联动重建）
+                        renderCustomSelect('license-user-filter', ['' => 'All Users'], '', 'w-full sm:w-40');
                         ?>
                     </div>
                 </div>
-                <div class="flex items-center justify-center sm:justify-end gap-2 flex-shrink-0">
-                    <button type="button" id="license-prev-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        Prev
-                    </button>
-                    <span class="text-sm text-white/60 whitespace-nowrap flex-shrink-0 min-w-fit">Page <span id="license-current-page">1</span> of <span id="license-total-pages">1</span></span>
-                    <button type="button" id="license-next-page" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-sm transition disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0" disabled>
-                        Next
-                    </button>
-                </div>
+                <?php renderPagination('license'); ?>
             </div>
         </div>
     </div>
