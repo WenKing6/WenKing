@@ -617,18 +617,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Desktop Table -->
-            <div class="hidden md:block overflow-x-auto">
+            <div class="hidden md:block overflow-x-hidden">
                 <table class="w-full text-sm table-fixed">
                     <colgroup>
                         <col class="w-[4%]">
+                        <col class="w-[24%]">
+                        <col class="w-[9%]">
+                        <col class="w-[9%]">
+                        <col class="w-[9%]">
                         <col class="w-[14%]">
-                        <col class="w-[10%]">
-                        <col class="w-[11%]">
-                        <col class="w-[10%]">
-                        <col class="w-[15%]">
-                        <col class="w-[13%]">
-                        <col class="w-[13%]">
-                        <col class="w-[10%]">
+                        <col class="w-[12%]">
+                        <col class="w-[12%]">
+                        <col class="w-[7%]">
                     </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
@@ -676,7 +676,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                 <td class="py-3 px-4">
                                     <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 </td>
-                                <td class="py-3 px-4 font-mono text-sm text-white/80"><?php echo htmlspecialchars($lic['license_key']); ?></td>
+                                <td class="py-3 px-4"><span class="block font-mono text-sm text-white/80 truncate" title="<?php echo htmlspecialchars($lic['license_key']); ?>"><?php echo htmlspecialchars($lic['license_key']); ?></span></td>
                                 <td class="py-3 px-4 text-white/60"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></td>
                                 <td class="py-3 px-4 text-white/60">
                                     <?php
