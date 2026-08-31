@@ -112,6 +112,34 @@
 }
 
 /* ============================================
+   1.5 表格横向滚动条美化
+   ============================================ */
+
+.app-content .overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+    padding-bottom: 4px; /* 为滚动条留出空间，避免遮挡表格内容 */
+}
+
+.app-content .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.app-content .overflow-x-auto::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 4px;
+}
+
+.app-content .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+}
+
+.app-content .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.32);
+}
+
+/* ============================================
    2. 布局样式
    ============================================ */
 

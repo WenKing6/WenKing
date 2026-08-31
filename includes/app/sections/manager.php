@@ -412,7 +412,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
         <div class="glass-card p-6 rounded-xl">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
                 <h3 class="text-lg font-semibold text-white">License Keys (<span id="license-count">0</span>)</h3>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
                     <div class="relative w-full sm:w-56">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,18 +445,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Desktop Table -->
-            <div class="hidden md:block overflow-x-hidden">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm table-fixed">
                     <colgroup>
                         <col class="w-[4%]">
-                        <col class="w-[24%]">
+                        <col class="w-[20%]">
                         <col class="w-[9%]">
                         <col class="w-[9%]">
                         <col class="w-[9%]">
-                        <col class="w-[14%]">
+                        <col class="w-[13%]">
                         <col class="w-[12%]">
                         <col class="w-[12%]">
-                        <col class="w-[7%]">
+                        <col class="w-[12%]">
                     </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
@@ -528,8 +528,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     }
                                     ?>
                                 </td>
-                                <td class="py-3 px-4 flex gap-2">
-                                    <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                <td class="py-3 px-2 flex gap-1.5">
+                                    <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-1.5 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
