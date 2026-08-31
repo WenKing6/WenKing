@@ -446,7 +446,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
             <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm table-fixed">
+                    <colgroup>
+                        <col class="w-[4%]">
+                        <col class="w-[14%]">
+                        <col class="w-[10%]">
+                        <col class="w-[11%]">
+                        <col class="w-[10%]">
+                        <col class="w-[15%]">
+                        <col class="w-[13%]">
+                        <col class="w-[13%]">
+                        <col class="w-[10%]">
+                    </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
                             <th class="py-3 px-4 w-10">
