@@ -23,7 +23,7 @@ $currentUsername = $currentUser ? htmlspecialchars($currentUser['username']) : '
 </div>
 
 <!-- 统计卡片 -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
     <!-- 订阅状态 -->
     <div class="glass-card p-6 rounded-xl">
         <div class="flex items-center gap-3 mb-4">
@@ -86,7 +86,7 @@ $currentUsername = $currentUser ? htmlspecialchars($currentUser['username']) : '
     <h2 class="text-xl font-display font-bold mb-4 text-white">
         <span class="bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent"><?php _e('dashboard.activated_mods'); ?></span>
     </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         <!-- GTA V -->
         <div class="glass-card p-4 rounded-xl" style="background-color: rgba(255, 255, 255, 0.05);">
             <div class="flex items-center gap-4">
@@ -130,7 +130,7 @@ $currentUsername = $currentUser ? htmlspecialchars($currentUser['username']) : '
         </div>
 
         <!-- GTA VI -->
-        <div class="glass-card p-4 rounded-xl" style="background-color: rgba(255, 255, 255, 0.05);">
+        <div class="glass-card p-4 rounded-xl sm:last:col-span-2 xl:last:col-span-1" style="background-color: rgba(255, 255, 255, 0.05);">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-lg bg-accent-cyan/20 flex items-center justify-center shrink-0">
                     <svg class="w-6 h-6 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,9 +153,9 @@ $currentUsername = $currentUser ? htmlspecialchars($currentUser['username']) : '
 </div>
 
 <!-- 最近活动 & 快速操作 -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
     <!-- 最近活动 -->
-    <div class="glass-card p-6 rounded-xl lg:col-span-2">
+    <div class="glass-card p-6 rounded-xl xl:col-span-2">
         <h3 class="text-lg font-semibold mb-4 text-white"><?php _e('dashboard.recent_activity'); ?></h3>
         <div class="space-y-4">
             <div class="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
