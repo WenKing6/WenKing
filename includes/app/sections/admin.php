@@ -1044,7 +1044,7 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                 foreach ($products as $p) {
                     $lfProductOptions[$p['id']] = $p['name'];
                 }
-                renderCustomSelect('lf-product', $lfProductOptions, '', 'w-full', true);
+                renderCustomSelect('lf-product', $lfProductOptions, '', 'w-full');
                 ?>
             </div>
             <div>

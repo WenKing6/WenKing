@@ -56,9 +56,13 @@ function licenseDurationLabel(int $days): string {
 /**
  * Render a custom select dropdown (wk-select component)
  * 视觉与 .app-input 保持一致，结构支持键盘导航与选中态指示
+ *
+ * 注意：原生 select 为 display:none，不能添加 required ——
+ * 浏览器原生校验会因控件不可聚焦而静默阻断表单提交
+ * （控制台报 "An invalid form control ... is not focusable"）。
+ * 必填校验由各表单的 JS 提交逻辑负责（toast 提示）。
  */
-function renderCustomSelect(string $id, array $options, string $selected = '', string $widthClass = 'w-full', bool $required = false): void {
-    $requiredAttr = $required ? ' required' : '';
+function renderCustomSelect(string $id, array $options, string $selected = '', string $widthClass = 'w-full'): void {
     $currentLabel = $options[$selected] ?? (count($options) > 0 ? array_values($options)[0] : '');
     $currentValue = $selected;
 
@@ -69,7 +73,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
     }
 
     echo '<div class="wk-select ' . $widthClass . '" data-wk-select>';
-    echo '    <select id="' . $id . '" class="wk-select__native"' . $requiredAttr . ' aria-hidden="true" tabindex="-1">';
+    echo '    <select id="' . $id . '" class="wk-select__native" aria-hidden="true" tabindex="-1">';
     foreach ($options as $value => $label) {
         $sel = (string)$value === (string)$currentValue ? ' selected' : '';
         echo '        <option value="' . htmlspecialchars((string)$value) . '"' . $sel . '>' . htmlspecialchars($label) . '</option>';
@@ -309,7 +313,7 @@ function renderGrantQuotaModal(array $config = []): void {
                 <?php if ($showRoleSelect): ?>
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Role *</label>
-                    <?php renderCustomSelect($p . '-role', $config['roles'] ?? ['' => '-- Select Role --'], '', 'w-full', true); ?>
+                    <?php renderCustomSelect($p . '-role', $config['roles'] ?? ['' => '-- Select Role --'], '', 'w-full'); ?>
                 </div>
                 <div id="<?php echo $p; ?>-user-container" class="hidden">
                 <?php else: ?>
@@ -325,7 +329,7 @@ function renderGrantQuotaModal(array $config = []): void {
                         foreach (($config['managers'] ?? []) as $mu) {
                             $managerOptions[$mu['id']] = $mu['username'];
                         }
-                        renderCustomSelect($p . '-manager', $managerOptions, '', 'w-full', true);
+                        renderCustomSelect($p . '-manager', $managerOptions, '', 'w-full');
                         ?>
                     </div>
                     <?php endif; ?>
@@ -335,13 +339,13 @@ function renderGrantQuotaModal(array $config = []): void {
                         foreach (($config['resellers'] ?? []) as $ru) {
                             $resellerOptions[$ru['id']] = $ru['username'];
                         }
-                        renderCustomSelect($p . '-reseller', $resellerOptions, '', 'w-full', true);
+                        renderCustomSelect($p . '-reseller', $resellerOptions, '', 'w-full');
                         ?>
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
-                    <?php renderCustomSelect($p . '-product', $productOptions, '', 'w-full', true); ?>
+                    <?php renderCustomSelect($p . '-product', $productOptions, '', 'w-full'); ?>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
@@ -353,7 +357,7 @@ function renderGrantQuotaModal(array $config = []): void {
                         '90' => '90 Days',
                         '365' => '1 Year',
                         '9999' => 'Lifetime'
-                    ], '', 'w-full', true); ?>
+                    ], '', 'w-full'); ?>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
