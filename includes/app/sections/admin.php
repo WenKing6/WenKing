@@ -121,7 +121,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 </div>
 
 <!-- Tab Navigation -->
-<div class="manager-tabs mb-6 flex gap-2 border-b border-white/10">
+<div class="manager-tabs mb-6 flex flex-wrap gap-2 border-b border-white/10">
     <button class="manager-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="products">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
