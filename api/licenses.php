@@ -226,8 +226,8 @@ switch ($action) {
         break;
 
     case 'claim_keys':
-        // 经理领取钥匙：身份取自 Session，不接受外部传入 user_id（防篡改）
-        if (!$currentUser || $currentUser['role'] !== 'manager') {
+        // 经理/经销商领取钥匙：身份取自 Session，不接受外部传入 user_id（防篡改）
+        if (!$currentUser || !in_array($currentUser['role'], ['manager', 'reseller'], true)) {
             echo json_encode(['success' => false, 'message' => 'Permission denied']);
             exit;
         }

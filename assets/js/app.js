@@ -1786,6 +1786,58 @@ window.showToast = function(message, type) {
         // ============================================
         // 配额管理（Admin Grant Quota / 经理领取钥匙）
         // ============================================
+        /**
+         * 通用提交请求：带 loading / 防重复点击 / 超时提示
+         * - 提交期间禁用按钮并显示 Submitting...，避免重复提交
+         * - 30 秒超时主动中止，给出明确 toast 提示（不再无限挂起无反馈）
+         * - 返回解析后的 JSON；网络错误/超时/解析失败返回 null
+         */
+        _postFormWithFeedback(btn, body) {
+            var origHtml = btn ? btn.innerHTML : '';
+            var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            var timedOut = false;
+            var timer = null;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = 'Submitting...';
+            }
+
+            if (controller) {
+                timer = setTimeout(function() {
+                    timedOut = true;
+                    controller.abort();
+                }, 30000);
+            }
+
+            function restore() {
+                if (timer) clearTimeout(timer);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+            }
+
+            return fetch(window.SITE_URL + '/api/licenses.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body,
+                signal: controller ? controller.signal : undefined
+            })
+            .then(function(r) { return r.json(); })
+            .catch(function() {
+                restore();
+                if (typeof window.showToast === 'function') {
+                    window.showToast(timedOut ? 'Request timed out, the server may be busy. Please try again later.' : 'Network error, please try again.', 'error');
+                }
+                return null;
+            })
+            .then(function(data) {
+                restore();
+                return data;
+            });
+        }
+
         _initQuotaManagement() {
             var self = this;
 
@@ -1955,13 +2007,9 @@ window.showToast = function(message, type) {
                         '&duration_days=' + encodeURIComponent(duration) +
                         '&quantity=' + encodeURIComponent(quantity);
 
-                    fetch(window.SITE_URL + '/api/licenses.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: body
-                    })
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
+                    var submitBtn = grantForm.querySelector('button[type="submit"]');
+                    self._postFormWithFeedback(submitBtn, body).then(function(data) {
+                        if (!data) return;
                         if (data.success) {
                             if (typeof window.showToast === 'function') {
                                 window.showToast(data.message || 'Quota granted successfully', 'success');
@@ -1972,11 +2020,6 @@ window.showToast = function(message, type) {
                             if (typeof window.showToast === 'function') {
                                 window.showToast(data.message || 'Failed to grant quota', 'error');
                             }
-                        }
-                    })
-                    .catch(function() {
-                        if (typeof window.showToast === 'function') {
-                            window.showToast('Network error', 'error');
                         }
                     });
                 });
@@ -2028,13 +2071,8 @@ window.showToast = function(message, type) {
                         '&duration_days=' + state.duration +
                         '&quantity=' + qty;
 
-                    fetch(window.SITE_URL + '/api/licenses.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: body
-                    })
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
+                    self._postFormWithFeedback(claimSubmit, body).then(function(data) {
+                        if (!data) return;
                         if (data.success) {
                             if (typeof window.showToast === 'function') {
                                 window.showToast(data.message || 'Keys claimed successfully', 'success');
@@ -2045,11 +2083,6 @@ window.showToast = function(message, type) {
                             if (typeof window.showToast === 'function') {
                                 window.showToast(data.message || 'Claim failed', 'error');
                             }
-                        }
-                    })
-                    .catch(function() {
-                        if (typeof window.showToast === 'function') {
-                            window.showToast('Network error', 'error');
                         }
                     });
                 });

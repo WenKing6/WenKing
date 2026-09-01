@@ -76,7 +76,8 @@ CREATE TABLE IF NOT EXISTS `licenses` (
     KEY `idx_product_id` (`product_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_status` (`status`),
-    KEY `idx_expires_at` (`expires_at`)
+    KEY `idx_expires_at` (`expires_at`),
+    KEY `idx_claim_lookup` (`product_id`, `duration_days`, `status`, `user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 站点设置表（Settings 页网站名称/图标等配置，key-value）

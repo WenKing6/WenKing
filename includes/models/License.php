@@ -14,6 +14,7 @@ class License {
         $this->db = Database::getInstance()->getPdo();
         if (!self::$allocationTableChecked) {
             $this->ensureAllocationTable();
+            $this->ensureClaimIndex();
             self::$allocationTableChecked = true;
         }
     }
@@ -38,6 +39,31 @@ class License {
             UNIQUE KEY `uk_user_product_duration` (`user_id`, `product_id`, `duration_days`),
             KEY `idx_alloc_user` (`user_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    }
+
+    /**
+     * 确保 licenses 表存在领取查询复合索引（幂等自愈迁移）
+     * claimKeys 的 SELECT ... FOR UPDATE 按 (product_id, duration_days, status, user_id) 精确锁定，
+     * 缺失该索引时会走近似全表扫描并放大锁范围，导致并发下长时间锁等待
+     */
+    private function ensureClaimIndex(): void {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) FROM information_schema.statistics
+                WHERE table_schema = DATABASE()
+                  AND table_name = 'licenses'
+                  AND index_name = 'idx_claim_lookup'
+            ");
+            $stmt->execute();
+            if ((int)$stmt->fetchColumn() === 0) {
+                $this->db->exec("
+                    ALTER TABLE `licenses`
+                    ADD INDEX `idx_claim_lookup` (`product_id`, `duration_days`, `status`, `user_id`)
+                ");
+            }
+        } catch (PDOException $e) {
+            // 索引创建失败不阻断业务（例如权限不足），仅保留原查询路径
+        }
     }
 
     /**

@@ -17,7 +17,7 @@ $users = $userModel->getAll();
 $sessionUserId = (int)($_SESSION['user_id'] ?? 0);
 $currentUser = $sessionUserId > 0 ? $userModel->findById($sessionUserId) : null;
 $currentRole = $currentUser ? $currentUser['role'] : '';
-$isManagerView = $currentRole === 'manager';
+$isManagerView = in_array($currentRole, ['manager', 'reseller'], true);
 $isAdminView = $currentRole === 'admin';
 $canViewLicenses = $isManagerView || $isAdminView;
 
