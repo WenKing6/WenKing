@@ -10,7 +10,7 @@
     <p class="text-white/60"><?php _e('redeem.subtitle'); ?></p>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
     <!-- Redeem Form -->
     <div class="glass-card p-8 rounded-xl">
         <div class="space-y-6">

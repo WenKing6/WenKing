@@ -188,7 +188,15 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 
             <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm table-fixed">
+                    <colgroup>
+                        <col class="w-[20%]">
+                        <col class="w-[26%]">
+                        <col class="w-[12%]">
+                        <col class="w-[12%]">
+                        <col class="w-[16%]">
+                        <col class="w-[14%]">
+                    </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
                             <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('username')">Username</th>
@@ -213,7 +221,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             <?php foreach ($users as $u): ?>
                             <tr class="user-row border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
                                 <td class="py-3 px-4 font-medium text-white user-cell-username"><?php echo htmlspecialchars($u['username']); ?></td>
-                                <td class="py-3 px-4 text-white/60 user-cell-email"><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td class="py-3 px-4 text-white/60 user-cell-email"><span class="block truncate"><?php echo htmlspecialchars($u['email']); ?></span></td>
                                 <td class="py-3 px-4 user-cell-role">
                                     <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
                                         <?php echo ucfirst($u['role']); ?>
@@ -225,13 +233,13 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-white/40 user-cell-created"><?php echo date('Y-m-d', strtotime($u['created_at'])); ?></td>
-                                <td class="py-3 px-4 flex gap-2">
-                                    <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                <td class="py-3 px-2 flex gap-1.5">
+                                    <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </button>
-                                    <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                    <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                         </svg>
@@ -333,7 +341,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 No quota has been allocated to you yet. Contact your admin to grant a quota.
             </div>
             <?php else: ?>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="manager-quota-list">
+            <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4" id="manager-quota-list">
                 <?php foreach ($allocations as $alloc):
                     $total = (int)$alloc['quantity'];
                     $used = (int)$alloc['used_count'];

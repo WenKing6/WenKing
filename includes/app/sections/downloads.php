@@ -11,7 +11,7 @@
 </div>
 
 <!-- 产品下载列表 -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <!-- GTA V Menu -->
     <div class="glass-card p-6 rounded-xl">
         <div class="flex items-start justify-between mb-4">

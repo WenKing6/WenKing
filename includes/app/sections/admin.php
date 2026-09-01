@@ -395,8 +395,16 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Desktop Table -->
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm">
+            <div class="hidden 2xl:block overflow-x-auto">
+                <table class="w-full text-sm table-fixed">
+                    <colgroup>
+                        <col class="w-[20%]">
+                        <col class="w-[26%]">
+                        <col class="w-[12%]">
+                        <col class="w-[12%]">
+                        <col class="w-[16%]">
+                        <col class="w-[14%]">
+                    </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
                             <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('username')">Username</th>
@@ -421,7 +429,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                             <?php foreach ($users as $u): ?>
                             <tr class="user-row border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
                                 <td class="py-3 px-4 font-medium text-white user-cell-username"><?php echo htmlspecialchars($u['username']); ?></td>
-                                <td class="py-3 px-4 text-white/60 user-cell-email"><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td class="py-3 px-4 text-white/60 user-cell-email"><span class="block truncate"><?php echo htmlspecialchars($u['email']); ?></span></td>
                                 <td class="py-3 px-4 user-cell-role">
                                     <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
                                         <?php echo ucfirst($u['role']); ?>
@@ -433,13 +441,13 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-white/40 user-cell-created"><?php echo date('Y-m-d', strtotime($u['created_at'])); ?></td>
-                                <td class="py-3 px-4 flex gap-2">
-                                    <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                <td class="py-3 px-2 flex gap-1.5">
+                                    <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </button>
-                                    <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                    <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                         </svg>
@@ -452,10 +460,10 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 </table>
             </div>
 
-            <!-- Mobile Card List -->
-            <div class="md:hidden space-y-3" id="user-cards">
+            <!-- Card List (Mobile + iPad) -->
+            <div class="2xl:hidden grid grid-cols-1 md:grid-cols-2 gap-3" id="user-cards">
                 <?php if (empty($users)): ?>
-                <div class="text-center py-12 text-white/40">
+                <div class="text-center py-12 text-white/40 md:col-span-2">
                     <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
@@ -463,13 +471,14 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 </div>
                 <?php else: ?>
                     <?php foreach ($users as $u): ?>
-                    <div class="user-card bg-white/5 rounded-xl p-4 border border-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="min-w-0 flex-1">
-                                <div class="font-semibold text-white user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
-                                <div class="text-sm text-white/50 user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
+                    <div class="user-card bg-white/[0.03] hover:bg-white/[0.06] rounded-xl p-5 border border-white/5 hover:border-white/10 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple/30 to-accent-cyan/20 flex items-center justify-center text-sm font-bold text-white/80 shrink-0"><?php echo strtoupper(substr($u['username'], 0, 1)); ?></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-white truncate user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
+                                <div class="text-xs text-white/40 truncate user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
                             </div>
-                            <div class="flex flex-col items-end gap-1">
+                            <div class="flex flex-col items-end gap-1.5 shrink-0">
                                 <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
                                     <?php echo ucfirst($u['role']); ?>
                                 </span>
@@ -478,18 +487,18 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                 </span>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between pt-3 border-t border-white/5">
                             <span class="text-xs text-white/40 user-card-created">
                                 <?php echo date('Y-m-d', strtotime($u['created_at'])); ?>
                             </span>
-                            <div class="flex gap-2">
-                                <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex gap-1.5">
+                                <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2.5 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                 </button>
-                                <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2.5 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                     </svg>
                                 </button>
@@ -617,7 +626,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
 
             <!-- Desktop Table -->
-            <div class="hidden md:block overflow-x-auto">
+            <div class="hidden 2xl:block overflow-x-auto">
                 <table class="w-full text-sm table-fixed">
                     <colgroup>
                         <col class="w-[4%]">
@@ -736,10 +745,10 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                 </table>
             </div>
 
-            <!-- Mobile Card List -->
-            <div class="md:hidden space-y-3" id="license-cards">
+            <!-- Card List (Mobile + iPad) -->
+            <div class="2xl:hidden grid grid-cols-1 md:grid-cols-2 gap-3" id="license-cards">
                 <?php if (empty($licenses)): ?>
-                <div class="text-center py-12 text-white/40">
+                <div class="text-center py-12 text-white/40 md:col-span-2">
                     <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
                     </svg>
@@ -755,28 +764,30 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                     ?>
                     <?php foreach ($licenses as $lic): ?>
                     <?php $userRole = !empty($lic['user_id']) ? ($userRoleMap[$lic['user_id']] ?? null) : null; ?>
-                    <div class="bg-white/5 rounded-xl p-4 border border-white/5"
+                    <div class="license-card bg-white/[0.03] hover:bg-white/[0.06] rounded-xl p-5 border border-white/5 hover:border-white/10 transition"
                          data-id="<?php echo $lic['id']; ?>"
                          data-product-id="<?php echo $lic['product_id']; ?>"
+                         data-key="<?php echo htmlspecialchars($lic['license_key']); ?>"
+                         data-status="<?php echo $lic['status']; ?>"
                          <?php if ($userRole === 'manager'): ?>
                          data-manager-id="<?php echo $lic['user_id']; ?>"
                          <?php elseif ($userRole === 'reseller'): ?>
                          data-reseller-id="<?php echo $lic['user_id']; ?>"
                          <?php endif; ?>>
-                        <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex items-start gap-3 flex-1 min-w-0">
                                 <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
                                 <div class="flex-1 min-w-0">
                                     <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
-                                    <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
+                                    <div class="text-xs text-white/50 mt-1 truncate"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
                                 </div>
                             </div>
                             <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs shrink-0">
                                 <?php echo ucfirst($lic['status']); ?>
                             </span>
                         </div>
-                        <div class="flex items-center justify-between text-xs text-white/40">
-                            <div class="flex gap-3">
+                        <div class="flex items-center justify-between text-xs text-white/40 pt-3 border-t border-white/5">
+                            <div class="flex gap-3 min-w-0">
                                 <?php
                                 $days = (int)$lic['duration_days'];
                                 if ($days === 1) $durationText = '1 Day';
@@ -787,8 +798,8 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                 elseif ($days >= 9999) $durationText = 'Lifetime';
                                 else $durationText = $days . ' Days';
                                 ?>
-                                <span><?php echo $durationText; ?></span>
-                                <span>
+                                <span class="shrink-0"><?php echo $durationText; ?></span>
+                                <span class="truncate">
                                     <?php if ($lic['user_id']): ?>
                                         <?php echo htmlspecialchars($lic['user_name'] ?? 'Unknown'); ?>
                                     <?php else: ?>
@@ -796,16 +807,16 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                                     <?php endif; ?>
                                 </span>
                             </div>
-                            <div class="flex items-center shrink-0">
+                            <div class="flex items-center shrink-0 gap-1">
                                 <?php if ($lic['user_id'] && $lic['status'] === 'unused'): ?>
-                                <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-2 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-2.5 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
                                 </button>
                                 <?php endif; ?>
-                                <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2.5 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
                                 </button>
@@ -868,7 +879,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Site Icon Upload -->
             <div class="rounded-xl bg-white/5 border border-white/5 p-6">
                 <div class="flex items-center gap-3 mb-5">

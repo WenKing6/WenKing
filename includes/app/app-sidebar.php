@@ -16,17 +16,17 @@ try {
 ?>
 
 <!-- 移动端汉堡按钮 -->
-<button id="sidebar-toggle" class="sidebar-toggle lg:hidden fixed top-4 left-4 z-50 p-2 bg-bg-secondary/80 backdrop-blur-md border border-white/10 rounded-lg hover:bg-white/5 transition">
+<button id="sidebar-toggle" class="sidebar-toggle 2xl:hidden fixed top-4 left-4 z-50 p-2 bg-bg-secondary/80 backdrop-blur-md border border-white/10 rounded-lg hover:bg-white/5 transition">
     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
     </svg>
 </button>
 
 <!-- 移动端遮罩层 -->
-<div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 invisible transition-opacity duration-300"></div>
+<div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 2xl:hidden opacity-0 invisible transition-opacity duration-300"></div>
 
 <!-- 侧边栏 -->
-<aside id="app-sidebar" class="app-sidebar fixed left-0 top-0 h-full w-64 bg-bg-secondary/80 backdrop-blur-md border-r border-white/10 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+<aside id="app-sidebar" class="app-sidebar fixed left-0 top-0 h-full w-64 bg-bg-secondary/80 backdrop-blur-md border-r border-white/10 z-40 transform -translate-x-full 2xl:translate-x-0 transition-transform duration-300">
     <!-- Logo 区域 -->
     <div class="p-6 border-b border-white/10">
         <a href="<?php echo SITE_URL; ?>/index.php" class="flex items-center gap-3 hover:opacity-80 transition">

@@ -1592,6 +1592,40 @@ window.showToast = function(message, type) {
                 row.style.display = '';
             });
 
+            // 卡片视图（iPad/移动端）同步筛选与分页
+            var cardsContainer = document.getElementById('license-cards');
+            if (cardsContainer) {
+                var allCards = Array.from(cardsContainer.querySelectorAll('.license-card'));
+                var visibleCards = [];
+
+                allCards.forEach(function(card) {
+                    var keyText = (card.getAttribute('data-key') || '').toLowerCase();
+                    var statusText = (card.getAttribute('data-status') || '').toLowerCase();
+
+                    var matchSearch = !searchTerm || keyText.includes(searchTerm);
+                    var matchProduct = !productValue || card.getAttribute('data-product-id') === productValue;
+                    var matchStatus = !statusValue || statusText.includes(statusValue);
+
+                    var cardRole = card.hasAttribute('data-manager-id') ? 'manager'
+                        : (card.hasAttribute('data-reseller-id') ? 'reseller' : '');
+                    var matchRole = !roleValue || cardRole === roleValue;
+
+                    var cardUserId = card.getAttribute('data-manager-id') || card.getAttribute('data-reseller-id') || '';
+                    var matchUser = !userValue || cardUserId === userValue;
+
+                    if (matchSearch && matchProduct && matchStatus && matchRole && matchUser) {
+                        visibleCards.push(card);
+                    }
+                });
+
+                allCards.forEach(function(card) {
+                    card.style.display = 'none';
+                });
+                visibleCards.slice(startIndex, endIndex).forEach(function(card) {
+                    card.style.display = '';
+                });
+            }
+
             // 更新分页信息
             this._updateLicensePagination(visibleRows.length, currentPage, perPage);
 

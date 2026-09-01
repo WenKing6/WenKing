@@ -261,7 +261,7 @@
             <div class="space-y-4">
                 <!-- License Card 1 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-ABCD-1234</code>
@@ -300,7 +300,7 @@
 
                 <!-- License Card 2 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-EFGH-5678</code>
@@ -339,7 +339,7 @@
 
                 <!-- License Card 3 -->
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
                             <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-IJKL-9012</code>

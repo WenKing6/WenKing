@@ -145,7 +145,7 @@ textarea:focus {
 }
 
 /* 响应式表格 */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .overflow-x-auto {
         overflow-x: auto;
     }
