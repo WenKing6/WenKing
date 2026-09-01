@@ -1057,7 +1057,7 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                     '90' => '90 Days',
                     '365' => '1 Year',
                     '9999' => 'Lifetime'
-                ], '', 'w-full', true); ?>
+                ], '', 'w-full'); ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-white/70 mb-2">Assign Role *</label>
@@ -1065,7 +1065,7 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                     'admin' => 'Admin',
                     'manager' => 'Manager',
                     'reseller' => 'Reseller'
-                ], 'admin', 'w-full', true); ?>
+                ], 'admin', 'w-full'); ?>
             </div>
             <div id="lf-user-container" style="display: none;">
                 <label class="block text-sm font-medium text-white/70 mb-2">Assign User *</label>
