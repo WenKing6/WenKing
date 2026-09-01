@@ -282,7 +282,7 @@ foreach ($allocations as $a) {
 
         <!-- My Quota Panel（共享渲染：配额卡片 + Create License + 分配许可证） -->
         <?php if ($canViewLicenses): ?>
-        <?php renderQuotaPanel($allocations, $vis, ['list_id' => 'manager-quota-list', 'grant_label' => 'Assign to Reseller']); ?>
+        <?php renderQuotaPanel($allocations, $vis, ['grant_label' => 'Assign to Reseller']); ?>
         <?php endif; ?>
 
         <!-- Statistics Cards -->

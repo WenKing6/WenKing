@@ -50,7 +50,7 @@ $licenseBadgeMap = [
 
 <!-- My Quota + Create License（LicenseModule 共享渲染）
      置于标签容器之外：默认标签是 Customers，若放在 Licenses 标签内则默认不可见 -->
-<?php renderQuotaPanel($allocations, $vis, ['list_id' => 'reseller-quota-list']); ?>
+<?php renderQuotaPanel($allocations, $vis); ?>
 
 <!-- Tab Navigation -->
 <div class="reseller-tabs mb-6 flex gap-2 border-b border-white/10">

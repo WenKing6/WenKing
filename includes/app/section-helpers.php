@@ -111,14 +111,15 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
  * @param array $allocations 当前用户配额列表（License::getAllocations 结构）
  * @param array $vis         LicenseModule::getUiVisibility($role) 输出
  * @param array $options     可选配置：
- *                           - list_id       string 配额卡片容器 id（默认 quota-list）
  *                           - grant_label   string 「分配许可证」按钮文案
+ *
+ * 说明：配额不再以卡片形式单独展示，配额选择统一收进 Create License 弹窗
+ * （renderClaimKeysModal 的配额下拉），面板仅保留入口按钮与汇总信息。
  */
 function renderQuotaPanel(array $allocations, array $vis, array $options = []): void {
     if (empty($vis['quota_panel'])) {
         return;
     }
-    $listId = $options['list_id'] ?? 'quota-list';
     $grantTargets = $vis['grant_quota_targets'] ?? [];
     ?>
     <div class="glass-card p-6 rounded-xl mb-6">
@@ -151,28 +152,18 @@ function renderQuotaPanel(array $allocations, array $vis, array $options = []): 
             No quota has been allocated to you yet. Contact your admin to grant a quota.
         </div>
         <?php else: ?>
-        <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4" id="<?php echo htmlspecialchars($listId); ?>">
-            <?php foreach ($allocations as $alloc):
-                $total = (int)$alloc['quantity'];
-                $used = (int)$alloc['used_count'];
-                $remaining = $total - $used;
-            ?>
-            <div class="bg-white/5 rounded-xl p-4 border border-white/5">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="font-semibold text-white truncate"><?php echo htmlspecialchars($alloc['product_name'] ?? 'N/A'); ?></span>
-                    <span class="text-xs text-accent-cyan shrink-0 ml-2"><?php echo licenseDurationLabel((int)$alloc['duration_days']); ?></span>
-                </div>
-                <div class="text-xs text-white/40 mb-3">
-                    Total <span class="text-white/80"><?php echo $total; ?></span> &middot; Claimed <span class="text-white/80"><?php echo $used; ?></span> &middot; Remaining <span class="text-accent-cyan"><?php echo $remaining; ?></span>
-                </div>
-                <?php if (!empty($vis['create_license_btn'])): ?>
-                <button type="button" class="btn-claim-keys w-full px-4 py-2 rounded-lg font-semibold text-sm btn-primary <?php echo $remaining <= 0 ? 'opacity-40 cursor-not-allowed' : ''; ?>" data-product-id="<?php echo (int)$alloc['product_id']; ?>" data-duration="<?php echo (int)$alloc['duration_days']; ?>" data-product-name="<?php echo htmlspecialchars($alloc['product_name'] ?? ''); ?>" data-duration-label="<?php echo licenseDurationLabel((int)$alloc['duration_days']); ?>" data-remaining="<?php echo $remaining; ?>" <?php echo $remaining <= 0 ? 'disabled' : ''; ?>>
-                    Claim Keys
-                </button>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
+        <?php
+        // 配额明细不再单独展示卡片，配额选择统一收进 Create License 弹窗
+        $totalRemaining = 0;
+        foreach ($allocations as $alloc) {
+            $totalRemaining += max(0, (int)$alloc['quantity'] - (int)$alloc['used_count']);
+        }
+        ?>
+        <p class="text-sm text-white/50">
+            <span class="text-white/80 font-semibold"><?php echo count($allocations); ?></span> quota(s)
+            &middot; <span class="text-accent-cyan font-semibold"><?php echo $totalRemaining; ?></span> key(s) remaining
+            — click "Create License" to claim keys from inventory.
+        </p>
         <?php endif; ?>
     </div>
     <?php
