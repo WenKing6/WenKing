@@ -4,9 +4,13 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
+// API 响应禁止缓存（防止浏览器用旧缓存掩盖服务端行为变化）
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/models/License.php';
 require_once __DIR__ . '/../includes/models/User.php';
+require_once __DIR__ . '/../includes/services/LicenseModule.php';
 
 // 当前登录用户（Session + 数据库角色校验，防止 URL 参数篡改）
 if (session_status() === PHP_SESSION_NONE) {
@@ -26,17 +30,31 @@ function requireRole(?array $currentUser, string $role): void {
     }
 }
 
+/**
+ * 登录校验：未登录直接拒绝（所有 action 的最低要求，防止游客越权操作许可证数据）
+ */
+function requireLogin(?array $currentUser): void {
+    if (!$currentUser) {
+        echo json_encode(['success' => false, 'message' => 'Please sign in']);
+        exit;
+    }
+}
+
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 $license = new License();
 
 switch ($action) {
     case 'list':
+        // 钥匙全表含敏感数据，仅管理员可拉取
+        requireRole($currentUser, 'admin');
         $items = $license->getAll();
         $stats = $license->getStats();
         echo json_encode(['success' => true, 'data' => $items, 'stats' => $stats]);
         break;
 
     case 'create':
+        // 生成新钥匙入库：仅管理员
+        requireRole($currentUser, 'admin');
         $data = [
             'license_key' => trim($_POST['license_key'] ?? ''),
             'product_id' => (int)($_POST['product_id'] ?? 0),
@@ -61,6 +79,8 @@ switch ($action) {
         break;
 
     case 'batch_create':
+        // 批量生成新钥匙入库：仅管理员
+        requireRole($currentUser, 'admin');
         // Batch create licenses
         $licensesData = json_decode($_POST['licenses'] ?? '[]', true);
         
@@ -96,6 +116,7 @@ switch ($action) {
         break;
 
     case 'update':
+        requireRole($currentUser, 'admin');
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             echo json_encode(['success' => false, 'message' => 'Invalid license ID']);
@@ -115,6 +136,7 @@ switch ($action) {
         break;
 
     case 'activate':
+        requireRole($currentUser, 'admin');
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             echo json_encode(['success' => false, 'message' => 'Invalid license ID']);
@@ -126,6 +148,7 @@ switch ($action) {
         break;
 
     case 'delete':
+        requireRole($currentUser, 'admin');
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             echo json_encode(['success' => false, 'message' => 'Invalid license ID']);
@@ -137,6 +160,7 @@ switch ($action) {
         break;
 
     case 'batch_delete':
+        requireRole($currentUser, 'admin');
         $ids = json_decode($_POST['ids'] ?? '[]', true);
         if (!is_array($ids) || empty($ids)) {
             echo json_encode(['success' => false, 'message' => 'No license IDs provided']);
@@ -148,6 +172,7 @@ switch ($action) {
         break;
 
     case 'get_by_product_user':
+        requireLogin($currentUser);
         $productId = (int)($_GET['product_id'] ?? 0);
         $userId = (int)($_GET['user_id'] ?? 0);
         
@@ -178,25 +203,22 @@ switch ($action) {
         break;
 
     case 'create_allocation':
-        requireRole($currentUser, 'admin');
+        requireLogin($currentUser);
         $userId = (int)($_POST['user_id'] ?? 0);
         $productId = (int)($_POST['product_id'] ?? 0);
         $durationDays = (int)($_POST['duration_days'] ?? 0);
         $quantity = (int)($_POST['quantity'] ?? 0);
 
-        if ($userId <= 0 || $productId <= 0 || $durationDays <= 0 || $quantity <= 0) {
-            echo json_encode(['success' => false, 'message' => 'All fields are required']);
-            exit;
-        }
-
-        // 配额只能给经理角色
-        $target = $userModel->findById($userId);
-        if (!$target || $target['role'] !== 'manager') {
-            echo json_encode(['success' => false, 'message' => 'Quota can only be granted to a Manager']);
-            exit;
-        }
-
-        echo json_encode($license->createAllocation($userId, $productId, $durationDays, $quantity));
+        // 权限与划转规则统一由 LicenseModule 权限矩阵决定：
+        // admin → manager/reseller（直接授权）；manager → reseller（从自己剩余配额划转）
+        $licenseModule = new LicenseModule();
+        echo json_encode($licenseModule->grantQuota(
+            ['id' => $currentUserId, 'role' => $currentUser['role']],
+            $userId,
+            $productId,
+            $durationDays,
+            $quantity
+        ));
         break;
 
     case 'delete_allocation':
@@ -226,19 +248,20 @@ switch ($action) {
         break;
 
     case 'claim_keys':
-        // 经理/经销商领取钥匙：身份取自 Session，不接受外部传入 user_id（防篡改）
-        if (!$currentUser || !in_array($currentUser['role'], ['manager', 'reseller'], true)) {
-            echo json_encode(['success' => false, 'message' => 'Permission denied']);
-            exit;
-        }
+        // 领取钥匙（Create License）：身份取自 Session，不接受外部传入 user_id（防篡改）；
+        // 可领取角色（manager/reseller）由 LicenseModule 权限矩阵决定
+        requireLogin($currentUser);
         $productId = (int)($_POST['product_id'] ?? 0);
         $durationDays = (int)($_POST['duration_days'] ?? 0);
         $quantity = (int)($_POST['quantity'] ?? 0);
-        if ($productId <= 0 || $durationDays <= 0 || $quantity <= 0) {
-            echo json_encode(['success' => false, 'message' => 'Product, duration and quantity are required']);
-            exit;
-        }
-        echo json_encode($license->claimKeys($currentUserId, $productId, $durationDays, $quantity));
+
+        $licenseModule = new LicenseModule();
+        echo json_encode($licenseModule->claim(
+            ['id' => $currentUserId, 'role' => $currentUser['role']],
+            $productId,
+            $durationDays,
+            $quantity
+        ));
         break;
 
     case 'recycle':

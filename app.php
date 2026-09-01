@@ -11,6 +11,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 禁止浏览器缓存动态页面（确保功能修复/更新立即生效，避免新旧 HTML/JS 混用）
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // PHP 端 SSR 路由（避免首屏闪烁）
 $allowed_pages = ['dashboard', 'settings', 'downloads', 'redeem', 'reseller', 'manager', 'admin'];
 $current_page = $_GET['page'] ?? 'dashboard';

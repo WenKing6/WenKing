@@ -1,7 +1,45 @@
 <?php
 /**
  * Reseller Page - Reseller Management Panel
+ * Licenses 标签接入 LicenseModule 共享渲染：
+ *   - My Quota 配额面板（配额卡片 + Create License 按钮）
+ *   - My Licenses（真实钥匙数据）
+ *   - Create License 领取卡片弹窗（renderClaimKeysModal）
+ * 页面可见性由 LicenseModule::getUiVisibility($role) 决定。
  */
+require_once __DIR__ . '/../../models/User.php';
+require_once __DIR__ . '/../../models/License.php';
+require_once __DIR__ . '/../section-helpers.php';
+
+// 当前用户识别：Session + 数据库角色校验（不信任 URL 参数，防篡改）
+$userModel = new User();
+$licenseModel = new License();
+$sessionUserId = (int)($_SESSION['user_id'] ?? 0);
+$currentUser = $sessionUserId > 0 ? $userModel->findById($sessionUserId) : null;
+$currentRole = $currentUser ? $currentUser['role'] : '';
+
+// 页面可见性配置（权限矩阵唯一来源：LicenseModule）
+$vis = LicenseModule::getUiVisibility($currentRole);
+
+// 管理员可查看全部（审计）；经理/经销商只看自己的
+if ($currentRole === 'admin') {
+    $allocations = $licenseModel->getAllocations();
+    $myLicenses = $licenseModel->getAll();
+} elseif ($vis['license_scope'] === 'own') {
+    $allocations = $licenseModel->getAllocations($sessionUserId);
+    $myLicenses = $licenseModel->getByUser($sessionUserId);
+} else {
+    $allocations = [];
+    $myLicenses = [];
+}
+
+// 钥匙状态徽章映射
+$licenseBadgeMap = [
+    'unused'   => ['status-updating', 'Unused'],
+    'active'   => ['status-online', 'Active'],
+    'expired'  => ['status-updating', 'Expired'],
+    'disabled' => ['status-updating', 'Disabled'],
+];
 ?>
 <div class="app-page-header mb-8">
     <h1 class="text-3xl font-display font-bold mb-2">
@@ -26,7 +64,7 @@
     </button>
     <button class="reseller-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="settings">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 01-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
         <?php _e('reseller.settings'); ?>
@@ -246,144 +284,53 @@
             </div>
         </div>
 
-        <!-- License Allocation Records - Card Layout -->
+        <!-- My Quota + Create License（LicenseModule 共享渲染） -->
+        <?php renderQuotaPanel($allocations, $vis, ['list_id' => 'reseller-quota-list']); ?>
+
+        <!-- My Licenses - Card Layout（真实数据） -->
         <div class="glass-card p-6 rounded-xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-white"><?php _e('reseller.allocation_records'); ?></h3>
-                <button class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <?php _e('reseller.generate_license'); ?>
-                </button>
+                <span class="text-sm text-white/40"><?php echo count($myLicenses); ?> key(s)</span>
             </div>
 
+            <?php if (empty($myLicenses)): ?>
+            <div class="text-center py-8 text-white/40">
+                No licenses yet. Click "Create License" to claim keys from inventory within your quota.
+            </div>
+            <?php else: ?>
             <div class="space-y-4">
-                <!-- License Card 1 -->
+                <?php foreach ($myLicenses as $lic):
+                    $badge = $licenseBadgeMap[$lic['status']] ?? ['status-updating', ucfirst($lic['status'])];
+                ?>
                 <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
                     <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
-                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-ABCD-1234</code>
+                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan"><?php echo htmlspecialchars($lic['license_key']); ?></code>
                         </div>
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
-                            <div class="text-sm text-white">GTA V Menu</div>
+                            <div class="text-sm text-white"><?php echo htmlspecialchars(($lic['product_name'] ?? 'N/A') . ' (' . licenseDurationLabel((int)$lic['duration_days']) . ')'); ?></div>
                         </div>
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
-                            <div class="text-sm text-white/60">JohnDoe</div>
+                            <div class="text-sm text-white/60"><?php echo htmlspecialchars($lic['user_name'] ?? '—'); ?></div>
                         </div>
                         <div>
                             <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
-                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-01-15</div>
-                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2025-01-15</div>
+                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: <?php echo !empty($lic['activated_at']) ? date('Y-m-d', strtotime($lic['activated_at'])) : '—'; ?></div>
+                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: <?php echo !empty($lic['expires_at']) ? date('Y-m-d', strtotime($lic['expires_at'])) : '—'; ?></div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
-                        <div class="flex gap-2">
-                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
-                            <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Revoke">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                                </svg>
-                            </button>
-                        </div>
+                        <span class="status-badge <?php echo $badge[0]; ?> text-xs"><?php echo $badge[1]; ?></span>
+                        <div class="text-xs text-white/40">Created: <?php echo date('Y-m-d', strtotime($lic['created_at'])); ?></div>
                     </div>
                 </div>
-
-                <!-- License Card 2 -->
-                <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
-                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-EFGH-5678</code>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
-                            <div class="text-sm text-white">RDR2 Mod</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
-                            <div class="text-sm text-white/60">AliceSmith</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
-                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-02-20</div>
-                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2024-08-20</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-online text-xs"><?php _e('reseller.active'); ?></span>
-                        <div class="flex gap-2">
-                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
-                            <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Revoke">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- License Card 3 -->
-                <div class="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.license_key'); ?></div>
-                            <code class="text-xs bg-white/10 px-2 py-1 rounded text-accent-cyan">WK-2024-IJKL-9012</code>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.product'); ?></div>
-                            <div class="text-sm text-white">GTA VI Beta</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.assigned_to'); ?></div>
-                            <div class="text-sm text-white/60">BobWilson</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-white/40 mb-1"><?php _e('reseller.time'); ?></div>
-                            <div class="text-sm text-white"><?php _e('reseller.activated'); ?>: 2024-03-10</div>
-                            <div class="text-xs text-white/60"><?php _e('reseller.expires'); ?>: 2024-06-10</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                        <span class="status-badge status-updating text-xs"><?php _e('reseller.expired'); ?></span>
-                        <div class="flex gap-2">
-                            <button class="text-white/40 hover:text-accent-purple transition p-2 rounded-lg hover:bg-white/5" title="View Details">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
-                            <button class="text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Revoke">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-
-            <div class="mt-6 flex items-center justify-between">
-                <div class="text-sm text-white/60"><?php _e('reseller.showing'); ?></div>
-                <div class="flex gap-2">
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.previous'); ?></button>
-                    <button class="px-3 py-1 rounded bg-white/5 text-white/40 cursor-not-allowed"><?php _e('reseller.next'); ?></button>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -491,3 +438,5 @@
         </div>
     </div>
 </div>
+
+<?php renderClaimKeysModal($allocations); ?>

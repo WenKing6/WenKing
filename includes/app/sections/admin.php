@@ -25,6 +25,7 @@ $currentIcon = $siteIcon ? SITE_URL . $siteIcon : SITE_URL . '/assets/images/gta
 // 当前用户识别：Session + 数据库角色校验（防篡改）
 $sessionUserId = (int)($_SESSION['user_id'] ?? 0);
 $currentUser = $sessionUserId > 0 ? $userModel->findById($sessionUserId) : null;
+$currentRole = $currentUser ? $currentUser['role'] : '';
 $isAdmin = $currentUser && $currentUser['role'] === 'admin';
 
 // 配额数据（仅管理员展示配额管理）
@@ -34,19 +35,6 @@ $allocations = $isAdmin ? $licenseModel->getAllocations() : [];
 $managerUsers = array_filter($users, fn($u) => $u['role'] === 'manager');
 // Reseller 用户列表（Grant Quota 弹窗用）
 $resellerUsers = array_filter($users, fn($u) => $u['role'] === 'reseller');
-
-/**
- * 时长显示标签
- */
-function licenseDurationLabel(int $days): string {
-    if ($days === 1) return '1 Day';
-    if ($days === 7) return '7 Days';
-    if ($days === 30) return '30 Days';
-    if ($days === 90) return '90 Days';
-    if ($days === 365) return '1 Year';
-    if ($days >= 9999) return 'Lifetime';
-    return $days . ' Days';
-}
 
 // Group users by role for license assignment
 $usersByRole = [];
@@ -62,53 +50,8 @@ foreach ($users as $u) {
     ];
 }
 
-/**
- * Render a custom select dropdown (wk-select component)
- * 视觉与 .app-input 保持一致，结构支持键盘导航与选中态指示
- */
-function renderCustomSelect(string $id, array $options, string $selected = '', string $widthClass = 'w-full', bool $required = false): void {
-    $requiredAttr = $required ? ' required' : '';
-    $currentLabel = $options[$selected] ?? (count($options) > 0 ? array_values($options)[0] : '');
-    $currentValue = $selected;
-
-    // 当未指定选中值或选中值不存在时，默认选中第一个选项
-    if (!array_key_exists($selected, $options) && count($options) > 0) {
-        $currentValue = array_key_first($options);
-        $currentLabel = $options[$currentValue];
-    }
-
-    echo '<div class="wk-select ' . $widthClass . '" data-wk-select>';
-    echo '    <select id="' . $id . '" class="wk-select__native"' . $requiredAttr . ' aria-hidden="true" tabindex="-1">';
-    foreach ($options as $value => $label) {
-        $sel = (string)$value === (string)$currentValue ? ' selected' : '';
-        echo '        <option value="' . htmlspecialchars((string)$value) . '"' . $sel . '>' . htmlspecialchars($label) . '</option>';
-    }
-    echo '    </select>';
-    echo '    <button type="button" class="wk-select__trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="' . $id . '-label">';
-    echo '        <span class="wk-select__value" id="' . $id . '-label">' . htmlspecialchars($currentLabel) . '</span>';
-    echo '        <svg class="wk-select__chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
-    echo '    </button>';
-    echo '    <div class="wk-select__menu" role="listbox" aria-hidden="true">';
-    echo '        <div class="wk-select__options">';
-    foreach ($options as $value => $label) {
-        $isSelected = (string)$value === (string)$currentValue;
-        echo '        <button type="button" class="wk-select__option' . ($isSelected ? ' is-selected' : '') . '" role="option" aria-selected="' . ($isSelected ? 'true' : 'false') . '" data-value="' . htmlspecialchars((string)$value) . '">';
-        echo '            <span class="wk-select__option-label">' . htmlspecialchars($label) . '</span>';
-        echo '        </button>';
-    }
-    echo '        </div>';
-    echo '        <div class="wk-select__pager">';
-    echo '            <button type="button" class="wk-select__pager-btn wk-select__pager-prev" aria-label="Previous page">';
-    echo '                <svg class="wk-select__pager-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>';
-    echo '            </button>';
-    echo '            <span class="wk-select__pager-info"></span>';
-    echo '            <button type="button" class="wk-select__pager-btn wk-select__pager-next" aria-label="Next page">';
-    echo '                <svg class="wk-select__pager-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
-    echo '            </button>';
-    echo '        </div>';
-    echo '    </div>';
-    echo '</div>';
-}
+// 页面可见性配置（权限矩阵唯一来源：LicenseModule）
+$vis = LicenseModule::getUiVisibility($currentRole);
 ?>
 <div class="app-page-header mb-8" data-users-by-role='<?php echo htmlspecialchars(json_encode($usersByRole), ENT_QUOTES); ?>'>
     <h1 class="text-3xl font-display font-bold mb-2">
@@ -615,7 +558,7 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
                         Add License
                     </button>
                     <?php if ($isAdmin): ?>
-                    <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" id="grant-quota-btn">
+                    <button type="button" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition" id="grant-quota-btn" data-grant-quota-open>
                         Grant Quota
                     </button>
                     <?php endif; ?>
@@ -1070,101 +1013,17 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 </div>
 
 <!-- Grant Quota Modal -->
-<div id="grant-quota-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="glass-card p-6 rounded-xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-200" id="grant-quota-dialog">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-white">Grant Quota</h3>
-            <button class="text-white/40 hover:text-white transition p-1" id="grant-quota-close">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        <form id="grant-quota-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Role *</label>
-                <?php
-                renderCustomSelect('gq-role', [
-                    '' => '-- Select Role --',
-                    'manager' => 'Manager',
-                    'reseller' => 'Reseller'
-                ], '', 'w-full', true);
-                ?>
-            </div>
-            <div id="gq-user-container" class="hidden">
-                <label class="block text-sm font-medium text-white/70 mb-2">User *</label>
-                <div id="gq-user-manager-wrapper">
-                    <?php
-                    $gqManagerOptions = ['' => '-- Select Manager --'];
-                    foreach ($managerUsers as $mu) {
-                        $gqManagerOptions[$mu['id']] = $mu['username'];
-                    }
-                    renderCustomSelect('gq-manager', $gqManagerOptions, '', 'w-full', true);
-                    ?>
-                </div>
-                <div id="gq-user-reseller-wrapper" class="hidden">
-                    <?php
-                    $gqResellerOptions = ['' => '-- Select Reseller --'];
-                    foreach ($resellerUsers as $ru) {
-                        $gqResellerOptions[$ru['id']] = $ru['username'];
-                    }
-                    renderCustomSelect('gq-reseller', $gqResellerOptions, '', 'w-full', true);
-                    ?>
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Product *</label>
-                <?php
-                $gqProductOptions = ['' => '-- Select Product --'];
-                foreach ($products as $p) {
-                    $gqProductOptions[$p['id']] = $p['name'];
-                }
-                renderCustomSelect('gq-product', $gqProductOptions, '', 'w-full', true);
-                ?>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Duration *</label>
-                <?php renderCustomSelect('gq-duration', [
-                    '' => '-- Select Time --',
-                    '1' => '1 Day',
-                    '7' => '7 Days',
-                    '30' => '30 Days',
-                    '90' => '90 Days',
-                    '365' => '1 Year',
-                    '9999' => 'Lifetime'
-                ], '', 'w-full', true); ?>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-white/70 mb-2">Quantity *</label>
-                <div class="wk-input-number w-full">
-                    <button type="button" class="wk-input-number__btn wk-input-number__btn--minus" aria-label="Decrease">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                        </svg>
-                    </button>
-                    <input type="number" id="gq-quantity" class="wk-input-number__input" min="1" placeholder="How many keys can this manager claim?" required>
-                    <button type="button" class="wk-input-number__btn wk-input-number__btn--plus" aria-label="Increase">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </button>
-                </div>
-                <p class="text-xs text-white/40 mt-1" id="gq-inventory-hint"></p>
-            </div>
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Grant Quota
-                </button>
-                <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="grant-quota-cancel">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+<!-- Grant Quota Modal（LicenseModule 共享渲染，交互在 license-module.js） -->
+<?php renderGrantQuotaModal([
+    'id_prefix'        => 'gq',
+    'title'            => 'Grant Quota',
+    'show_role_select' => true,
+    'roles'            => ['' => '-- Select Role --', 'manager' => 'Manager', 'reseller' => 'Reseller'],
+    'managers'         => array_values($managerUsers),
+    'resellers'        => array_values($resellerUsers),
+    'products'         => $products,
+    'from_own_quota'   => false,
+]); ?>
 
 <!-- License Edit Modal -->
 <div id="license-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">

@@ -450,6 +450,43 @@ class License {
     }
 
     /**
+     * 暴露 PDO 连接（供 LicenseModule 等服务层编排跨模型事务）
+     */
+    public function getPdo(): PDO {
+        return $this->db;
+    }
+
+    /**
+     * 查询某用户「某产品 + 某时长」的配额行
+     * @param bool $forUpdate true 时加行锁（FOR UPDATE），用于事务内防并发超发
+     */
+    public function getAllocationRow(int $userId, int $productId, int $durationDays, bool $forUpdate = false): ?array {
+        $stmt = $this->db->prepare('
+            SELECT id, user_id, product_id, duration_days, quantity, used_count
+            FROM license_allocations
+            WHERE user_id = :user_id AND product_id = :product_id AND duration_days = :duration_days
+            ' . ($forUpdate ? 'FOR UPDATE' : '') . '
+        ');
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':product_id' => $productId,
+            ':duration_days' => $durationDays,
+        ]);
+        $row = $stmt->fetch();
+        return $row === false ? null : $row;
+    }
+
+    /**
+     * 配额已用数量增加（划转/领取同步），调用方需保证不超过 quantity
+     */
+    public function addUsedCount(int $allocationId, int $quantity): void {
+        $stmt = $this->db->prepare('
+            UPDATE license_allocations SET used_count = used_count + :qty WHERE id = :id
+        ');
+        $stmt->execute([':qty' => $quantity, ':id' => $allocationId]);
+    }
+
+    /**
      * 统计某产品 + 某时长的库存可用钥匙数量（unused 且未分配给任何人）
      */
     public function getInventoryCount(int $productId, int $durationDays): int {
@@ -471,6 +508,9 @@ class License {
         }
 
         try {
+            // 短锁等待：锁冲突时 10 秒内快速失败并给出明确错误，
+            // 避免沿用服务器默认 120s 导致前端长时间无响应（PDO 为请求级连接，无需恢复）
+            $this->db->exec('SET SESSION innodb_lock_wait_timeout = 10');
             $this->db->beginTransaction();
 
             // 锁定配额行，防止并发超领
