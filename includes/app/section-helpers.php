@@ -127,7 +127,7 @@ function renderQuotaActions(array $vis, array $options = []): void {
     endif;
     if (!empty($vis['grant_quota_targets'])):
         ?>
-        <button type="button" data-grant-quota-open class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition">
+        <button type="button" data-grant-quota-open class="btn-secondary px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
             </svg>

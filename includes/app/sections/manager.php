@@ -116,25 +116,23 @@ foreach ($allocations as $a) {
 
         <!-- User List -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                <h3 class="text-lg font-semibold text-white">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <div class="relative w-full sm:w-56">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </span>
-                        <input type="text" id="user-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by username...">
-                    </div>
-                    <?php
-                    $roleOptions = ['' => 'All Roles'];
-                    foreach ($userModel->getAvailableRoles() as $key => $label) {
-                        $roleOptions[$key] = $label;
-                    }
-                    renderCustomSelect('user-role-filter', $roleOptions, '', 'w-full sm:w-36');
-                    ?>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+                <h3 class="text-lg font-semibold text-white shrink-0">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
+                <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] md:max-w-full md:mx-0 2xl:basis-56 2xl:flex-none">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </span>
+                    <input type="text" id="user-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by username...">
                 </div>
+                <?php
+                $roleOptions = ['' => 'All Roles'];
+                foreach ($userModel->getAvailableRoles() as $key => $label) {
+                    $roleOptions[$key] = $label;
+                }
+                renderCustomSelect('user-role-filter', $roleOptions, '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
+                ?>
             </div>
 
             <!-- Desktop Table -->
@@ -333,32 +331,32 @@ foreach ($allocations as $a) {
 
         <!-- License List -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                <h3 class="text-lg font-semibold text-white">License Keys (<span id="license-count">0</span>)</h3>
-                <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
-                    <div class="relative w-full sm:w-56">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </span>
-                        <input type="text" id="license-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by key...">
-                    </div>
-                    <?php
-                    $licenseProductOptions = ['' => 'All Products'];
-                    foreach ($products as $p) {
-                        $licenseProductOptions[$p['id']] = $p['name'];
-                    }
-                    renderCustomSelect('license-product-filter', $licenseProductOptions, '', 'w-full sm:w-40');
-                    renderCustomSelect('license-status-filter', [
-                        '' => 'All Status',
-                        'unused' => 'Unused',
-                        'active' => 'Active',
-                        'expired' => 'Expired',
-                        'disabled' => 'Disabled'
-                    ], '', 'w-full sm:w-36');
-                    ?>
-                    <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition" title="Delete selected licenses">
+            <div class="flex flex-col md:flex-row md:flex-wrap md:items-center gap-3 mb-6">
+                <h3 class="text-lg font-semibold text-white shrink-0">License Keys (<span id="license-count">0</span>)</h3>
+                <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] 2xl:basis-56 2xl:flex-none">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </span>
+                    <input type="text" id="license-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by key...">
+                </div>
+                <?php
+                $licenseProductOptions = ['' => 'All Products'];
+                foreach ($products as $p) {
+                    $licenseProductOptions[$p['id']] = $p['name'];
+                }
+                renderCustomSelect('license-product-filter', $licenseProductOptions, '', 'w-full sm:w-40 md:shrink-0 md:basis-auto');
+                renderCustomSelect('license-status-filter', [
+                    '' => 'All Status',
+                    'unused' => 'Unused',
+                    'active' => 'Active',
+                    'expired' => 'Expired',
+                    'disabled' => 'Disabled'
+                ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
+                ?>
+                <div class="flex flex-wrap items-center justify-between gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                    <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap btn-danger" title="Delete selected licenses">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
