@@ -48,27 +48,39 @@ h1, h2, h3, h4, h5, h6 {
     border-color: rgba(139, 92, 246, 0.3);
 }
 
-/* ===== 按钮样式 ===== */
-.btn-primary {
-    --color: #8b5cf6;
-    display: inline-flex;
+/* ===== 按钮样式 =====
+   统一按钮体系：.btn-primary / .btn-secondary / .btn-danger 共用同一套几何尺寸
+   （高度、内边距、圆角、字号、字重、对齐方式），仅配色与 hover 语义不同。
+   几何属性用 !important 固定，避免被页面上追加的 Tailwind 尺寸类覆盖，
+   保证后台所有按钮视觉完全一致，只调用这一套 CSS。 */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border: 2px solid var(--color) !important;
-    border-radius: 6px !important;
-    background: var(--color) !important;
-    color: #ffffff !important;
+    height: 40px;
+    padding: 0 0.75rem !important;
+    border: 2px solid transparent !important;
+    border-radius: 8px !important;
     font-family: inherit;
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 600;
+    line-height: 1;
     cursor: pointer;
-    position: relative;
     text-align: center;
     text-decoration: none;
-    line-height: 1.5;
     white-space: nowrap;
     transition: all 0.3s ease;
+}
+
+.btn-primary {
+    --color: #8b5cf6;
+    background: var(--color) !important;
+    border-color: var(--color) !important;
+    color: #ffffff !important;
+    position: relative;
     z-index: 1;
 }
 
@@ -78,51 +90,33 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
-/* 认证表单提交按钮统一高度 */
+/* 认证表单提交按钮统一高度（比默认 40px 略高，表单上下留白更大） */
 .auth-form button[type="submit"].btn-primary {
     height: 50px;
 }
 
-/* 统一按钮体系：secondary（次要）与 danger（危险/删除）与 btn-primary 同构 */
-.btn-secondary,
-.btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    font-family: inherit;
-    font-weight: 600;
-    line-height: 1.5;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.3s ease;
-}
-
 .btn-secondary {
     background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2) !important;
     color: #ffffff;
 }
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: rgba(139, 92, 246, 0.5) !important;
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
     color: #ffffff;
 }
 
 .btn-danger {
     background: rgba(248, 113, 113, 0.1);
-    border-color: rgba(248, 113, 113, 0.25);
+    border-color: rgba(248, 113, 113, 0.25) !important;
     color: #f87171;
 }
 
 .btn-danger:hover {
     background: rgba(248, 113, 113, 0.2);
-    border-color: rgba(248, 113, 113, 0.5);
+    border-color: rgba(248, 113, 113, 0.5) !important;
     box-shadow: 0 0 20px rgba(248, 113, 113, 0.15);
     color: #f87171;
 }

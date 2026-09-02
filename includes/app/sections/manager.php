@@ -355,14 +355,14 @@ foreach ($allocations as $a) {
                     'disabled' => 'Disabled'
                 ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
                 ?>
-                <div class="flex flex-wrap items-center justify-between gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
-                    <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap btn-danger" title="Delete selected licenses">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-wrap items-center gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                    <button type="button" id="license-delete-selected" class="hidden w-full flex-none items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
-                    <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller']); ?>
+                    <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller', 'button_extra_class' => 'flex-1 min-w-0 2xl:flex-initial']); ?>
                 </div>
             </div>
 

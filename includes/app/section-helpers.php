@@ -115,10 +115,12 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
  *                        - grant_label string 授权按钮文案
  */
 function renderQuotaActions(array $vis, array $options = []): void {
+    // 可选：通过 options['button_extra_class'] 传入扩展类（例如 flex-1 让整行按钮等分宽度）
+    $extra = trim($options['button_extra_class'] ?? '');
     if (!empty($vis['create_license_btn'])):
         ?>
-        <button type="button" id="create-license-btn" class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button type="button" id="create-license-btn" class="btn-primary <?php echo $extra; ?> whitespace-nowrap">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Create License
@@ -127,8 +129,8 @@ function renderQuotaActions(array $vis, array $options = []): void {
     endif;
     if (!empty($vis['grant_quota_targets'])):
         ?>
-        <button type="button" data-grant-quota-open class="btn-secondary px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button type="button" data-grant-quota-open class="btn-secondary <?php echo $extra; ?> whitespace-nowrap">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
             </svg>
             <?php echo htmlspecialchars($options['grant_label'] ?? 'Assign to Reseller'); ?>

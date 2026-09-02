@@ -159,7 +159,7 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                         'development' => 'Development'
                     ], '', 'w-full sm:w-40'); ?>
                     <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openProductModal()">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                         Add Product
@@ -316,9 +316,9 @@ $vis = LicenseModule::getUiVisibility($currentRole);
 
         <!-- User List -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6">
                 <h3 class="text-lg font-semibold text-white shrink-0">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
-                <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] md:max-w-full md:mx-0 2xl:basis-56 2xl:flex-none">
+                <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] md:max-w-[15rem]">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -551,16 +551,16 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                     'disabled' => 'Disabled'
                 ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
                 ?>
-                <div class="flex flex-wrap items-center justify-between gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
-                    <button type="button" class="btn-primary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" onclick="openLicenseModal()">
+                <div class="flex flex-wrap items-center gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                    <button type="button" class="btn-primary flex-1 min-w-0 2xl:flex-initial whitespace-nowrap" onclick="openLicenseModal()">
                         Add License
                     </button>
                     <?php if ($isAdmin): ?>
-                    <button type="button" class="btn-secondary px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap" id="grant-quota-btn" data-grant-quota-open>
+                    <button type="button" class="btn-secondary flex-1 min-w-0 2xl:flex-initial whitespace-nowrap" id="grant-quota-btn" data-grant-quota-open>
                         Grant Quota
                     </button>
                     <?php endif; ?>
-                    <button type="button" id="license-delete-selected" class="hidden items-center gap-1 px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap btn-danger" title="Delete selected licenses">
+                    <button type="button" id="license-delete-selected" class="hidden w-full flex-none items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
                 </div>
