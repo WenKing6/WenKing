@@ -64,27 +64,27 @@ $vis = LicenseModule::getUiVisibility($currentRole);
 </div>
 
 <!-- Tab Navigation -->
-<div class="manager-tabs mb-6 flex flex-wrap gap-2 border-b border-white/10">
-    <button class="manager-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="products">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div class="manager-tabs mb-6 grid grid-cols-2 md:grid-cols-4 gap-2 border-b border-white/10">
+    <button class="manager-tab active flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="products">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
         Products
     </button>
-    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="users">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button class="manager-tab flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="users">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </svg>
         Users
     </button>
-    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button class="manager-tab flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
         </svg>
         License
     </button>
-    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="settings">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button class="manager-tab flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="settings">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
@@ -551,16 +551,16 @@ $vis = LicenseModule::getUiVisibility($currentRole);
                     'disabled' => 'Disabled'
                 ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
                 ?>
-                <div class="flex flex-wrap items-center gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
-                    <button type="button" class="btn-primary flex-1 min-w-0 2xl:flex-initial whitespace-nowrap" onclick="openLicenseModal()">
+                <div class="grid grid-cols-2 items-center gap-2 md:basis-full 2xl:flex 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                    <button type="button" class="btn-primary whitespace-nowrap" onclick="openLicenseModal()">
                         Add License
                     </button>
                     <?php if ($isAdmin): ?>
-                    <button type="button" class="btn-secondary flex-1 min-w-0 2xl:flex-initial whitespace-nowrap" id="grant-quota-btn" data-grant-quota-open>
+                    <button type="button" class="btn-secondary whitespace-nowrap" id="grant-quota-btn" data-grant-quota-open>
                         Grant Quota
                     </button>
                     <?php endif; ?>
-                    <button type="button" id="license-delete-selected" class="hidden w-full flex-none items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
+                    <button type="button" id="license-delete-selected" class="hidden col-span-2 justify-center items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
                 </div>

@@ -56,15 +56,15 @@ foreach ($allocations as $a) {
 </div>
 
 <!-- Tab 导航 -->
-<div class="manager-tabs mb-6 flex gap-2 border-b border-white/10">
-    <button class="manager-tab px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="users">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div class="manager-tabs mb-6 grid grid-cols-2 gap-2 border-b border-white/10">
+    <button class="manager-tab flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="users">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </svg>
         <?php _e('manager.user_management'); ?>
     </button>
-    <button class="manager-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
-        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button class="manager-tab active flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="licenses">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
         </svg>
         <?php _e('manager.license_management'); ?>
@@ -355,14 +355,14 @@ foreach ($allocations as $a) {
                     'disabled' => 'Disabled'
                 ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
                 ?>
-                <div class="flex flex-wrap items-center gap-2 md:basis-full 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
-                    <button type="button" id="license-delete-selected" class="hidden w-full flex-none items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
+                <div class="grid grid-cols-2 items-center gap-2 md:basis-full 2xl:flex 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                    <button type="button" id="license-delete-selected" class="hidden col-span-2 justify-center items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
-                    <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller', 'button_extra_class' => 'flex-1 min-w-0 2xl:flex-initial']); ?>
+                    <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller']); ?>
                 </div>
             </div>
 
