@@ -7,7 +7,7 @@
  *   - renderPagination        通用分页控件
  *   - licenseDurationLabel    时长显示标签
  *   - renderCustomSelect      统一风格下拉框（wk-select）
- *   - renderQuotaPanel        My Quota 配额面板（配额卡片 + Create License / 分配许可证按钮）
+ *   - renderQuotaActions      配额操作按钮（Create License / 分配许可证，置于许可证列表头部）
  *   - renderClaimKeysModal    Create License 领取钥匙卡片（弹窗）
  *   - renderGrantQuotaModal   授权配额卡片（弹窗，admin / manager 通过配置复用）
  *
@@ -106,67 +106,35 @@ function renderCustomSelect(string $id, array $options, string $selected = '', s
 }
 
 /**
- * 渲染 My Quota 配额面板（manager.php / reseller.php 共用）
+ * 渲染配额操作按钮（Create License / Assign to Reseller）
+ * manager.php / reseller.php 共用，置于许可证列表卡片头部；
+ * 可见性由权限矩阵（LicenseModule::getUiVisibility）决定。
  *
- * @param array $allocations 当前用户配额列表（License::getAllocations 结构）
- * @param array $vis         LicenseModule::getUiVisibility($role) 输出
- * @param array $options     可选配置：
- *                           - grant_label   string 「分配许可证」按钮文案
- *
- * 说明：配额不再以卡片形式单独展示，配额选择统一收进 Create License 弹窗
- * （renderClaimKeysModal 的配额下拉），面板仅保留入口按钮与汇总信息。
+ * @param array $vis      LicenseModule::getUiVisibility($role) 输出
+ * @param array $options  可选配置：
+ *                        - grant_label string 授权按钮文案
  */
-function renderQuotaPanel(array $allocations, array $vis, array $options = []): void {
-    if (empty($vis['quota_panel'])) {
-        return;
-    }
-    $grantTargets = $vis['grant_quota_targets'] ?? [];
-    ?>
-    <div class="glass-card p-6 rounded-xl mb-6">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
-            <div>
-                <h3 class="text-lg font-semibold text-white">My Quota</h3>
-                <p class="text-xs text-white/40">Quota granted by Admin — claim keys from inventory within your quota.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <?php if (!empty($vis['create_license_btn'])): ?>
-                <button type="button" id="create-license-btn" class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Create License
-                </button>
-                <?php endif; ?>
-                <?php if (!empty($grantTargets)): ?>
-                <button type="button" data-grant-quota-open class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
-                    </svg>
-                    <?php echo htmlspecialchars($options['grant_label'] ?? 'Assign to Reseller'); ?>
-                </button>
-                <?php endif; ?>
-            </div>
-        </div>
-        <?php if (empty($allocations)): ?>
-        <div class="text-center py-8 text-white/40">
-            No quota has been allocated to you yet. Contact your admin to grant a quota.
-        </div>
-        <?php else: ?>
-        <?php
-        // 配额明细不再单独展示卡片，配额选择统一收进 Create License 弹窗
-        $totalRemaining = 0;
-        foreach ($allocations as $alloc) {
-            $totalRemaining += max(0, (int)$alloc['quantity'] - (int)$alloc['used_count']);
-        }
+function renderQuotaActions(array $vis, array $options = []): void {
+    if (!empty($vis['create_license_btn'])):
         ?>
-        <p class="text-sm text-white/50">
-            <span class="text-white/80 font-semibold"><?php echo count($allocations); ?></span> quota(s)
-            &middot; <span class="text-accent-cyan font-semibold"><?php echo $totalRemaining; ?></span> key(s) remaining
-            — click "Create License" to claim keys from inventory.
-        </p>
-        <?php endif; ?>
-    </div>
-    <?php
+        <button type="button" id="create-license-btn" class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Create License
+        </button>
+        <?php
+    endif;
+    if (!empty($vis['grant_quota_targets'])):
+        ?>
+        <button type="button" data-grant-quota-open class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30 hover:bg-accent-cyan/30 transition">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+            </svg>
+            <?php echo htmlspecialchars($options['grant_label'] ?? 'Assign to Reseller'); ?>
+        </button>
+        <?php
+    endif;
 }
 
 /**

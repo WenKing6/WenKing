@@ -48,10 +48,6 @@ $licenseBadgeMap = [
     <p class="text-white/60"><?php _e('reseller.subtitle'); ?></p>
 </div>
 
-<!-- My Quota + Create License（LicenseModule 共享渲染）
-     置于标签容器之外：默认标签是 Customers，若放在 Licenses 标签内则默认不可见 -->
-<?php renderQuotaPanel($allocations, $vis); ?>
-
 <!-- Tab Navigation -->
 <div class="reseller-tabs mb-6 flex gap-2 border-b border-white/10">
     <button class="reseller-tab active px-4 py-2 text-white/70 hover:text-white transition border-b-2 border-transparent" data-tab="customers">
@@ -290,9 +286,12 @@ $licenseBadgeMap = [
 
         <!-- My Licenses - Card Layout（真实数据） -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
                 <h3 class="text-lg font-semibold text-white"><?php _e('reseller.allocation_records'); ?></h3>
-                <span class="text-sm text-white/40"><?php echo count($myLicenses); ?> key(s)</span>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-sm text-white/40"><?php echo count($myLicenses); ?> key(s)</span>
+                    <?php renderQuotaActions($vis); ?>
+                </div>
             </div>
 
             <?php if (empty($myLicenses)): ?>

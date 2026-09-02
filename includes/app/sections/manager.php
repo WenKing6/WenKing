@@ -280,11 +280,6 @@ foreach ($allocations as $a) {
         </div>
         <?php endif; ?>
 
-        <!-- My Quota Panel（共享渲染：配额卡片 + Create License + 分配许可证） -->
-        <?php if ($canViewLicenses): ?>
-        <?php renderQuotaPanel($allocations, $vis, ['grant_label' => 'Assign to Reseller']); ?>
-        <?php endif; ?>
-
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
             <div class="glass-card p-6 rounded-xl">
@@ -369,6 +364,7 @@ foreach ($allocations as $a) {
                         </svg>
                         Delete Selected (<span id="license-selected-count">0</span>)
                     </button>
+                    <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller']); ?>
                 </div>
             </div>
 

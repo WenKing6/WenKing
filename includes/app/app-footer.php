@@ -10,7 +10,7 @@
 
     <!-- Scripts（?v= 版本号用于失效浏览器缓存的旧 JS） -->
     <script src="<?php echo SITE_URL; ?>/assets/js/grid-scan.js"></script>
-    <script src="<?php echo SITE_URL; ?>/assets/js/license-module.js?v=20260902"></script>
+    <script src="<?php echo SITE_URL; ?>/assets/js/license-module.js?v=20260903"></script>
     <script src="<?php echo SITE_URL; ?>/assets/js/app.js?v=20260902"></script>
 
     <!-- GridScan 初始化 -->
