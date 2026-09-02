@@ -121,6 +121,12 @@ h1, h2, h3, h4, h5, h6 {
     color: #f87171;
 }
 
+/* 批量删除按钮隐藏态：.btn-danger 的 display:inline-flex !important 会覆盖 Tailwind 的 .hidden，
+   需用更高优先级 !important 规则强制隐藏，默认不显示，勾选许可证后再显示 */
+#license-delete-selected.hidden {
+    display: none !important;
+}
+
 /* ===== 卡片样式 ===== */
 .product-card {
     background: #0a0a0f;

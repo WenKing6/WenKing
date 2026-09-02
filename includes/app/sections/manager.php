@@ -356,12 +356,6 @@ foreach ($allocations as $a) {
                 ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
                 ?>
                 <div class="grid grid-cols-2 items-center gap-2 md:basis-full 2xl:flex 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
-                    <button type="button" id="license-delete-selected" class="hidden col-span-2 justify-center items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        Delete Selected (<span id="license-selected-count">0</span>)
-                    </button>
                     <?php renderQuotaActions($vis, ['grant_label' => 'Assign to Reseller']); ?>
                 </div>
             </div>
@@ -370,7 +364,6 @@ foreach ($allocations as $a) {
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm table-fixed">
                     <colgroup>
-                        <col class="w-[4%]">
                         <col class="w-[20%]">
                         <col class="w-[9%]">
                         <col class="w-[9%]">
@@ -378,13 +371,9 @@ foreach ($allocations as $a) {
                         <col class="w-[13%]">
                         <col class="w-[12%]">
                         <col class="w-[12%]">
-                        <col class="w-[12%]">
                     </colgroup>
                     <thead>
                         <tr class="text-white/50 border-b border-white/10">
-                            <th class="py-3 px-4 w-10">
-                                <input type="checkbox" id="license-select-all" class="license-checkbox" title="Select all on this page" aria-label="Select all licenses on this page">
-                            </th>
                             <th class="text-left py-3 px-4">License Key</th>
                             <th class="text-left py-3 px-4">Product</th>
                             <th class="text-left py-3 px-4">Duration</th>
@@ -392,13 +381,12 @@ foreach ($allocations as $a) {
                             <th class="text-left py-3 px-4">Status</th>
                             <th class="text-left py-3 px-4">Created</th>
                             <th class="text-left py-3 px-4">Expires</th>
-                            <th class="text-left py-3 px-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="license-list">
                         <?php if (empty($licenses)): ?>
                         <tr>
-                            <td colspan="9" class="text-center py-12 text-white/40">
+                            <td colspan="7" class="text-center py-12 text-white/40">
                                 <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
                                 </svg>
@@ -408,9 +396,6 @@ foreach ($allocations as $a) {
                         <?php else: ?>
                             <?php foreach ($licenses as $lic): ?>
                             <tr class="border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
-                                <td class="py-3 px-4">
-                                    <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
-                                </td>
                                 <td class="py-3 px-4"><span class="block font-mono text-sm text-white/80 truncate"><?php echo htmlspecialchars($lic['license_key']); ?></span></td>
                                 <td class="py-3 px-4 text-white/60"><span class="block truncate"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></span></td>
                                 <td class="py-3 px-4 text-white/60">
@@ -450,13 +435,6 @@ foreach ($allocations as $a) {
                                     }
                                     ?>
                                 </td>
-                                <td class="py-3 px-2 flex gap-1.5">
-                                    <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-1.5 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </td>
                             </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -477,18 +455,15 @@ foreach ($allocations as $a) {
                     <?php foreach ($licenses as $lic): ?>
                     <div class="bg-white/5 rounded-xl p-4 border border-white/5" data-id="<?php echo $lic['id']; ?>" data-product-id="<?php echo $lic['product_id']; ?>">
                         <div class="flex items-start justify-between mb-3">
-                            <div class="flex items-start gap-3 flex-1 min-w-0">
-                                <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
-                                <div class="flex-1 min-w-0">
-                                    <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
-                                    <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
-                                </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
+                                <div class="text-xs text-white/60 mt-1"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
                             </div>
                             <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs shrink-0">
                                 <?php echo ucfirst($lic['status']); ?>
                             </span>
                         </div>
-                        <div class="flex items-center justify-between text-xs text-white/40">
+                        <div class="flex items-center text-xs text-white/40">
                             <div class="flex gap-3">
                                 <?php
                                 $days = (int)$lic['duration_days'];
@@ -509,11 +484,6 @@ foreach ($allocations as $a) {
                                     <?php endif; ?>
                                 </span>
                             </div>
-                            <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
                         </div>
                     </div>
                     <?php endforeach; ?>
