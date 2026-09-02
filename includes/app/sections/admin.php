@@ -149,19 +149,17 @@ $vis = LicenseModule::getUiVisibility($currentRole);
 
         <!-- Product List -->
         <div class="glass-card p-6 rounded-xl">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                <h3 class="text-lg font-semibold text-white">Product List (<span id="product-count"><?php echo count($products); ?></span>)</h3>
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <?php renderCustomSelect('product-status-filter', [
-                        '' => 'All Statuses',
-                        'online' => 'Online',
-                        'updating' => 'Updating',
-                        'development' => 'Development'
-                    ], '', 'w-full sm:w-40'); ?>
-                    <button type="button" class="btn-primary whitespace-nowrap" onclick="openProductModal()">
-                        Add Product
-                    </button>
-                </div>
+            <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6">
+                <h3 class="text-lg font-semibold text-white shrink-0">Product List (<span id="product-count"><?php echo count($products); ?></span>)</h3>
+                <?php renderCustomSelect('product-status-filter', [
+                    '' => 'All Statuses',
+                    'online' => 'Online',
+                    'updating' => 'Updating',
+                    'development' => 'Development'
+                ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto'); ?>
+                <button type="button" class="btn-primary whitespace-nowrap md:ml-auto" onclick="openProductModal()">
+                    Add Product
+                </button>
             </div>
 
             <!-- Desktop Table Layout -->
