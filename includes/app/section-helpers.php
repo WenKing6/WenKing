@@ -356,3 +356,648 @@ function renderGrantQuotaModal(array $config = []): void {
     </div>
     <?php
 }
+
+/**
+ * 渲染「用户管理」模块（Admin / Manager / Reseller 共用）
+ *
+ * 三页共用同一套结构与 ID 约定（user-search / user-list / user-cards / user-per-page...），
+ * 交互逻辑集中在 assets/js/app.js（_initUserPagination / _initUserSearch / _initUserEditForm）。
+ * 单页应用同一时间只加载一个 section，因此 ID 不会冲突。
+ *
+ * @param array $users 用户列表（每项含 id/username/email/role/status/created_at）
+ * @param array $opts  可选配置：
+ *   - show_stats        bool 是否显示统计卡片（默认 true）
+ *   - show_actions      bool 是否显示编辑/切换状态按钮（默认 true）
+ *   - show_role_filter  bool 是否显示角色筛选（默认 true；Reseller 客户均为同角色时传 false）
+ *   - role_options      array 角色筛选选项（默认仅 All Roles）
+ */
+function renderUserSection(array $users, array $opts = []): void {
+    $showStats       = $opts['show_stats'] ?? true;
+    $showActions     = $opts['show_actions'] ?? true;
+    $showRoleFilter  = $opts['show_role_filter'] ?? true;
+    $roleOptions     = $opts['role_options'] ?? ['' => 'All Roles'];
+    $emptyColspan    = $showActions ? 6 : 5;
+    ?>
+    <?php if ($showStats): ?>
+    <!-- User Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Total Users</span>
+            </div>
+            <div class="text-3xl font-bold text-white"><?php echo count($users); ?></div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-status-online/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-status-online" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Active</span>
+            </div>
+            <div class="text-3xl font-bold text-white"><?php echo count(array_filter($users, fn($u) => $u['status'] === 'active')); ?></div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Inactive / Banned</span>
+            </div>
+            <div class="text-3xl font-bold text-white"><?php echo count(array_filter($users, fn($u) => $u['status'] !== 'active')); ?></div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- User List -->
+    <div class="glass-card p-6 rounded-xl">
+        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6">
+            <h3 class="text-lg font-semibold text-white shrink-0">User List (<span id="user-count"><?php echo count($users); ?></span>)</h3>
+            <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] md:max-w-[15rem]">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="user-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by username...">
+            </div>
+            <?php if ($showRoleFilter): ?>
+            <?php renderCustomSelect('user-role-filter', $roleOptions, '', 'w-full sm:w-36 md:shrink-0 md:basis-auto'); ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden 2xl:block overflow-x-auto">
+            <table class="w-full text-sm table-fixed">
+                <colgroup>
+                    <col class="w-[20%]">
+                    <col class="w-[26%]">
+                    <col class="w-[12%]">
+                    <col class="w-[12%]">
+                    <col class="w-[16%]">
+                    <?php if ($showActions): ?>
+                    <col class="w-[14%]">
+                    <?php endif; ?>
+                </colgroup>
+                <thead>
+                    <tr class="text-white/50 border-b border-white/10">
+                        <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('username')">Username</th>
+                        <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('email')">Email</th>
+                        <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('role')">Role</th>
+                        <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('status')">Status</th>
+                        <th class="text-left py-3 px-4 cursor-pointer hover:text-white/80 transition" onclick="sortUsers('created_at')">Created</th>
+                        <?php if ($showActions): ?>
+                        <th class="text-left py-3 px-4">Actions</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    <?php if (empty($users)): ?>
+                    <tr>
+                        <td colspan="<?php echo $emptyColspan; ?>" class="text-center py-12 text-white/40">
+                            <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            No users found
+                        </td>
+                    </tr>
+                    <?php else: ?>
+                        <?php foreach ($users as $u): ?>
+                        <tr class="user-row border-b border-white/5 hover:bg-white/5 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
+                            <td class="py-3 px-4 font-medium text-white user-cell-username"><?php echo htmlspecialchars($u['username']); ?></td>
+                            <td class="py-3 px-4 text-white/60 user-cell-email"><span class="block truncate"><?php echo htmlspecialchars($u['email']); ?></span></td>
+                            <td class="py-3 px-4 user-cell-role">
+                                <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
+                                    <?php echo ucfirst($u['role']); ?>
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 user-cell-status">
+                                <span class="status-badge <?php echo $u['status'] === 'active' ? 'status-online' : 'bg-red-500/20 text-red-400 border-red-500/30'; ?> text-xs">
+                                    <?php echo ucfirst($u['status']); ?>
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-white/40 user-cell-created"><?php echo date('Y-m-d', strtotime($u['created_at'])); ?></td>
+                            <?php if ($showActions): ?>
+                            <td class="py-3 px-2 flex gap-1.5">
+                                <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-1.5 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Card List (Mobile + iPad) -->
+        <div class="2xl:hidden grid grid-cols-1 md:grid-cols-2 gap-3" id="user-cards">
+            <?php if (empty($users)): ?>
+            <div class="text-center py-12 text-white/40 md:col-span-2">
+                <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                No users found
+            </div>
+            <?php else: ?>
+                <?php foreach ($users as $u): ?>
+                <div class="user-card bg-white/[0.03] hover:bg-white/[0.06] rounded-xl p-5 border border-white/5 hover:border-white/10 transition" data-id="<?php echo $u['id']; ?>" data-username="<?php echo htmlspecialchars(strtolower($u['username'])); ?>" data-email="<?php echo htmlspecialchars(strtolower($u['email'])); ?>" data-role="<?php echo $u['role']; ?>" data-status="<?php echo $u['status']; ?>" data-created="<?php echo $u['created_at']; ?>">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple/30 to-accent-cyan/20 flex items-center justify-center text-sm font-bold text-white/80 shrink-0"><?php echo strtoupper(substr($u['username'], 0, 1)); ?></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-white truncate user-card-username"><?php echo htmlspecialchars($u['username']); ?></div>
+                            <div class="text-xs text-white/40 truncate user-card-email"><?php echo htmlspecialchars($u['email']); ?></div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1.5 shrink-0">
+                            <span class="role-badge text-xs px-2 py-0.5 rounded-full border <?php echo $u['role'] === 'admin' ? 'bg-accent-purple/20 text-accent-purple border-accent-purple/30' : ($u['role'] === 'manager' ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : ($u['role'] === 'reseller' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/10 text-white/60 border-white/10')); ?>">
+                                <?php echo ucfirst($u['role']); ?>
+                            </span>
+                            <span class="status-badge <?php echo $u['status'] === 'active' ? 'status-online' : 'bg-red-500/20 text-red-400 border-red-500/30'; ?> text-xs user-card-status">
+                                <?php echo ucfirst($u['status']); ?>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-white/5">
+                        <span class="text-xs text-white/40 user-card-created">
+                            <?php echo date('Y-m-d', strtotime($u['created_at'])); ?>
+                        </span>
+                        <?php if ($showActions): ?>
+                        <div class="flex gap-1.5">
+                            <button class="btn-user-edit text-white/40 hover:text-accent-blue transition p-2.5 rounded-lg hover:bg-white/5" title="Edit" data-user='<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>'>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-user-toggle text-white/40 hover:text-accent-blue transition p-2.5 rounded-lg hover:bg-white/5" title="Toggle Status" data-id="<?php echo $u['id']; ?>" data-status="<?php echo $u['status']; ?>">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+            <div class="flex items-center gap-4">
+                <div class="text-sm text-white/40">
+                    Showing <span id="user-showing-start">0</span>-<span id="user-showing-end">0</span> of <span id="user-total-count"><?php echo count($users); ?></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-white/40">Per page</span>
+                    <?php renderCustomSelect('user-per-page', [
+                        '10' => '10',
+                        '20' => '20',
+                        '50' => '50',
+                        '100' => '100'
+                    ], '10', 'wk-select--fit'); ?>
+                </div>
+            </div>
+            <?php renderPagination('user'); ?>
+        </div>
+    </div>
+    <?php
+}
+
+/**
+ * 渲染「许可证管理」模块（Admin / Manager / Reseller 共用）
+ *
+ * 结构统一为 Admin 样式；复选框列 / 删除 / 回收 / Add License / 角色·用户筛选
+ * 由权限矩阵（LicenseModule::getUiVisibility）控制：
+ *   - Admin：完整（复选框 + Add License + Grant Quota + 批量删除 + 单行删除/回收 + 角色/用户筛选）
+ *   - Manager：Create License + Assign to Reseller，无复选框/删除
+ *   - Reseller：Create License，无复选框/删除
+ *
+ * JS 侧通过 <tbody id="license-list" data-has-checkbox="0|1"> 区分列偏移：
+ *   - data-has-checkbox="1"（Admin）：License Key = td:nth-child(2)、Status = td:nth-child(6)
+ *   - data-has-checkbox="0"：License Key = td:nth-child(1)、Status = td:nth-child(5)
+ *
+ * @param array $licenses 许可证列表
+ * @param array $products 产品列表（产品筛选用）
+ * @param array $vis      LicenseModule::getUiVisibility($role)
+ * @param array $opts     可选配置：
+ *   - is_admin     bool  是否为管理员视图（显示角色/用户筛选；默认 false）
+ *   - users        array 用户列表（仅 admin 需要，用于 data-manager-id / data-reseller-id）
+ *   - grant_label  string Grant Quota 按钮文案（默认 Grant Quota）
+ */
+function renderLicenseSection(array $licenses, array $products, array $vis, array $opts = []): void {
+    $isAdmin     = !empty($opts['is_admin']);
+    $users       = $opts['users'] ?? [];
+    $grantLabel  = $opts['grant_label'] ?? 'Grant Quota';
+    $hasCheckbox = !empty($vis['delete_license']); // 复选框/删除仅 admin
+
+    // 统计卡片初始值（JS 初始化时也会重算）
+    $statTotal   = count($licenses);
+    $statActive  = count(array_filter($licenses, fn($l) => $l['status'] === 'active'));
+    $statUnused  = count(array_filter($licenses, fn($l) => $l['status'] === 'unused'));
+    $statExpired = count(array_filter($licenses, fn($l) => in_array($l['status'], ['expired', 'disabled'])));
+
+    // 用户角色映射（仅 admin 的角色/用户筛选需要）
+    $userRoleMap = [];
+    if ($isAdmin) {
+        foreach ($users as $u) {
+            $userRoleMap[$u['id']] = $u['role'];
+        }
+    }
+    ?>
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Total Licenses</span>
+            </div>
+            <div class="text-3xl font-bold text-white" id="license-total"><?php echo $statTotal; ?></div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-status-online/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-status-online" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Active</span>
+            </div>
+            <div class="text-3xl font-bold text-white" id="license-active"><?php echo $statActive; ?></div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-status-updating/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-status-updating" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Unused</span>
+            </div>
+            <div class="text-3xl font-bold text-white" id="license-unused"><?php echo $statUnused; ?></div>
+        </div>
+
+        <div class="glass-card p-6 rounded-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                </div>
+                <span class="text-sm text-white/60">Expired / Disabled</span>
+            </div>
+            <div class="text-3xl font-bold text-white" id="license-expired"><?php echo $statExpired; ?></div>
+        </div>
+    </div>
+
+    <!-- License List -->
+    <div class="glass-card p-6 rounded-xl">
+        <div class="flex flex-col md:flex-row md:flex-wrap md:items-center gap-3 mb-6">
+            <h3 class="text-lg font-semibold text-white shrink-0">License Keys (<span id="license-count"><?php echo $statTotal; ?></span>)</h3>
+            <div class="relative w-full md:flex-1 md:basis-0 md:min-w-[150px] 2xl:basis-56 2xl:flex-none">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="license-search" class="app-input w-full pl-9 pr-4 py-2" placeholder="Search by key...">
+            </div>
+            <?php
+            $licenseProductOptions = ['' => 'All Products'];
+            foreach ($products as $p) {
+                $licenseProductOptions[$p['id']] = $p['name'];
+            }
+            renderCustomSelect('license-product-filter', $licenseProductOptions, '', 'w-full sm:w-40 md:shrink-0 md:basis-auto');
+            renderCustomSelect('license-status-filter', [
+                '' => 'All Status',
+                'unused' => 'Unused',
+                'active' => 'Active',
+                'expired' => 'Expired',
+                'disabled' => 'Disabled'
+            ], '', 'w-full sm:w-36 md:shrink-0 md:basis-auto');
+            ?>
+            <div class="grid grid-cols-2 items-center gap-2 md:basis-full 2xl:flex 2xl:basis-auto 2xl:ml-auto 2xl:justify-end">
+                <?php if (!empty($vis['add_license'])): ?>
+                <button type="button" class="btn-primary whitespace-nowrap" onclick="openLicenseModal()">
+                    Add License
+                </button>
+                <?php endif; ?>
+                <?php renderQuotaActions($vis, ['grant_label' => $grantLabel]); ?>
+                <?php if (!empty($vis['delete_license'])): ?>
+                <button type="button" id="license-delete-selected" class="hidden col-span-2 justify-center items-center gap-1 whitespace-nowrap btn-danger 2xl:w-auto" title="Delete selected licenses">
+                    Delete Selected (<span id="license-selected-count">0</span>)
+                </button>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden 2xl:block overflow-x-auto">
+            <table class="w-full text-sm table-fixed">
+                <colgroup>
+                    <?php if ($hasCheckbox): ?>
+                    <col class="w-[4%]">
+                    <?php endif; ?>
+                    <col class="w-[20%]">
+                    <col class="w-[9%]">
+                    <col class="w-[9%]">
+                    <col class="w-[9%]">
+                    <col class="w-[13%]">
+                    <col class="w-[12%]">
+                    <col class="w-[12%]">
+                    <?php if ($hasCheckbox): ?>
+                    <col class="w-[12%]">
+                    <?php endif; ?>
+                </colgroup>
+                <thead>
+                    <tr class="text-white/50 border-b border-white/10">
+                        <?php if ($hasCheckbox): ?>
+                        <th class="py-3 px-4 w-10">
+                            <input type="checkbox" id="license-select-all" class="license-checkbox" title="Select all on this page" aria-label="Select all licenses on this page">
+                        </th>
+                        <?php endif; ?>
+                        <th class="text-left py-3 px-4">License Key</th>
+                        <th class="text-left py-3 px-4">Product</th>
+                        <th class="text-left py-3 px-4">Duration</th>
+                        <th class="text-left py-3 px-4">Assigned To</th>
+                        <th class="text-left py-3 px-4">Status</th>
+                        <th class="text-left py-3 px-4">Created</th>
+                        <th class="text-left py-3 px-4">Expires</th>
+                        <?php if ($hasCheckbox): ?>
+                        <th class="text-left py-3 px-4">Actions</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody id="license-list" data-has-checkbox="<?php echo $hasCheckbox ? '1' : '0'; ?>">
+                    <?php if (empty($licenses)): ?>
+                    <tr>
+                        <td colspan="<?php echo $hasCheckbox ? 9 : 7; ?>" class="text-center py-12 text-white/40">
+                            <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                            </svg>
+                            No licenses yet. Click "Add License" to create one.
+                        </td>
+                    </tr>
+                    <?php else: ?>
+                        <?php foreach ($licenses as $lic): ?>
+                        <?php $userRole = !empty($lic['user_id']) ? ($userRoleMap[$lic['user_id']] ?? null) : null; ?>
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition"
+                            data-id="<?php echo $lic['id']; ?>"
+                            data-product-id="<?php echo $lic['product_id']; ?>"
+                            <?php if ($isAdmin): ?>
+                            <?php if ($userRole === 'manager'): ?>
+                            data-manager-id="<?php echo $lic['user_id']; ?>"
+                            <?php elseif ($userRole === 'reseller'): ?>
+                            data-reseller-id="<?php echo $lic['user_id']; ?>"
+                            <?php endif; ?>
+                            <?php endif; ?>>
+                            <?php if ($hasCheckbox): ?>
+                            <td class="py-3 px-4">
+                                <input type="checkbox" class="license-row-check license-checkbox" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
+                            </td>
+                            <?php endif; ?>
+                            <td class="py-3 px-4"><span class="block font-mono text-sm text-white/80 truncate"><?php echo htmlspecialchars($lic['license_key']); ?></span></td>
+                            <td class="py-3 px-4 text-white/60"><span class="block truncate"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></span></td>
+                            <td class="py-3 px-4 text-white/60"><?php echo licenseDurationLabel((int)$lic['duration_days']); ?></td>
+                            <td class="py-3 px-4 text-white/60">
+                                <?php if ($lic['user_id']): ?>
+                                    <?php echo htmlspecialchars($lic['user_name'] ?? 'Unknown'); ?>
+                                <?php else: ?>
+                                    <span class="text-accent-purple">Admin</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs">
+                                    <?php echo ucfirst($lic['status']); ?>
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-white/40 text-xs"><?php echo date('Y-m-d', strtotime($lic['created_at'])); ?></td>
+                            <td class="py-3 px-4 text-white/40 text-xs">
+                                <?php
+                                if ($lic['activated_at'] && $lic['duration_days'] < 9999) {
+                                    $expiresAt = date('Y-m-d', strtotime($lic['activated_at'] . ' + ' . $lic['duration_days'] . ' days'));
+                                    echo $expiresAt;
+                                } elseif ($lic['duration_days'] >= 9999) {
+                                    echo '<span class="text-accent-cyan">Never</span>';
+                                } else {
+                                    echo '-';
+                                }
+                                ?>
+                            </td>
+                            <?php if ($hasCheckbox): ?>
+                            <td class="py-3 px-2 flex gap-1.5">
+                                <?php if (!empty($vis['recycle']) && $lic['user_id'] && $lic['status'] === 'unused'): ?>
+                                <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-1.5 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                </button>
+                                <?php endif; ?>
+                                <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-1.5 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Card List (Mobile + iPad) -->
+        <div class="2xl:hidden grid grid-cols-1 md:grid-cols-2 gap-3" id="license-cards">
+            <?php if (empty($licenses)): ?>
+            <div class="text-center py-12 text-white/40 md:col-span-2">
+                <svg class="w-16 h-16 mx-auto text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                No licenses yet. Click "Add License" to create one.
+            </div>
+            <?php else: ?>
+                <?php foreach ($licenses as $lic): ?>
+                <?php $userRole = !empty($lic['user_id']) ? ($userRoleMap[$lic['user_id']] ?? null) : null; ?>
+                <div class="license-card bg-white/[0.03] hover:bg-white/[0.06] rounded-xl p-5 border border-white/5 hover:border-white/10 transition"
+                     data-id="<?php echo $lic['id']; ?>"
+                     data-product-id="<?php echo $lic['product_id']; ?>"
+                     data-key="<?php echo htmlspecialchars($lic['license_key']); ?>"
+                     data-status="<?php echo $lic['status']; ?>"
+                     <?php if ($isAdmin): ?>
+                     <?php if ($userRole === 'manager'): ?>
+                     data-manager-id="<?php echo $lic['user_id']; ?>"
+                     <?php elseif ($userRole === 'reseller'): ?>
+                     data-reseller-id="<?php echo $lic['user_id']; ?>"
+                     <?php endif; ?>
+                     <?php endif; ?>>
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <?php if ($hasCheckbox): ?>
+                            <input type="checkbox" class="license-row-check license-checkbox mt-1 shrink-0" data-id="<?php echo $lic['id']; ?>" aria-label="Select license">
+                            <?php endif; ?>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-mono text-sm font-medium text-white truncate"><?php echo htmlspecialchars($lic['license_key']); ?></div>
+                                <div class="text-xs text-white/50 mt-1 truncate"><?php echo htmlspecialchars($lic['product_name'] ?? 'N/A'); ?></div>
+                            </div>
+                        </div>
+                        <span class="status-badge <?php echo $lic['status'] === 'active' ? 'status-online' : ($lic['status'] === 'unused' ? 'status-updating' : ($lic['status'] === 'expired' || $lic['status'] === 'disabled' ? 'bg-red-500/20 text-red-400 border-red-500/30' : '')); ?> text-xs shrink-0">
+                            <?php echo ucfirst($lic['status']); ?>
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-white/40 pt-3 border-t border-white/5">
+                        <div class="flex gap-3 min-w-0">
+                            <span class="shrink-0"><?php echo licenseDurationLabel((int)$lic['duration_days']); ?></span>
+                            <span class="truncate">
+                                <?php if ($lic['user_id']): ?>
+                                    <?php echo htmlspecialchars($lic['user_name'] ?? 'Unknown'); ?>
+                                <?php else: ?>
+                                    <span class="text-accent-purple">Admin</span>
+                                <?php endif; ?>
+                            </span>
+                        </div>
+                        <?php if ($hasCheckbox): ?>
+                        <div class="flex items-center shrink-0 gap-1">
+                            <?php if (!empty($vis['recycle']) && $lic['user_id'] && $lic['status'] === 'unused'): ?>
+                            <button class="btn-license-recycle text-white/40 hover:text-accent-cyan transition p-2.5 rounded-lg hover:bg-white/5" title="Recycle to inventory" data-id="<?php echo $lic['id']; ?>">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </button>
+                            <?php endif; ?>
+                            <button class="btn-license-delete text-white/40 hover:text-red-500 transition p-2.5 rounded-lg hover:bg-white/5" title="Delete" data-id="<?php echo $lic['id']; ?>">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-white/10">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 min-w-0">
+                <div class="text-sm text-white/40">
+                    Showing <span id="license-showing-start">0</span>-<span id="license-showing-end">0</span> of <span id="license-total-count"><?php echo $statTotal; ?></span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-sm text-white/40">Per page</span>
+                    <?php renderCustomSelect('license-per-page', [
+                        '10' => '10',
+                        '20' => '20',
+                        '50' => '50',
+                        '100' => '100'
+                    ], '10', 'wk-select--fit'); ?>
+                    <?php if ($isAdmin): ?>
+                    <?php
+                    // 角色筛选（联动下方用户筛选）
+                    renderCustomSelect('license-role-filter', [
+                        '' => 'All Roles',
+                        'manager' => 'Manager',
+                        'reseller' => 'Reseller'
+                    ], '', 'w-full sm:w-36');
+                    // 用户筛选（选项由 JS 根据 data-users-by-role 联动重建）
+                    renderCustomSelect('license-user-filter', ['' => 'All Users'], '', 'w-full sm:w-40');
+                    ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php renderPagination('license'); ?>
+        </div>
+    </div>
+    <?php
+}
+
+/**
+ * 渲染「编辑用户」弹窗（Admin / Manager / Reseller 共用，置于 tab-panel 之外）
+ *
+ * @param array $opts 可选配置：
+ *   - show_role bool 是否显示角色下拉（默认 true；Reseller 隐藏，防越权改角色）
+ */
+function renderUserEditModal(array $opts = []): void {
+    $showRole = $opts['show_role'] ?? true;
+    ?>
+    <!-- User Edit Modal (outside tab-panel to avoid display:none) -->
+    <div id="user-edit-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="glass-card p-6 rounded-xl max-w-md w-full mx-4 transform scale-95 opacity-0 transition-all duration-200" id="user-edit-dialog">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-white" id="user-edit-title">Edit User</h3>
+                <button class="text-white/40 hover:text-white transition p-1" id="user-edit-close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="user-edit-form" class="space-y-4">
+                <input type="hidden" id="ue-id">
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Username</label>
+                    <input type="text" id="ue-username" class="app-input w-full px-4 py-2" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Email</label>
+                    <input type="email" id="ue-email" class="app-input w-full px-4 py-2" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Status</label>
+                    <?php renderCustomSelect('ue-status', [
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                        'banned' => 'Banned'
+                    ], 'active', 'w-full'); ?>
+                </div>
+                <?php if ($showRole): ?>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Role</label>
+                    <?php renderCustomSelect('ue-role', [
+                        'user' => 'User',
+                        'reseller' => 'Reseller',
+                        'manager' => 'Manager',
+                        'admin' => 'Admin'
+                    ], 'user', 'w-full'); ?>
+                </div>
+                <?php endif; ?>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">New Password <span class="text-white/40">(leave blank to keep current)</span></label>
+                    <input type="password" id="ue-password" class="app-input w-full px-4 py-2" placeholder="Enter new password...">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-semibold flex-1">
+                        Save Changes
+                    </button>
+                    <button type="button" class="px-6 py-2 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition flex-1" id="user-edit-cancel">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php
+}

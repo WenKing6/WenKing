@@ -11,6 +11,43 @@ require_once __DIR__ . '/../includes/models/User.php';
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 $user   = new User();
 
+/**
+ * 用户管理接口权限守卫（需求3补充：防未授权/越权调用）
+ *
+ * 基于 Session + 数据库角色校验（不信任任何请求参数）：
+ *   - 未登录或账号非 active → 401
+ *   - 角色不在允许列表内      → 403
+ *
+ * @param array $allowedRoles 允许执行该动作的角色列表；空 = 仅要求登录
+ * @return array 当前登录用户记录（id/username/role/status）
+ */
+function require_role(array $allowedRoles = []): array {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $uid = (int)($_SESSION['user_id'] ?? 0);
+    if ($uid <= 0) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+        exit;
+    }
+
+    $u = (new User())->findById($uid);
+    if (!$u || $u['status'] !== 'active') {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+        exit;
+    }
+
+    if (!empty($allowedRoles) && !in_array($u['role'], $allowedRoles, true)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Forbidden']);
+        exit;
+    }
+
+    return $u;
+}
+
 switch ($action) {
     case 'login':
         $username = trim($_POST['username'] ?? '');
@@ -137,11 +174,13 @@ switch ($action) {
         break;
 
     case 'get_users':
+        require_role(['admin', 'manager']);
         $users = $user->getAll();
         echo json_encode(['success' => true, 'data' => $users]);
         break;
 
     case 'update_user':
+        $actor = require_role(['admin', 'manager']);
         $userId   = (int) ($_POST['id'] ?? 0);
         $username = trim($_POST['username'] ?? '');
         $email    = trim($_POST['email'] ?? '');
@@ -164,22 +203,49 @@ switch ($action) {
             break;
         }
 
+        // 经理不能修改管理员/经理账号（防越权）
+        if ($actor['role'] === 'manager') {
+            $target = $user->findById($userId);
+            if (!$target || in_array($target['role'], ['admin', 'manager'], true)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Forbidden']);
+                break;
+            }
+            // 经理编辑普通用户时禁止提升角色
+            if (!empty($role) && $role !== $target['role'] && $role !== 'user' && $role !== 'reseller') {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Forbidden']);
+                break;
+            }
+        }
+
         $success = $user->update($userId, $username, $email, $status, $password, $role);
         echo json_encode(['success' => $success['success'], 'message' => $success['message']]);
         break;
 
     case 'update_user_status':
+        $actor = require_role(['admin', 'manager']);
         $userId = (int) ($_POST['id'] ?? 0);
         $status = trim($_POST['status'] ?? '');
         if ($userId <= 0 || !in_array($status, ['active', 'inactive', 'banned'])) {
             echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
             break;
         }
+        // 经理不能切换管理员/经理账号状态（防越权）
+        if ($actor['role'] === 'manager') {
+            $target = $user->findById($userId);
+            if (!$target || in_array($target['role'], ['admin', 'manager'], true)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Forbidden']);
+                break;
+            }
+        }
         $success = $user->updateStatus($userId, $status);
         echo json_encode(['success' => $success, 'message' => $success ? 'Status updated' : 'Update failed']);
         break;
 
     case 'delete_user':
+        require_role(['admin']);
         $userId = (int) ($_POST['id'] ?? 0);
         if ($userId <= 0) {
             echo json_encode(['success' => false, 'message' => 'Invalid user ID']);

@@ -1526,6 +1526,22 @@ window.showToast = function(message, type) {
             this._refreshCustomSelect('license-user-filter');
         }
 
+        /**
+         * 计算许可证表格列偏移（兼容有无复选框列）
+         * 依据 <tbody id="license-list" data-has-checkbox="0|1">
+         *   - data-has-checkbox="1"（Admin）：License Key=第2列、Status=第6列
+         *   - data-has-checkbox="0"（Manager/Reseller）：License Key=第1列、Status=第5列
+         * @returns {{key: number, status: number}}
+         */
+        _getLicenseColOffsets() {
+            var tbody = document.getElementById('license-list');
+            var hasCheckbox = tbody ? tbody.getAttribute('data-has-checkbox') === '1' : true;
+            return {
+                key: hasCheckbox ? 2 : 1,
+                status: hasCheckbox ? 6 : 5
+            };
+        }
+
         _filterLicenses() {
             var searchInput = document.getElementById('license-search');
             var productFilter = document.getElementById('license-product-filter');
@@ -1545,10 +1561,11 @@ window.showToast = function(message, type) {
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var visibleRows = [];
 
-            // 筛选行（第1列为勾选框，License Key/Product/Status 依次为第2/3/6列）
+            // 筛选行（列偏移由 data-has-checkbox 决定）
+            var colOffsets = this._getLicenseColOffsets();
             allRows.forEach(function(row) {
-                var licenseKey = row.querySelector('td:nth-child(2)');
-                var statusCell = row.querySelector('td:nth-child(6)');
+                var licenseKey = row.querySelector('td:nth-child(' + colOffsets.key + ')');
+                var statusCell = row.querySelector('td:nth-child(' + colOffsets.status + ')');
 
                 var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
                 var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
@@ -1649,10 +1666,11 @@ window.showToast = function(message, type) {
 
             var allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
             var count = 0;
+            var colOffsets = this._getLicenseColOffsets();
 
             allRows.forEach(function(row) {
-                var licenseKey = row.querySelector('td:nth-child(2)');
-                var statusCell = row.querySelector('td:nth-child(6)');
+                var licenseKey = row.querySelector('td:nth-child(' + colOffsets.key + ')');
+                var statusCell = row.querySelector('td:nth-child(' + colOffsets.status + ')');
 
                 var keyText = licenseKey ? licenseKey.textContent.toLowerCase() : '';
                 var statusText = statusCell ? statusCell.textContent.toLowerCase() : '';
@@ -1927,13 +1945,17 @@ window.showToast = function(message, type) {
             document.getElementById('ue-username').value = user.username;
             document.getElementById('ue-email').value = user.email;
             document.getElementById('ue-status').value = user.status;
-            document.getElementById('ue-role').value = user.role || 'user';
-            document.getElementById('ue-role').setAttribute('data-current-role', user.role || 'user');
+            // 弹窗可能隐藏角色下拉（renderUserEditModal show_role=false），需判空
+            var roleEl = document.getElementById('ue-role');
+            if (roleEl) {
+                roleEl.value = user.role || 'user';
+                roleEl.setAttribute('data-current-role', user.role || 'user');
+            }
             document.getElementById('ue-password').value = '';
             document.getElementById('user-edit-title').textContent = 'Edit User: ' + user.username;
 
             this._refreshCustomSelect('ue-status');
-            this._refreshCustomSelect('ue-role');
+            if (roleEl) this._refreshCustomSelect('ue-role');
 
             var overlay = document.getElementById('user-edit-overlay');
             var dialog = document.getElementById('user-edit-dialog');
@@ -1964,11 +1986,12 @@ window.showToast = function(message, type) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var id = document.getElementById('ue-id').value;
-                var newRole = document.getElementById('ue-role').value;
-                var currentRole = document.getElementById('ue-role').getAttribute('data-current-role') || 'user';
+                var roleEl = document.getElementById('ue-role');
+                var newRole = roleEl ? roleEl.value : '';
+                var currentRole = roleEl ? (roleEl.getAttribute('data-current-role') || 'user') : 'user';
 
-                // 如果角色发生变化，需要二次确认
-                if (newRole !== currentRole) {
+                // 如果角色发生变化，需要二次确认（弹窗无角色下拉时跳过）
+                if (roleEl && newRole !== currentRole) {
                     self._showConfirmDialog('Are you sure you want to change the role from ' + currentRole + ' to ' + newRole + '?', function() {
                         self._submitUserUpdate(id);
                     });
@@ -1980,13 +2003,15 @@ window.showToast = function(message, type) {
 
         _submitUserUpdate(id) {
             var self = this;
+            var roleEl = document.getElementById('ue-role');
+            var roleValue = roleEl ? roleEl.value : '';
             var body = new URLSearchParams({
                 action: 'update_user',
                 id: id,
                 username: document.getElementById('ue-username').value,
                 email: document.getElementById('ue-email').value,
                 status: document.getElementById('ue-status').value,
-                role: document.getElementById('ue-role').value,
+                role: roleValue,
                 password: document.getElementById('ue-password').value,
             });
 
@@ -3295,6 +3320,7 @@ window.showToast = function(message, type) {
 
             this.state.setState({ currentPage: page, isLoading: true });
             await this.pageLoader.loadPage(page);
+
             this.sidebar.updateActiveLink(page);
             this.state.setState({ isLoading: false });
 
